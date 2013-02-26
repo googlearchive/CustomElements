@@ -1,6 +1,4 @@
 /node_modules
 
-/webcomponents.min.js
-/webcomponents.min.source-map.js
-
-/min
+/custom-elements.min.js
+/custom-elements.min.source-map.js
