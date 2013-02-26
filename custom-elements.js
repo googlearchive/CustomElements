@@ -6,7 +6,7 @@
 
 (function(scope) {
 
-var thisFile = 'custom-element.js';
+var thisFile = 'custom-elements.js';
 
 // NOTE: use attributes on the script tag for this file as directives
 
@@ -29,17 +29,13 @@ var source, base = '';
     }
   });
   source = source || {
-    getAttribute: nop
+    getAttribute: function() {}
   };
 })();
 
 // flags
 
 var flags = {};
-
-// shadow defaults
-
-flags.shadow = HTMLElement.prototype.webkitCreateShadowRoot ? 'native' : 'shim';
 
 // acquire flags from script tag attributes
 
@@ -88,27 +84,13 @@ console.log(flags);
 // write script tags for dependencies
 
 var modules = [
-  'CustomElements/CustomElements.js',
-  'CustomElements/HTMLElementElement.js',
-  'CustomElements/ComponentDocument.js'
+  'src/CustomElements.js',
+  'src/HTMLElementElement.js',
+  'src/ComponentDocument.js'
 ];
-if (flags.shadow !== 'native') {
-  modules.push(
-    'ShadowDOM/sdom.js',
-    'ShadowDOM/ShadowDOMNohd.js',
-    'ShadowDOM/querySelector.js',
-    'ShadowDOM/ShadowDOM.js'
-  );
-} else {
-  window.SDOM = function(inNode) {
-    return inNode;
-  };
-}
-modules.push('ShadowDOM/inspector.js');
 
-var require = function(inSrc) {
+modules.forEach(function(inSrc) {
   document.write('<script src="' + base + inSrc + '"></script>');
-};
-modules.forEach(require);
+});
 
 })(window.__exported_components_polyfill_scope__);

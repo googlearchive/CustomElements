@@ -175,7 +175,6 @@ function upgradeElement(inElement) {
 
 function upgradeElements(inRoot) {
   var nodes = inRoot.querySelectorAll(registrySlctr);
-  console.log(registrySlctr, nodes);
   forEach(nodes, upgradeElement);
 }
 
