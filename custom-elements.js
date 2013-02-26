@@ -6,7 +6,7 @@
 
 (function(scope) {
 
-scope = scope || {};
+var thisFile = 'custom-element.js';
 
 // NOTE: use attributes on the script tag for this file as directives
 
@@ -15,9 +15,9 @@ scope = scope || {};
 
 // NOTE: uses 'window' and 'document' globals
 
-// directives
+// acquire directives and base path from script element
 
-var source, base = '', thisFile = 'webcomponents.js';
+var source, base = '';
 
 (function() {
   var s$ = document.querySelectorAll('[src]');
@@ -69,6 +69,8 @@ if (flags.log) {
 window.logFlags = logFlags;
 
 // support exportas directive
+
+scope = scope || {};
 
 if (flags.exportas) {
   window[flags.exportas] = scope;

@@ -13,10 +13,10 @@ module.exports = function(grunt) {
 		uglify: {
       CustomElements: {
 			  options: {
-					sourceMap: 'CustomElements/custom-elements-source-map.js'
+					sourceMap: 'custom-elements.min.source-map.js'
 				},
 				files: {
-					'CustomElements/custom-elements.min.js': CustomElements
+					'custom-elements.min.js': CustomElements
 				}
       }
 		}
