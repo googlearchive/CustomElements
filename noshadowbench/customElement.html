@@ -1,0 +1,69 @@
+<!--
+Copyright 2012 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+    <script src="../CustomElements/CustomElements.js"></script>
+  </head>
+  <body>
+    <script>
+      window.onload = function() {
+        XFoo = document.register('x-foo');
+        xfoo = new XFoo();
+        document.body.appendChild(xfoo).textContent = '[x-foo]';
+        //
+        //
+        XBarPrototype = Object.create(HTMLButtonElement.prototype);
+        XBar = document.register('x-bar', {
+          prototype: XBarPrototype,
+          extends: 'button'
+        });
+        xbar = new XBar();
+        document.body.appendChild(xbar).textContent = 'x-bar';
+        //
+        XNafPrototype = Object.create(XBarPrototype);
+        XNaf = document.register('x-naf', {
+          prototype: XNafPrototype,
+          extends: 'x-bar'
+        });
+        xnaf = new XNaf();
+        document.body.appendChild(xnaf).textContent = 'x-naf';
+        //
+        //
+        XZotPrototype = Object.create(HTMLElement.prototype);
+        XZotPrototype.bluate = function() {
+          this.style.color = 'lightblue';
+        };
+        XZot = document.register('x-zot', {
+          prototype: XZotPrototype,
+          lifecycle: {
+            created: function() {
+              this.style.fontStyle = 'italic';
+            }
+          }
+        });
+        //
+        XBazPrototype = Object.create(XZotPrototype);
+        XBazPrototype.splat = function() {
+          this.textContent = Math.random();
+        };
+        XBaz = document.register('x-baz', {
+          prototype: XBazPrototype,
+          lifecycle: {
+            created: function() {
+              this.style.fontSize = '32pt';
+            }
+          },
+          extends: 'x-zot'
+        });
+        xbaz = new XBaz();
+        document.body.appendChild(xbaz).textContent = 'x-baz';
+      };
+    </script>
+  </body>
+</html>

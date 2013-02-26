@@ -1,0 +1,30 @@
+<!--
+Copyright 2012 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="UTF-8">
+    <script src="../CustomElements/CustomElements.js"></script>
+    <script src="../CustomElements/HTMLElementElement.js"></script>
+    <script src="../CustomElements/ComponentDocument.js"></script>
+    <link rel="components" href="test-component.html">
+  </head>
+  <body>
+    <script>
+      componentDocument.parse(document, function() {
+        first = document.createElement('x-first');
+        document.body.appendChild(first);
+        //
+        moar = document.createElement('x-moar');
+        document.body.appendChild(moar).textContent = 'x-moar';
+        //
+        last = document.createElement('x-last');
+        document.body.appendChild(last).textContent = '[x-last]';
+      });
+    </script>
+  </body>
+</html>

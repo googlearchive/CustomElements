@@ -1,0 +1,21 @@
+<!--
+Copyright 2012 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<link rel="components" href="components/before-components.html">
+<element name="x-first">
+  <template>
+      [x-first from template]
+  </template>
+  <script>
+    var template = this.querySelector('template');
+    this.lifecycle({
+      created: function() {
+        this.appendChild(template.content);
+        this.style.color = 'orange';
+      }
+    });
+  </script>
+</element>
+<link rel="components" href="components/moar-components.html">

@@ -1,0 +1,56 @@
+<!--
+Copyright 2013 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <script src="../webcomponents.js"></script>
+  </head>
+  <body>
+    <element name="x-foo">
+      <template>
+        It LIVES <content></content>
+        <div thing="{{value}}">Value Thing</div>
+      </template>
+      <script>
+        this.component && this.component({
+          created: function() {
+            this.textContent = 'cordon bleu';
+            this.blueate();
+          },
+          blueate: function() {
+            this.style.backgroundColor = 'lightblue';
+          }
+        });
+      </script>
+    </element>
+    <script>
+      HTMLElementElement.prototype.component = function(inPrototype) {
+        var element = this;
+        this.register({
+          prototype: inPrototype,
+          lifecycle: {
+            created: function() {
+              var template = element.querySelector('template');
+              if (template) {
+                var root = this.webkitCreateShadowRoot();
+                root.appendChild(template.content.cloneNode(true));
+              }
+              inPrototype.created.call(this);
+            }
+          }
+        });
+        console.log("initialized component " + this.options.name);
+      };
+    </script>
+    <script>
+      componentDocument.parse(document, function() {
+        SDOM(document.body).appendChild(document.createElement('x-foo'));
+        console.log("done");
+      });
+    </script>
+  </body>
+</html>
