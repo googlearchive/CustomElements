@@ -168,14 +168,16 @@ function upgradeElement(inElement) {
   }
   // TODO(sjmiles): polyfill pollution
   var element = inElement.node || inElement;
-  var definition = 
+  var definition =
       registry[element.getAttribute('is') || element.localName];
   return upgrade(element, definition);
 }
 
 function upgradeElements(inRoot) {
-  var nodes = inRoot.querySelectorAll(registrySlctr);
-  forEach(nodes, upgradeElement);
+  if (registrySlctr) {
+    var nodes = inRoot.querySelectorAll(registrySlctr);
+    forEach(nodes, upgradeElement);
+  }
 }
 
 // utilities
@@ -235,7 +237,7 @@ document.upgradeElements = upgradeElements;
 // TODO(sjmiles): temporary: control scope better
 window.mixin = mixin;
 
-// bootstrap 
+// bootstrap
 
 window.addEventListener('load', function() {
   componentDocument.parse(document, function() {
