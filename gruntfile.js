@@ -4,22 +4,24 @@
  * license that can be found in the LICENSE file.
  */
 module.exports = function(grunt) {
-	CustomElements = [
-		'src/CustomElements.js',
-		'src/HTMLElementElement.js',
-		'src/ComponentDocument.js'
-	];
+  CustomElements = [
+    'src/CustomElements.js',
+    'src/HTMLElementElement.js',
+    'src/ComponentDocument.js'
+  ];
   grunt.initConfig({
-		uglify: {
+    uglify: {
       CustomElements: {
-			  options: {
-					sourceMap: 'custom-elements.min.source-map.js'
-				},
-				files: {
-					'custom-elements.min.js': CustomElements
-				}
+        /*
+        options: {
+          sourceMap: 'custom-elements.min.source-map.js'
+        },
+        */
+        files: {
+          'custom-elements.min.js': CustomElements
+        }
       }
-		}
+    }
   });
 
   // plugins
