@@ -4,8 +4,47 @@
  * license that can be found in the LICENSE file.
  */
 
+/**
+Implements document.register
+
+@module CustomElements
+*/
+
+/**
+Polyfilled extensions for the `document` object.
+
+@class document
+*/
+
 (function() {
 
+/**
+ * Registers a custom tag name with the document.
+ * 
+ * @method register
+ * @param {String} inName The tag name to register. Must include a dash ('-'), 
+ *    for example 'x-component'.
+ * @param {Object} inOptions
+ *    @param {String} [inOptions.extends]
+ *      (_off spec_) Tag name of an element to extend (or blank for a new 
+ *      element). This paramter is not part of the specification, but instead 
+ *      is a hint for the polyfill because the extendee is difficult to infer.
+ *      Remember that the input prototype must chain to the extended element's 
+ *      prototype (or HTMLElement.prototype) regardless of the value of 
+ *      `extends`.
+ *    @param {Object} inOptions.prototype The prototype to use for the new 
+ *      element. The prototype must inherit from HTMLElement.
+ *    @param {Object} [inOptions.lifecycle]
+ *      Callbacks that fire at important phases in the life of the custom 
+ *      element.
+ *       
+ * @example
+ *      FancyButton = document.register("fancy-button", {
+ *        extends: 'button',
+ *        prototype: Object.create(HTMLButtonElement.prototype)
+ *      });
+ * @return {Function) Constructor for the registered type.
+ */
 function register(inName, inOptions) {
   //console.warn('document.register("' + inName + '", ', inOptions, ')');
   // construct a defintion out of options
