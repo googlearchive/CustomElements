@@ -1,0 +1,13 @@
+{
+  "name": "CustomElements",
+  "description": "Polyfill for W3C CustomElements Specification",
+  "version": "0.0.1",
+  "url": "https://github.com/toolkitchen/CustomElements",
+  "options": {
+    "paths": "src",
+    "outdir": "docs",
+    "linkNatives": "true",
+    "tabtospace": 2,
+    "themedir": "../docs/doc_themes/simple"
+  }
+}

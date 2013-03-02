@@ -13,7 +13,7 @@ Implements document.register
 /**
 Polyfilled extensions for the `document` object.
 
-@class document
+@class Document
 */
 
 (function() {
@@ -43,7 +43,7 @@ Polyfilled extensions for the `document` object.
  *        extends: 'button',
  *        prototype: Object.create(HTMLButtonElement.prototype)
  *      });
- * @return {Function) Constructor for the registered type.
+ * @return {Function} Constructor for the newly registered type.
  */
 function register(inName, inOptions) {
   //console.warn('document.register("' + inName + '", ', inOptions, ')');
@@ -129,8 +129,6 @@ function upgrade(inElement, inDefinition) {
   // OUTPUT
   return implementor;
 };
-
-var domCreateElement = document.createElement.bind(document);
 
 function implement(inElement, inPrototype) {
   if (Object.__proto__) {
@@ -275,6 +273,9 @@ function getPropertyDescriptor(inObject, inName) {
   }
 }
 
+// capture native createElement before we override it
+var domCreateElement = document.createElement.bind(document);
+
 // exports
 
 document.register = register;
@@ -282,7 +283,7 @@ document.createElement = createElement;
 document.upgradeElement = upgradeElement;
 document.upgradeElements = upgradeElements;
 
-// TODO(sjmiles): temporary: control scope better
+// TODO(sjmiles): temporary, control scope better
 window.mixin = mixin;
 
 // bootstrap
