@@ -107,12 +107,21 @@ function instantiate(inDefinition) {
 }
 
 function upgrade(inElement, inDefinition) {
+  var element = inElement;
+  // TODO(sjmiles): polyfill pollution
+  // under ShadowDOM polyfill `inElement` may be a node wrapper,
+  // we need the underlying node
+  if (element.node && element.node.__$wrapper$__) {
+    element = element.node;
+    element.__$wrapper$__ = null;
+  }
+  // some definitions specify as 'is' attribute
   if (inDefinition.is) {
     inElement.setAttribute('is', inDefinition.is);
   }
-  // under ShadowDOM polyfill `implementor` may be a node wrapper
   // TODO(sjmiles): polyfill pollution
-  var implementor = implement(inElement, inDefinition.prototype);
+  // under ShadowDOM polyfill `implementor` may be a node wrapper
+  var implementor = implement(element, inDefinition.prototype);
   // invoke lifecycle.created callbacks
   created(implementor, inDefinition);
   // flag as upgraded
@@ -127,7 +136,7 @@ function implement(inElement, inPrototype) {
   if (Object.__proto__) {
     inElement.__proto__ = inPrototype;
   } else {
-    // where above we can reacquire inPrototype via
+    // where above we can re-acquire inPrototype via
     // getPrototypeOf(Element), we cannot do so when
     // we use mixin, so we install a magic reference
     inElement.__proto__ = inPrototype;
