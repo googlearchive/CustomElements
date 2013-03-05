@@ -1,23 +1,41 @@
 /*
- * Copyright 2012 The Toolkitchen Authors. All rights reserved.
+ * Copyright 2013 The Toolkitchen Authors. All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
 
-// TODO(sjmiles): implement HTMLElementElement via document.register
+HTMLElementElement = document.register('element', {
+  prototype: Object.create(HTMLElement.prototype, {
+    readyCallback: {
+      value: function() {
+        parseElementElement.call(this);
+      },
+      enumerable: true
+    },
+    register: {
+      value: function(inMore) {
+        if (inMore) {
+          this.options.lifecycle = inMore.lifecycle;
+          if (inMore.prototype) {
+            mixin(this.options.prototype, inMore.prototype);
+          }
+        }
+      },
+      enumerable: true
+    }
+  })
+});
 
-HTMLElementElement = function(inElement) {
-  // poor man's custom element: install API
-  mixin(inElement, HTMLElementElement.prototype);
+function parseElementElement() {
   // options to glean from inElement attributes
   var options = {
     name: '',
     extends: null
   };
   // glean them
-  takeAttributes(inElement, options);
+  takeAttributes(this, options);
   // default base
-  var base = HTMLUnknownElement.prototype;
+  var base = HTMLElement.prototype;
   // optional specified base
   if (options.extends) {
     // build an instance of options.extends
@@ -31,52 +49,16 @@ HTMLElementElement = function(inElement) {
   // extend base
   options.prototype = Object.create(base);
   // install options
-  inElement.options = options;
+  this.options = options;
   // locate user script
-  var script = inElement.querySelector('script');
+  var script = this.querySelector('script,scripts');
   if (script) {
     // execute user script in 'inElement' context
-    executeComponentScript(script.textContent, inElement, options.name);
+    executeComponentScript(script.textContent, this, options.name);
   };
   // register our new element
   document.register(options.name, options);
-  return inElement;
-};
-
-HTMLElementElement.prototype = {
-  register: function(inMore) {
-    if (inMore) {
-      this.options.lifecycle = inMore.lifecycle;
-      if (inMore.prototype) {
-        mixin(this.options.prototype, inMore.prototype);
-      }
-    }
-  }
-};
-
-// invoke inScript in inContext scope
-function executeComponentScript(inScript, inContext, inName) {
-  // set (highlander) context
-  context = inContext;
-  // compose script
-  var code = "__componentScript('"
-    + inName
-    + "', function(){"
-    + inScript
-    + "});"
-    + "\n//@ sourceURL=" + inContext.ownerDocument._URL + "\n"
-  ;
-  eval(code);
 }
-
-var context;
-
-// global necessary for script injection
-window.__componentScript = function(inName, inFunc) {
-  inFunc.call(context);
-};
-
-// utilities
 
 // each property in inDictionary takes a value
 // from the matching attribute in inElement, if any
@@ -88,3 +70,38 @@ function takeAttributes(inElement, inDictionary) {
     }
   }
 }
+
+// invoke inScript in inContext scope
+function executeComponentScript(inScript, inContext, inName) {
+  // set (highlander) context
+  context = inContext;
+  // source location
+  var owner = context.ownerDocument;
+  // compose script
+  var code = "__componentScript('"
+    + inName
+    + "', function(){"
+    + inScript
+    + "});"
+    + "\n//@ sourceURL=" + (owner._URL || owner.URL) + "\n"
+  ;
+  // inject script
+  eval(code);
+}
+
+var context;
+
+// global necessary for script injection
+window.__componentScript = function(inName, inFunc) {
+  inFunc.call(context);
+};
+
+// bootstrap
+
+// TODO(sjmiles): CustomElements.js does this too. The first one
+// catches <element> tags, the second one catches elements registered
+// via <element> tags. Interestingly, it doesn't matter which load
+// event runs first.
+window.addEventListener('load', function() {
+  document.upgradeElements(document.body);
+});

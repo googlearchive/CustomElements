@@ -5,20 +5,24 @@
  */
 
 /**
-Implements `document.register`
-@module CustomElements
+ * Implements `document.register`
+ * @module CustomElements
 */
 
 /**
-Polyfilled extensions for the `document` object.
-
-@class Document
+ * Polyfilled extensions to the `document` object.
+ * @class Document
 */
 
 (function() {
 
 /**
  * Registers a custom tag name with the document.
+ * 
+ * When a registered element is created, a `readyCallback` method is called
+ * in the scope of the element. The `readyCallback` method can be specified on 
+ * either `inOptions.prototype` or `inOptions.lifecycle` with the latter taking
+ * precedence.
  * 
  * @method register
  * @param {String} inName The tag name to register. Must include a dash ('-'), 
@@ -40,7 +44,13 @@ Polyfilled extensions for the `document` object.
  * @example
  *      FancyButton = document.register("fancy-button", {
  *        extends: 'button',
- *        prototype: Object.create(HTMLButtonElement.prototype)
+ *        prototype: Object.create(HTMLButtonElement.prototype, {
+ *          readyCallback: {
+ *            value: function() {
+ *              console.log("a fancy-button was created",
+ *            }
+ *          }
+ *        })
  *      });
  * @return {Function} Constructor for the newly registered type.
  */
@@ -124,10 +134,10 @@ function upgrade(inElement, inDefinition) {
   // TODO(sjmiles): polyfill pollution
   // under ShadowDOM polyfill `implementor` may be a node wrapper
   var implementor = implement(element, inDefinition.prototype);
-  // invoke lifecycle.created callbacks
-  created(implementor, inDefinition);
   // flag as upgraded
   implementor.__upgraded__ = true;
+  // invoke lifecycle.created callbacks
+  created(implementor, inDefinition);
   // OUTPUT
   return implementor;
 };
@@ -200,6 +210,17 @@ function createElement(inTag) {
   return domCreateElement(inTag);
 }
 
+/**
+ * Upgrade an element to a custom element. Upgrading an element
+ * causes the custom prototype to be applied, an `is` attribute to be attached
+ * (as needed), and invocation of the `readyCallback`.
+ * `upgradeElement` does nothing is the element is already upgraded, or
+ * if it matches no registered custom tag name. 
+ * 
+ * @method ugpradeElement
+ * @param {Element} inElement The element to upgrade.
+ * @return {Element} The upgraded element.
+ */
 function upgradeElement(inElement) {
   if (inElement.__upgraded__) {
     return;
@@ -208,17 +229,32 @@ function upgradeElement(inElement) {
   var element = inElement.node || inElement;
   var definition =
       registry[element.getAttribute('is') || element.localName];
-  return upgrade(element, definition);
+  return definition && upgrade(element, definition);
 }
 
-function upgradeElements(inRoot) {
-  if (registrySlctr) {
-    var nodes = inRoot.querySelectorAll(registrySlctr);
-    forEach(nodes, upgradeElement);
+/**
+ * Upgrade all elements under `inRoot` that match selector `inSlctr`.
+ * causes the custom prototype to be applied, an `is` attribute to be attached
+ * (as needed), and invocation of the `readyCallback`.
+ * `upgradeElement` does nothing is the element is already upgraded, or
+ * if it matches no registered custom tag name. 
+ * 
+ * @method ugpradeElements
+ * @param {Node} inRoot The root of the DOM subtree in which elements are to 
+ *  be upgraded.
+ * @param {String} [inSlctr] An optional selector for matching specific 
+ * elements, otherwise all register element types are upgraded.
+ */
+function upgradeElements(inRoot, inSlctr) {
+  var slctr = inSlctr || registrySlctr;
+  if (slctr) {
+    forEach((inRoot || document).querySelectorAll(slctr), upgradeElement);
   }
 }
 
 // utilities
+
+var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
 // copy all properties from inProps (et al) to inObj
 function mixin(inObj/*, inProps, inMoreProps, ...*/) {
@@ -273,6 +309,7 @@ var domCreateElement = document.createElement.bind(document);
 document.register = register;
 document.upgradeElement = upgradeElement;
 document.upgradeElements = upgradeElements;
+
 document.createElement = createElement; // override
 
 // TODO(sjmiles): temporary, control scope better
@@ -281,9 +318,9 @@ window.mixin = mixin;
 // bootstrap
 
 window.addEventListener('load', function() {
-  componentDocument.parse(document, function() {
+  //componentDocument.parse(document, function() {
      document.upgradeElements(document.body);
-   });
+  //});
 });
 
 })();
