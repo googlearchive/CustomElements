@@ -315,12 +315,4 @@ document.createElement = createElement; // override
 // TODO(sjmiles): temporary, control scope better
 window.mixin = mixin;
 
-// bootstrap
-
-window.addEventListener('load', function() {
-  //componentDocument.parse(document, function() {
-     document.upgradeElements(document.body);
-  //});
-});
-
 })();

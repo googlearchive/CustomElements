@@ -83,14 +83,20 @@ console.log(flags);
 
 // write script tags for dependencies
 
-var modules = [
+[
   'src/CustomElements.js',
-  'src/HTMLElementElement.js',
-  'src/ComponentDocument.js'
-];
-
-modules.forEach(function(inSrc) {
+  'src/HTMLElementElement.js'
+].forEach(function(inSrc) {
   document.write('<script src="' + base + inSrc + '"></script>');
+});
+
+// bootstrap
+
+window.addEventListener('load', function() {
+  // upgrade the element-elements
+  document.upgradeElements(document.body, 'element');
+  // upgrade everything
+  document.upgradeElements();
 });
 
 })(window.__exported_components_polyfill_scope__);

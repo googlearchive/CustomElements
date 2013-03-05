@@ -95,13 +95,3 @@ var context;
 window.__componentScript = function(inName, inFunc) {
   inFunc.call(context);
 };
-
-// bootstrap
-
-// TODO(sjmiles): CustomElements.js does this too. The first one
-// catches <element> tags, the second one catches elements registered
-// via <element> tags. Interestingly, it doesn't matter which load
-// event runs first.
-window.addEventListener('load', function() {
-  document.upgradeElements(document.body);
-});
