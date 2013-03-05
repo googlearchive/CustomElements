@@ -8,10 +8,10 @@ license that can be found in the LICENSE file.
   <head>
     <title>CustomElements Workbench</title>
     <meta charset="UTF-8">
-    <script src="../src/CustomElements.js"></script>
+    <script src="../custom-elements.js"></script>
   </head>
   <body>
-    <x-foo>XFoo</x-foo>
+    <x-foo id="xfoo">XFoo</x-foo>
     <script>
       XFoo = document.register('x-foo', {
         prototype: Object.create(HTMLElement.prototype, {
@@ -29,6 +29,9 @@ license that can be found in the LICENSE file.
           }
         })
       });
+      window.addEventListener('load', function() {
+        xfoo.foo();
+      })
     </script>
   </body>
 </html>

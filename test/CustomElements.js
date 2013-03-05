@@ -84,7 +84,7 @@ suite('customElements', function() {
     var XZot = document.register('x-zot', {
       prototype: XZotPrototype,
       lifecycle: {
-        created: function() {
+        readyCallback: function() {
           this.style.fontStyle = 'italic';
         }
       }
@@ -102,7 +102,7 @@ suite('customElements', function() {
       prototype: XBazPrototype,
       extends: 'x-zot',
       lifecycle: {
-        created: function() {
+        readyCallback: function() {
           this.style.fontSize = '32pt';
         }
       }
