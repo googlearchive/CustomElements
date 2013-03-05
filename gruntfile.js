@@ -21,13 +21,33 @@ module.exports = function(grunt) {
           'custom-elements.min.js': CustomElements
         }
       }
-    }
+    },
+    yuidoc: {
+      compile: {
+        name: '<%= pkg.name %>',
+        description: '<%= pkg.description %>',
+        version: '<%= pkg.version %>',
+        url: '<%= pkg.homepage %>',
+        options: {
+          exclude: 'third_party',
+          paths: '.',
+          outdir: 'docs',
+          linkNatives: 'true',
+          tabtospace: 2,
+          themedir: '../docs/doc_themes/simple'
+        }
+      }
+    },
+    pkg: grunt.file.readJSON('package.json')
   });
 
   // plugins
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-yuidoc');
 
   // tasks
   grunt.registerTask('default', ['uglify']);
+  grunt.registerTask('minify', ['uglify']);
+  grunt.registerTask('docs', ['yuidoc']);
 };
 
