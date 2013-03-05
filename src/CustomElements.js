@@ -5,8 +5,7 @@
  */
 
 /**
-Implements document.register
-
+Implements `document.register`
 @module CustomElements
 */
 
@@ -52,6 +51,8 @@ function register(inName, inOptions) {
   var definition = inOptions || {};
   // record name
   definition.name = inName;
+  // ensure a lifecycle object so we don't have to null test it
+  definition.lifecycle = definition.lifecycle || {};
   // must have a prototype, default to an extension of HTMLElement
   // TODO(sjmiles): probably should throw if no prototype, check spec
   definition.prototype = definition.prototype
@@ -66,6 +67,7 @@ function register(inName, inOptions) {
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
   // 7.1.8. Return the output of the previous step.
   definition.ctor = generateConstructor(definition);
+  definition.ctor.prototype = definition.prototype;
   return definition.ctor;
 }
 
@@ -147,11 +149,10 @@ function implement(inElement, inPrototype) {
 
 // TODO(sjmiles): polyfill pollution
 function _publishToWrapper(inElement, inPrototype) {
-  var element = inElement;
+  var element = (window.wrap && wrap(inElement)) || inElement;
   if (window.Nohd) {
     // attempt to publish our public interface directly
     // to our ShadowDOM polyfill wrapper object (excluding overrides)
-    element = SDOM(inElement);
     var p = inPrototype;
     while (p && p !== HTMLElement.prototype) {
       Object.keys(p).forEach(function(k) {
@@ -163,35 +164,26 @@ function _publishToWrapper(inElement, inPrototype) {
     }
   }
   return element;
-};
+}
 
 function created(inElement, inDefinition) {
-  for (var i=0, a; (a=inDefinition.ancestry[i]); i++) {
-    _created(inElement, a.lifecycle);
-  }
-  _created(inElement, inDefinition.lifecycle);
-}
-
-function _created(inElement, inLifecycle) {
-  var created = inLifecycle && inLifecycle.created;
-  if (created) {
-    created.call(inElement);
+  var readyCallback = inDefinition.lifecycle.readyCallback || 
+      inElement.readyCallback;
+  if (readyCallback) {
+    readyCallback.call(inElement);
   }
 }
-
-// FOO_CONSTRUCTOR = document.register(‘x-foo’, {
-//   prototype: ELEMENT_PROTOTYPE,
-//   lifecycle: {
-//      created: CALLBACK
-//   }
-// });
 
 var registry = {};
 var registrySlctr = '';
 
 function registerDefinition(inName, inDefinition) {
   registry[inName] = inDefinition;
-  registrySlctr += (registrySlctr ? ',' : '') + inName;
+  registrySlctr += (registrySlctr ? ',' : '');
+  if (inDefinition.extends) {
+    registrySlctr += inDefinition.extends + '[is=' + inDefinition.is + '],';
+  }
+  registrySlctr += inName;
 }
 
 function generateConstructor(inDefinition) {
@@ -279,9 +271,9 @@ var domCreateElement = document.createElement.bind(document);
 // exports
 
 document.register = register;
-document.createElement = createElement;
 document.upgradeElement = upgradeElement;
 document.upgradeElements = upgradeElements;
+document.createElement = createElement; // override
 
 // TODO(sjmiles): temporary, control scope better
 window.mixin = mixin;
