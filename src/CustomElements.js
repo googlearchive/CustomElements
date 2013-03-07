@@ -91,7 +91,7 @@ function ancestry(inExtends) {
 
 function resolveTagName(inDefinition) {
   // if we are explicitly extending something, that thing is our
-  // baseTag, unless it represents a custom compoenent
+  // baseTag, unless it represents a custom component
   var baseTag = inDefinition.extends;
   // if our ancestry includes custom components, we only have a
   // baseTag if one of them does
@@ -191,7 +191,7 @@ function registerDefinition(inName, inDefinition) {
   registry[inName] = inDefinition;
   registrySlctr += (registrySlctr ? ',' : '');
   if (inDefinition.extends) {
-    registrySlctr += inDefinition.extends + '[is=' + inDefinition.is + '],';
+    registrySlctr += inDefinition.tag + '[is=' + inDefinition.is + '],';
   }
   registrySlctr += inName;
 }
@@ -309,7 +309,6 @@ var domCreateElement = document.createElement.bind(document);
 document.register = register;
 document.upgradeElement = upgradeElement;
 document.upgradeElements = upgradeElements;
-
 document.createElement = createElement; // override
 
 // TODO(sjmiles): temporary, control scope better
