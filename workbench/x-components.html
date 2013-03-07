@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<!--
+Copyright 2013 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<html>
+  <head>
+    <title>CustomElements Workbench</title>
+    <meta charset="UTF-8">
+    <script src="../custom-elements.js"></script>
+    <style>
+      body {
+        margin: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <style>
+      [is=x-icon], x-icon {
+        display: inline-block;
+        width: 24px;
+        height: 24px;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+      
+      [is=x-icon-button] {
+        padding: 7px;
+        border: 1px solid transparent;
+        background: transparent;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      
+      [is=x-icon-button]:hover, [is=x-icon-button]:active, [is=x-icon-button].selected {
+        border: 1px solid rgba(0,0,0,0.16);
+        border-radius: 3px;
+        opacity: 0.8;
+      }
+      
+      [is=x-icon-button]:active, [is=x-icon-button].selected {
+        box-shadow: inset 0 0 10px rgba(0,0,0,0.16);
+      }
+      
+      [is=x-icon-button]:disabled {
+        opacity: 0.4;
+      }
+      
+      [is=x-menu-item] {
+        display: block;
+        padding: 12px 14px;
+        margin: 10px;
+        border: 1px solid transparent;
+        border-radius: 3px;
+        background: transparent;
+        cursor: pointer;
+        -webkit-user-select: none;
+      }
+      
+      [is=x-menu-item].selected {
+        border: 1px solid rgba(0, 0, 0, 0.16);
+        background: whitesmoke;
+      }
+      
+      [is=x-menu-item] > * {
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 10px;
+      }
+      
+      [is=x-menu], x-menu {
+        display: inline-block;
+        border: 1px solid #cfcfcf;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+        background: white;
+      }
+    </style>
+    
+    <h3>x-icon</h3>    
+    <x-icon src="images/star.svg"></x-icon>
+
+    <h3>x-icon-button (extends button and has x-icon)</h3>
+    <button is="x-icon-button" src="images/star.svg"></button>
+    <button is="x-icon-button" src="images/star.svg" active="true"></button>
+    <button is="x-icon-button" src="images/star.svg" active="true" disabled="true"></button>
+    
+    <h3>x-menu-item (extends x-icon-button)</h3>
+    <button is="x-menu-item" src="images/email.svg" label="Email Link" active="true"></button>
+    
+    <h3>x-selector</h3>
+    <x-selector>
+      <button is="x-icon-button" src="images/email.svg" active="true"></button>
+      <button is="x-icon-button" src="images/chat.svg"></button>
+      <button is="x-icon-button" src="images/favorite.svg"></button>
+    </x-selector>
+    
+    <h3>x-menu (extends x-selector)</h3>
+    <x-menu>
+      <button is="x-menu-item" src="images/email.svg" label="Email Link" active="true"></button>
+      <button is="x-menu-item" src="images/chat.svg" label="Share Link"></button>
+      <button is="x-menu-item" src="images/favorite.svg" label="Favorites"></button>
+    </x-menu>
+    
+    <script>
+      XIcon = document.register('x-icon', {
+        prototype: Object.create(HTMLElement.prototype, {
+          readyCallback: {
+            value: function() {
+              this.src = this.getAttribute('src');
+            },
+            enumerable: true
+          },
+          src: {
+            set: function(inValue) {
+              this.style.backgroundImage = 'url(' + inValue + ')';
+            },
+            enumerable: true
+          }
+        })
+      });
+      
+      XIconButton = document.register('x-icon-button', {
+        extends: 'button',
+        prototype: Object.create(HTMLButtonElement.prototype, {
+          readyCallback: {
+            value: function() {
+              this.src = this.getAttribute('src');
+              this.active = this.getAttribute('active') == 'true';
+            },
+            enumerable: true
+          },
+          src: {
+            set: function(inValue) {
+              if (!this.icon) {
+                this.icon = document.createElement('x-icon');
+                this.insertBefore(this.icon, this.firstChild);
+              }
+              this.icon.src = inValue;
+            },
+            enumerable: true
+          },
+          active: {
+            set: function(inValue) {
+              this.classList.toggle('selected', inValue);
+            },
+            enumerable: true
+          }
+        })
+      });
+      
+      XMenuItem = document.register('x-menu-item', {
+        extends: 'x-icon-button',
+        prototype: Object.create(XIconButton.prototype, {
+          readyCallback: {
+            value: function() {
+              XIconButton.prototype.readyCallback.call(this);
+              this.label = this.getAttribute('label');
+            },
+            enumerable: true
+          },
+          label: {
+            set: function(inValue) {
+              if (!this.labelElement) {
+                this.labelElement = document.createElement('label');
+                this.appendChild(this.labelElement)
+              }
+              this.labelElement.textContent = inValue;
+            },
+            enumerable: true
+          }
+        })
+      });
+      
+      function findTarget(inTarget, inNodes) {
+        var n = inTarget;
+        while (n && n != this) {
+          var i = Array.prototype.indexOf.call(inNodes, n);
+          if (i >= 0) {
+            return inNodes[i];
+          }
+          n = n.parentNode;
+        }
+      }
+      
+      XSelector = document.register('x-selector', {
+        prototype: Object.create(HTMLElement.prototype, {
+          readyCallback: {
+            value: function() {
+              this.selected = this.querySelector('[active=true]');
+              this.addEventListener('mouseup', function(e) {
+                if (this.selected) {
+                  this.selected.active = false;
+                }
+                this.selected = findTarget(e.target, this.children);
+                if (this.selected) {
+                  this.selected.active = true;
+                }
+              }.bind(this));
+            },
+            enumerable: true
+          }
+        })
+      });
+      
+      XMenu = document.register('x-menu', {
+        prototype: Object.create(XSelector.prototype)
+      });
+    </script>
+  </body>
+</html>
