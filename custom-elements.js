@@ -85,7 +85,9 @@ console.log(flags);
 
 [
   'src/CustomElements.js',
-  'src/HTMLElementElement.js'
+  'src/HTMLElementElement.js',
+  'src/Parser.js',
+  'src/live.js'
 ].forEach(function(inSrc) {
   document.write('<script src="' + base + inSrc + '"></script>');
 });
@@ -93,8 +95,8 @@ console.log(flags);
 // bootstrap
 
 window.addEventListener('load', function() {
-  // upgrade the element-elements
-  document.upgradeElements(document.body, 'element');
+  // parse document
+  document.parseComponents();
   // upgrade everything
   document.upgradeElements();
 });
