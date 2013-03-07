@@ -4,36 +4,33 @@
  * license that can be found in the LICENSE file.
  */
 
-HTMLElementElement = document.register('element', {
-  prototype: Object.create(HTMLElement.prototype, {
-    readyCallback: {
-      value: function() {
-        parseElementElement.call(this);
-      },
-      enumerable: true
-    },
-    register: {
-      value: function(inMore) {
-        if (inMore) {
-          this.options.lifecycle = inMore.lifecycle;
-          if (inMore.prototype) {
-            mixin(this.options.prototype, inMore.prototype);
-          }
-        }
-      },
-      enumerable: true
-    }
-  })
-});
+(function(){
+  
+var HTMLElementElement = function(inElement) {
+  inElement.register = HTMLElementElement.prototype.register;
+  parseElementElement(inElement);
+  return inElement;
+};
 
-function parseElementElement() {
+HTMLElementElement.prototype = {
+  register: function(inMore) {
+    if (inMore) {
+      this.options.lifecycle = inMore.lifecycle;
+      if (inMore.prototype) {
+        mixin(this.options.prototype, inMore.prototype);
+      }
+    }
+  }
+};
+
+function parseElementElement(inElement) {
   // options to glean from inElement attributes
   var options = {
     name: '',
     extends: null
   };
   // glean them
-  takeAttributes(this, options);
+  takeAttributes(inElement, options);
   // default base
   var base = HTMLElement.prototype;
   // optional specified base
@@ -49,17 +46,17 @@ function parseElementElement() {
   // extend base
   options.prototype = Object.create(base);
   // install options
-  this.options = options;
+  inElement.options = options;
   // locate user script
-  var script = this.querySelector('script,scripts');
+  var script = inElement.querySelector('script,scripts');
   if (script) {
     // execute user script in 'inElement' context
-    executeComponentScript(script.textContent, this, options.name);
+    executeComponentScript(script.textContent, inElement, options.name);
   };
   // register our new element
   document.register(options.name, options);
 }
-
+  
 // each property in inDictionary takes a value
 // from the matching attribute in inElement, if any
 function takeAttributes(inElement, inDictionary) {
@@ -95,3 +92,9 @@ var context;
 window.__componentScript = function(inName, inFunc) {
   inFunc.call(context);
 };
+
+// exports
+
+window.HTMLElementElement = HTMLElementElement;
+
+})();
