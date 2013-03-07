@@ -108,11 +108,35 @@ suite('customElements', function() {
       }
     });
     var xbaz = new XBaz();
-    assert.equal(xbaz.style.fontStyle, 'italic');
+    assert.equal(xbaz.style.fontStyle, '');
     assert.equal(xbaz.style.fontSize, '32pt');
     xbaz.bluate();
     assert.equal(xbaz.color, 'lightblue');
     xbaz.splat();
     assert.equal(xbaz.textContent, 'splat');
+    //    
+    // readyCallback in prototype
+    var XBooPrototype = Object.create(HTMLElement.prototype);
+    XBooPrototype.readyCallback = function() {
+      this.style.fontStyle = 'italic';
+    }
+    var XBoo = document.register('x-boo', {
+      prototype: XBooPrototype
+    });
+    var xboo = new XBoo();
+    assert.equal(xboo.style.fontStyle, 'italic');
+    //
+    var XBooBooPrototype = Object.create(XBooPrototype);
+    XBooBooPrototype.readyCallback = function() {
+      XBoo.prototype.readyCallback.call(this);
+      this.style.fontSize = '32pt';
+    };
+    var XBooBoo = document.register('x-booboo', {
+      prototype: XBooBooPrototype,
+      extends: 'x-boo'
+    });
+    var xbooboo = new XBooBoo();
+    assert.equal(xbooboo.style.fontStyle, 'italic');
+    assert.equal(xbooboo.style.fontSize, '32pt');
   });
 });
