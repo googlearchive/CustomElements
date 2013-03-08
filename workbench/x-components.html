@@ -30,16 +30,15 @@ license that can be found in the LICENSE file.
         border: 1px solid transparent;
         background: transparent;
         cursor: pointer;
-        font-size: 16px;
       }
       
-      [is=x-icon-button]:hover, [is=x-icon-button]:active, [is=x-icon-button].selected {
+      [is=x-icon-button]:hover, [is=x-icon-button]:active, [is=x-icon-button].active {
         border: 1px solid rgba(0,0,0,0.16);
         border-radius: 3px;
         opacity: 0.8;
       }
       
-      [is=x-icon-button]:active, [is=x-icon-button].selected {
+      [is=x-icon-button]:active, [is=x-icon-button].active {
         box-shadow: inset 0 0 10px rgba(0,0,0,0.16);
       }
       
@@ -58,7 +57,7 @@ license that can be found in the LICENSE file.
         -webkit-user-select: none;
       }
       
-      [is=x-menu-item].selected {
+      [is=x-menu-item].active {
         border: 1px solid rgba(0, 0, 0, 0.16);
         background: whitesmoke;
       }
@@ -74,6 +73,43 @@ license that can be found in the LICENSE file.
         border: 1px solid #cfcfcf;
         box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
         background: white;
+      }
+      
+      x-tabs {
+        display: block;
+        height: 28px;
+        line-height: 28px;
+        border: 0;
+        border-bottom: 1px solid #ccc;
+      }
+      
+      x-tabs[vertical] {
+        display: inline-block;
+        width: 71px;
+        height: 100%;
+        border: 0;
+        border-right: 1px solid #ccc;
+      }
+      
+      x-tabs > * {
+        display: inline-block;
+        min-width: 54px;
+        height: 27px;
+        line-height: 27px;
+        text-align: center;
+        padding: 0 8px;
+        cursor: default;
+        border: 1px solid transparent;
+        border-radius: 4px 4px 0 0;
+        -webkit-transition: all 0.218s;
+      }
+      
+      x-tabs[vertical] > * {
+        border-radius: 4px 0 0 4px;
+      }
+      
+      x-tabs > .active {
+        border: 1px solid #ccc;
       }
     </style>
     
@@ -101,6 +137,24 @@ license that can be found in the LICENSE file.
       <button is="x-menu-item" src="images/chat.svg" label="Share Link"></button>
       <button is="x-menu-item" src="images/favorite.svg" label="Favorites"></button>
     </x-menu>
+    
+    <h3>x-tabs (extends x-selector)</h3>
+    <x-tabs>
+      <div class="active">One</div>
+      <div>Two</div>
+      <div>Three</div>
+    </x-tabs>
+    <br><br>
+    <x-tabs vertical>
+      <div class="active">One</div>
+      <div>Two</div>
+      <div>Three</div>
+    </x-tabs>
+    
+    <h3>x-ratings (uses x-icon)</h3>
+    <x-ratings value="3"></x-ratings>
+    <br>
+    <x-ratings value="5" count="10"></x-ratings>
     
     <script>
       XIcon = document.register('x-icon', {
@@ -136,13 +190,14 @@ license that can be found in the LICENSE file.
                 this.icon = document.createElement('x-icon');
                 this.insertBefore(this.icon, this.firstChild);
               }
+              this.icon.style.display = inValue ? '' : 'none';
               this.icon.src = inValue;
             },
             enumerable: true
           },
           active: {
             set: function(inValue) {
-              this.classList.toggle('selected', inValue);
+              this.classList.toggle('active', inValue);
             },
             enumerable: true
           }
@@ -163,7 +218,7 @@ license that can be found in the LICENSE file.
             set: function(inValue) {
               if (!this.labelElement) {
                 this.labelElement = document.createElement('label');
-                this.appendChild(this.labelElement)
+                this.appendChild(this.labelElement);
               }
               this.labelElement.textContent = inValue;
             },
@@ -177,7 +232,7 @@ license that can be found in the LICENSE file.
         while (n && n != this) {
           var i = Array.prototype.indexOf.call(inNodes, n);
           if (i >= 0) {
-            return inNodes[i];
+            return i;
           }
           n = n.parentNode;
         }
@@ -187,14 +242,13 @@ license that can be found in the LICENSE file.
         prototype: Object.create(HTMLElement.prototype, {
           readyCallback: {
             value: function() {
-              this.selected = this.querySelector('[active=true]');
               this.addEventListener('mouseup', function(e) {
-                if (this.selected) {
-                  this.selected.active = false;
-                }
-                this.selected = findTarget(e.target, this.children);
-                if (this.selected) {
-                  this.selected.active = true;
+                var item = this.children[findTarget(e.target, this.children)];
+                if (item) {
+                  Array.prototype.forEach.call(this.querySelectorAll('.active'), function(item) {
+                    item.classList.remove('active');
+                  });
+                  item.classList.add('active');
                 }
               }.bind(this));
             },
@@ -205,6 +259,49 @@ license that can be found in the LICENSE file.
       
       XMenu = document.register('x-menu', {
         prototype: Object.create(XSelector.prototype)
+      });
+      
+      XTabs = document.register('x-tabs', {
+        prototype: Object.create(XSelector.prototype)
+      });
+      
+      XRatings = document.register('x-ratings', {
+        prototype: Object.create(HTMLElement.prototype, {
+          readyCallback: {
+            value: function() {
+              this.count = Number(this.getAttribute('count')) || 5;
+              this.addEventListener('click', function(e) {
+                var i = findTarget(e.target, this.children);
+                if (i >= 0) {
+                  this.value = this.value == i + 1 ? i : i + 1;
+                }
+              }.bind(this));
+            },
+            enumerable: true
+          },
+          count: {
+            set: function(inValue) {
+              this.textContent = '';
+              for (var i = 0; i < inValue; i++) {
+                var s = document.createElement('x-icon');
+                s.src = 'images/star_blank.svg';
+                this.appendChild(s);
+              }
+              this.value = Number(this.getAttribute('value'));
+            }
+          },
+          value: {
+            set: function(inValue) {
+              this._value = inValue;
+              Array.prototype.forEach.call(this.children, function(s, i) {
+                s.src = i < inValue ? 'images/star.svg' : 'images/star_blank.svg';
+              }.bind(this));
+            },
+            get: function() {
+              return this._value;
+            }
+          }
+        })
       });
     </script>
   </body>
