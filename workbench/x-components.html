@@ -17,32 +17,38 @@ license that can be found in the LICENSE file.
   </head>
   <body>
     <style>
-      [is=x-icon], x-icon {
+      x-icon, x-star {
         display: inline-block;
         width: 24px;
         height: 24px;
         background-repeat: no-repeat;
+        background-size: 100% 100%;
         background-position: center;
       }
       
       [is=x-icon-button] {
+        width: 40px;
+        height: 40px;
         padding: 7px;
+        box-sizing: border-box;
         border: 1px solid transparent;
         background: transparent;
         cursor: pointer;
       }
       
       [is=x-icon-button]:hover, [is=x-icon-button]:active, [is=x-icon-button].active {
-        border: 1px solid rgba(0,0,0,0.16);
+        border: 1px solid rgba(0, 0, 0, 0.16);
         border-radius: 3px;
         opacity: 0.8;
       }
       
-      [is=x-icon-button]:active, [is=x-icon-button].active {
-        box-shadow: inset 0 0 10px rgba(0,0,0,0.16);
+      [is=x-icon-button]:not(:disabled):active, [is=x-icon-button].active {
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.16);
+        background-color: rgba(0, 0, 0, 0.08);
       }
       
       [is=x-icon-button]:disabled {
+        border: 1px solid transparent;
         opacity: 0.4;
       }
       
@@ -111,31 +117,36 @@ license that can be found in the LICENSE file.
       x-tabs > .active {
         border: 1px solid #ccc;
       }
+      
+      x-ratings {
+        display: inline-block;
+      }
     </style>
     
     <h3>x-icon</h3>    
     <x-icon src="images/star.svg"></x-icon>
+    <x-icon src="images/favorite.png"></x-icon>
 
     <h3>x-icon-button (extends button and has x-icon)</h3>
-    <button is="x-icon-button" src="images/star.svg"></button>
-    <button is="x-icon-button" src="images/star.svg" active="true"></button>
-    <button is="x-icon-button" src="images/star.svg" active="true" disabled="true"></button>
+    <button is="x-icon-button" src="images/mail.png"></button>
+    <button is="x-icon-button" src="images/mail.png" active="true"></button>
+    <button is="x-icon-button" src="images/mail.png" disabled="true"></button>
     
     <h3>x-menu-item (extends x-icon-button)</h3>
-    <button is="x-menu-item" src="images/email.svg" label="Email Link" active="true"></button>
+    <button is="x-menu-item" src="images/mail.png" label="Email Link" active="true"></button>
     
     <h3>x-selector</h3>
     <x-selector>
-      <button is="x-icon-button" src="images/email.svg" active="true"></button>
-      <button is="x-icon-button" src="images/chat.svg"></button>
-      <button is="x-icon-button" src="images/favorite.svg"></button>
+      <button is="x-icon-button" src="images/mail.png" active="true"></button>
+      <button is="x-icon-button" src="images/hangout.png"></button>
+      <button is="x-icon-button" src="images/favorite.png"></button>
     </x-selector>
     
     <h3>x-menu (extends x-selector)</h3>
     <x-menu>
-      <button is="x-menu-item" src="images/email.svg" label="Email Link" active="true"></button>
-      <button is="x-menu-item" src="images/chat.svg" label="Share Link"></button>
-      <button is="x-menu-item" src="images/favorite.svg" label="Favorites"></button>
+      <button is="x-menu-item" src="images/mail.png" label="Email Link" active="true"></button>
+      <button is="x-menu-item" src="images/hangout.png" label="Hangout"></button>
+      <button is="x-menu-item" src="images/favorite.png" label="Favorites"></button>
     </x-menu>
     
     <h3>x-tabs (extends x-selector)</h3>
@@ -151,10 +162,14 @@ license that can be found in the LICENSE file.
       <div>Three</div>
     </x-tabs>
     
-    <h3>x-ratings (uses x-icon)</h3>
+    <h3>x-star (extends x-icon)</h3>
+    <x-star></x-star>
+    <x-star empty="true"></x-star>
+    
+    <h3>x-ratings (uses x-star)</h3>
     <x-ratings value="3"></x-ratings>
     <br>
-    <x-ratings value="5" count="10"></x-ratings>
+    <x-ratings value="6" count="12"></x-ratings>
     
     <script>
       XIcon = document.register('x-icon', {
@@ -258,11 +273,31 @@ license that can be found in the LICENSE file.
       });
       
       XMenu = document.register('x-menu', {
+        extends: 'x-selector',
         prototype: Object.create(XSelector.prototype)
       });
       
       XTabs = document.register('x-tabs', {
+        extends: 'x-selector',
         prototype: Object.create(XSelector.prototype)
+      });
+      
+      XStar = document.register('x-star', {
+        extends: 'x-icon',
+        prototype: Object.create(XIcon.prototype, {
+          readyCallback: {
+            value: function() {
+              this.empty = this.getAttribute('empty') == 'true';
+            },
+            enumerable: true
+          },
+          empty: {
+            set: function(inValue) {
+              this.src = inValue ? 'images/star_blank.svg' : 'images/star.svg';
+            },
+            enumerable: true
+          }
+        })
       });
       
       XRatings = document.register('x-ratings', {
@@ -283,23 +318,24 @@ license that can be found in the LICENSE file.
             set: function(inValue) {
               this.textContent = '';
               for (var i = 0; i < inValue; i++) {
-                var s = document.createElement('x-icon');
-                s.src = 'images/star_blank.svg';
+                var s = document.createElement('x-star');
                 this.appendChild(s);
               }
               this.value = Number(this.getAttribute('value'));
-            }
+            },
+            enumerable: true
           },
           value: {
             set: function(inValue) {
               this._value = inValue;
               Array.prototype.forEach.call(this.children, function(s, i) {
-                s.src = i < inValue ? 'images/star.svg' : 'images/star_blank.svg';
+                s.empty = i >= inValue;
               }.bind(this));
             },
             get: function() {
               return this._value;
-            }
+            },
+            enumerable: true
           }
         })
       });
