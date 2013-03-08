@@ -17,7 +17,7 @@ suite('customElements', function() {
     document.body.removeChild(work);
   });
 
-  test('document.register', function() {
+  test('document.register create via new', function() {
     // register x-foo
     var XFoo = document.register('x-foo');
     // create an instance via new
@@ -30,16 +30,44 @@ suite('customElements', function() {
     var xfoo = work.querySelector('x-foo');
     // test textContent
     assert.equal(xfoo.textContent, '[x-foo]');
-    // create an instance via createElement
-    var xfoo2 = document.createElement('x-foo');
-    // test localName
-    assert.equal(xfoo2.localName, 'x-foo');
-    // attach content
-    xfoo2.textContent = '[x-foo2]';
-    // test textContent
-    assert.equal(xfoo2.textContent, '[x-foo2]');
   });
-
+  
+  test('document.register create via createElement', function() {
+    // register x-foo
+    var XFoo = document.register('x-foo');
+    // create an instance via createElement
+    var xfoo = document.createElement('x-foo');
+    // test localName
+    assert.equal(xfoo.localName, 'x-foo');
+    // attach content
+    xfoo.textContent = '[x-foo2]';
+    // test textContent
+    assert.equal(xfoo.textContent, '[x-foo2]');
+  });
+  
+  test('document.register create multiple instances', function() {
+    var XFooPrototype = Object.create(HTMLElement.prototype);
+    XFooPrototype.bluate = function() {
+      this.color = 'lightblue';
+    };
+    var XFoo = document.register('x-foo', {
+      prototype: XFooPrototype
+    });
+    // create an instance
+    var xfoo1 = new XFoo();
+    // create another instance
+    var xfoo2 = new XFoo();
+    // test textContent
+    xfoo1.textContent = '[x-foo1]';
+    xfoo2.textContent = '[x-foo2]';
+    assert.equal(xfoo1.textContent, '[x-foo1]');
+    assert.equal(xfoo2.textContent, '[x-foo2]');
+    // test bluate
+    xfoo1.bluate();
+    assert.equal(xfoo1.color, 'lightblue');
+    assert.isUndefined(xfoo2.color);
+  });
+  
   test('document.register extend native element', function() {
     // test native element extension
     var XBarPrototype = Object.create(HTMLButtonElement.prototype);
@@ -76,7 +104,7 @@ suite('customElements', function() {
     assert.equal(xbarbarbar.textContent, 'x-barbarbar');
   });
 
-  test('document.register prototype/lifecycle', function() {
+  test('document.register readyCallback in lifecycle', function() {
     var XZotPrototype = Object.create(HTMLElement.prototype);
     XZotPrototype.bluate = function() {
       this.color = 'lightblue';
@@ -114,8 +142,9 @@ suite('customElements', function() {
     assert.equal(xbaz.color, 'lightblue');
     xbaz.splat();
     assert.equal(xbaz.textContent, 'splat');
-    //    
-    // readyCallback in prototype
+  });
+  
+  test('document.register readyCallback in prototype', function() {
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.readyCallback = function() {
       this.style.fontStyle = 'italic';
