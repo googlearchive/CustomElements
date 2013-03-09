@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-suite('HTMLElement', function() {
+suite('HTMLElementElement', function() {
   var assert = chai.assert;
   
   var work;
@@ -43,5 +43,82 @@ suite('HTMLElement', function() {
     document.upgradeElement(x);
     assert.equal(x.__upgraded__, true);
     assert.equal(x.value, 'x-test-script-element');
+  });
+  
+  test('readyCallback in prototype', function() {
+    work.innerHTML = '<element name="x-test-script-element">' +
+      '<script>' +
+        'this.register({' +
+          'prototype: {' +
+            'readyCallback: function() {' +
+              'this.textContent = "Hello World"' +
+            '}' +
+          '}' +
+      '});' +
+      '</script>' +
+      '</element>' +
+      '<x-test-script-element></x-test-script-element>';
+    new HTMLElementElement(work.querySelector('element'));
+    var x = work.lastChild;
+    document.upgradeElement(x);
+    assert.equal(x.textContent, 'Hello World');
+  });
+  
+  test('readyCallback in lifecycle', function() {
+    work.innerHTML = '<element name="x-test-script-element">' +
+      '<script>' +
+        'this.register({' +
+          'lifecycle: {' +
+            'readyCallback: function() {' +
+              'this.textContent = "Hello World"' +
+            '}' +
+          '}' +
+      '});' +
+      '</script>' +
+      '</element>' +
+      '<x-test-script-element></x-test-script-element>';
+    new HTMLElementElement(work.querySelector('element'));
+    var x = work.lastChild;
+    document.upgradeElement(x);
+    assert.equal(x.textContent, 'Hello World');
+  });
+  
+  test('extend element', function() {
+    work.innerHTML = '<element name="x-foo">' +
+      '<script>' +
+        'this.register({' +
+          'prototype: {' +
+            'value: "fooValue"' +
+          '}' +
+      '});' +
+      '</script>' +
+      '</element>' +
+      '<element name="x-bar" extends="x-foo"></element>' +
+      '<x-bar></x-bar>';
+    new HTMLElementElement(work.querySelector('[name=x-foo]'));
+    new HTMLElementElement(work.querySelector('[name=x-bar]'));
+    var x = work.lastChild;
+    document.upgradeElement(x);
+    assert.equal(x.value, 'fooValue');
+  });
+  
+  test('extend native element', function() {
+    work.innerHTML = '<element name="x-button" extends="button">' +
+      '<script>' +
+        'this.register({' +
+          'prototype: {' +
+            'readyCallback: function() {' +
+              'this.textContent = "Hello World"' +
+            '}' +
+          '}' +
+      '});' +
+      '</script>' +
+      '</element>' +
+      '<button is="x-button"></button>';
+    new HTMLElementElement(work.querySelector('element'));
+    var x = work.lastChild;
+    document.upgradeElement(x);
+    assert.equal(x.type, 'submit');
+    assert.equal(x.textContent, 'Hello World');
   });
 });
