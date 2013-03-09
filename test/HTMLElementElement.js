@@ -5,9 +5,10 @@
  */
 
 suite('HTMLElement', function() {
-  var work;
   var assert = chai.assert;
-
+  
+  var work;
+  
   setup(function() {
     work = document.createElement('div');
     document.body.appendChild(work);
@@ -17,16 +18,10 @@ suite('HTMLElement', function() {
     document.body.removeChild(work);
   });
   
-  
-  function registerTestComponent(inName, inValue) {
-    var element = '<element name="' + inName + '"></element>';
-  }
-  
-
   test('component upgraded', function() {
     work.innerHTML = '<element name="x-test-element"></element>' +
       '<x-test-element>Foo</x-test-element>';
-    document.parseComponents();
+    new HTMLElementElement(work.querySelector('element'));
     var xtest = work.lastChild;
     document.upgradeElement(xtest);
     assert.equal(xtest.__upgraded__, true);
@@ -43,11 +38,10 @@ suite('HTMLElement', function() {
       '</script>' +
       '</element>' +
       '<x-test-script-element></x-test-script-element>';
-    document.parseComponents();
+    new HTMLElementElement(work.querySelector('element'));
     var x = work.lastChild;
     document.upgradeElement(x);
     assert.equal(x.__upgraded__, true);
     assert.equal(x.value, 'x-test-script-element');
   });
-  
 });

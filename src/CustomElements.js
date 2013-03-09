@@ -140,7 +140,7 @@ function upgrade(inElement, inDefinition) {
   created(implementor, inDefinition);
   // OUTPUT
   return implementor;
-};
+}
 
 function implement(inElement, inPrototype) {
   if (Object.__proto__) {
