@@ -63,10 +63,22 @@ var cp = componentParser;
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
+// bootstrap parsing
+
+var parseTimeEvent = window.WebComponents ? 'WebComponentsLoaded' : 'load';
+window.addEventListener(parseTimeEvent, function() {
+  // parse document
+  componentParser.parse(document);
+  // upgrade everything
+  document.upgradeElements();
+});
+
 // exports
 
+/*
 document.parseComponents = function() {
   componentParser.parse(document);
 };
+*/
 
 })();

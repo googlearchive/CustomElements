@@ -86,19 +86,9 @@ console.log(flags);
 [
   'src/CustomElements.js',
   'src/HTMLElementElement.js',
-  'src/Parser.js',
-  'src/live.js'
+  'src/Parser.js'
 ].forEach(function(inSrc) {
   document.write('<script src="' + base + inSrc + '"></script>');
-});
-
-// bootstrap
-
-window.addEventListener('load', function() {
-  // parse document
-  document.parseComponents();
-  // upgrade everything
-  document.upgradeElements();
 });
 
 })(window.__exported_components_polyfill_scope__);
