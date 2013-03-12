@@ -60,7 +60,6 @@ license that can be found in the LICENSE file.
         border-radius: 3px;
         background: transparent;
         cursor: pointer;
-        -webkit-user-select: none;
       }
       
       [is=x-menu-item].active {
@@ -107,7 +106,9 @@ license that can be found in the LICENSE file.
         cursor: default;
         border: 1px solid transparent;
         border-radius: 4px 4px 0 0;
+        transition: all 0.218s;
         -webkit-transition: all 0.218s;
+        -moz-transition: all 0.218s;
       }
       
       x-tabs[vertical] > * {
@@ -212,7 +213,7 @@ license that can be found in the LICENSE file.
           },
           active: {
             set: function(inValue) {
-              this.classList.toggle('active', inValue);
+              this.classList[inValue ? 'add' : 'remove']('active');
             },
             enumerable: true
           }
