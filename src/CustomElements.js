@@ -160,6 +160,7 @@ function implement(inElement, inPrototype) {
 // TODO(sjmiles): polyfill pollution
 function _publishToWrapper(inElement, inPrototype) {
   var element = (window.wrap && wrap(inElement)) || inElement;
+  // TODO(sjmiles): ShadowDOM shim only
   if (window.Nohd) {
     // attempt to publish our public interface directly
     // to our ShadowDOM polyfill wrapper object (excluding overrides)
@@ -222,14 +223,11 @@ function createElement(inTag) {
  * @return {Element} The upgraded element.
  */
 function upgradeElement(inElement) {
-  if (inElement.__upgraded__) {
-    return;
+  if (!inElement.__upgraded__) {
+    var type = inElement.getAttribute('is') || inElement.localName;
+    var definition = registry[type];
+    return definition && upgrade(inElement, definition);
   }
-  // TODO(sjmiles): polyfill pollution
-  var element = inElement.node || inElement;
-  var definition =
-      registry[element.getAttribute('is') || element.localName];
-  return definition && upgrade(element, definition);
 }
 
 /**
@@ -248,7 +246,8 @@ function upgradeElement(inElement) {
 function upgradeElements(inRoot, inSlctr) {
   var slctr = inSlctr || registrySlctr;
   if (slctr) {
-    forEach((inRoot || document).querySelectorAll(slctr), upgradeElement);
+    var root = inRoot || (window.wrap ? wrap(document) : document);
+    forEach(root.querySelectorAll(slctr), upgradeElement);
   }
 }
 
