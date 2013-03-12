@@ -119,12 +119,13 @@ function instantiate(inDefinition) {
 }
 
 function upgrade(inElement, inDefinition) {
-  var element = inElement;
   // TODO(sjmiles): polyfill pollution
-  // under ShadowDOM polyfill `inElement` may be a node wrapper,
+  // under ShadowDOM polyfill/shim `inElement` may be a node wrapper,
   // we need the underlying node
+  var element = inElement.node || inElement;
+  // under ShadowDOM polyfill, we need to destroy the old wrapper
+  // as we need to fresh one for the mutated prototype
   if (/*element instanceof*/ window.WrapperElement) {
-    element = element.node;
     rewrap(element, undefined);
   }
   // some definitions specify as 'is' attribute
@@ -160,7 +161,7 @@ function implement(inElement, inPrototype) {
 // TODO(sjmiles): polyfill pollution
 function _publishToWrapper(inElement, inPrototype) {
   var element = (window.wrap && wrap(inElement)) || inElement;
-  // TODO(sjmiles): ShadowDOM shim only
+  // TODO(sjmiles): needed for ShadowDOMShim only
   if (window.Nohd) {
     // attempt to publish our public interface directly
     // to our ShadowDOM polyfill wrapper object (excluding overrides)
@@ -246,6 +247,7 @@ function upgradeElement(inElement) {
 function upgradeElements(inRoot, inSlctr) {
   var slctr = inSlctr || registrySlctr;
   if (slctr) {
+    // TODO(sjmiles): polyfill pollution
     var root = inRoot || (window.wrap ? wrap(document) : document);
     forEach(root.querySelectorAll(slctr), upgradeElement);
   }
