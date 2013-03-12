@@ -123,9 +123,9 @@ function upgrade(inElement, inDefinition) {
   // TODO(sjmiles): polyfill pollution
   // under ShadowDOM polyfill `inElement` may be a node wrapper,
   // we need the underlying node
-  if (element.node && window.wrapperTable) {
+  if (/*element instanceof*/ window.WrapperElement) {
     element = element.node;
-    wrapperTable.set(element, undefined);
+    rewrap(element, undefined);
   }
   // some definitions specify as 'is' attribute
   if (inDefinition.is) {
