@@ -50,7 +50,10 @@ var componentParser = {
       return;
     }
     // evaluate now
-    console.log(inScriptElt.__resource || '(no code)');
+    var code = inScriptElt.__resource;
+    if (code) {
+      eval(code);
+    }
   },
   parseElement: function(inElementElt) {
     // TODO(sjmiles): ShadowDOM polyfill pollution
