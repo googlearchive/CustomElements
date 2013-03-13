@@ -84,12 +84,4 @@ window.addEventListener(parseTimeEvent, function() {
   webComponentsReady();
 });
 
-// exports
-
-/*
-document.parseComponents = function() {
-  componentParser.parse(document);
-};
-*/
-
 })();
