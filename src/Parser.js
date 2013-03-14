@@ -68,20 +68,16 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
 // bootstrap parsing
 
-function webComponentsReady() {
-  var e = document.createEvent('Event');
-  e.initEvent('WebComponentsReady', true, true);
-  document.body.dispatchEvent(e);
-}
-
 var parseTimeEvent = window.WebComponents ? 'WebComponentsLoaded' : 'load';
+
 window.addEventListener(parseTimeEvent, function() {
   // parse document
   componentParser.parse(document);
   // upgrade everything
   document.upgradeElements();
   // notify system
-  webComponentsReady();
+  document.body.dispatchEvent(
+      new CustomEvent('WebComponentsReady', {bubbles: true}));
 });
 
 })();
