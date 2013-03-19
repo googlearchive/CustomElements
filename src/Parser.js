@@ -13,15 +13,20 @@ var componentParser = {
     'link[rel=component]',
     'link[rel=stylesheet]',
     'script[src]',
+    'script',
+    'style',
     'element'
   ],
   map: {
     link: 'parseLink',
     script: 'parseScript',
-    element: 'parseElement'
+    element: 'parseElement',
+    style: 'parseStyle'
   },
   parse: function(inDocument) {
     if (inDocument) {
+      // upgrade everything
+      document.upgradeElements(inDocument);
       // all parsable elements in inDocument (depth-first pre-order traversal)
       var elts = inDocument.querySelectorAll(cp.selectors);
       // for each parsable node type in inDocument, call the parsing method
@@ -37,7 +42,8 @@ var componentParser = {
     if (this.isDocumentLink(inLinkElt)) {
       cp.parse(inLinkElt.__resource);
     } else {
-    // rel=stylesheet
+      // rel=stylesheet
+      // inject into main body
     }
   },
   isDocumentLink: function(inElt) {
@@ -50,10 +56,13 @@ var componentParser = {
       return;
     }
     // evaluate now
-    var code = inScriptElt.__resource;
+    var code = inScriptElt.__resource || inScriptElt.textContent;
     if (code) {
       eval(code);
     }
+  },
+  parseStyle: function(inStyleElt) {
+    document.querySelector("head").appendChild(inStyleElt);
   },
   parseElement: function(inElementElt) {
     // TODO(sjmiles): ShadowDOM polyfill pollution
