@@ -119,22 +119,24 @@ function instantiate(inDefinition) {
 }
 
 function upgrade(inElement, inDefinition) {
+  var element = inElement;
   // TODO(sjmiles): polyfill pollution
   // under ShadowDOM polyfill/shim `inElement` may be a node wrapper,
   // we need the underlying node
-  var element = inElement.node || inElement;
   // under ShadowDOM polyfill, we need to destroy the old wrapper
   // as we need to fresh one for the mutated prototype
   if (/*element instanceof*/ window.WrapperElement) {
+    //element = inElement.impl || inElement;
+    element = unwrap(inElement);
     rewrap(element, undefined);
-  }
-  // some definitions specify as 'is' attribute
-  if (inDefinition.is) {
-    inElement.setAttribute('is', inDefinition.is);
   }
   // TODO(sjmiles): polyfill pollution
   // under ShadowDOM polyfill `implementor` may be a node wrapper
   var implementor = implement(element, inDefinition.prototype);
+  // some definitions specify as 'is' attribute
+  if (inDefinition.is) {
+    inElement.setAttribute('is', inDefinition.is);
+  }
   // flag as upgraded
   implementor.__upgraded__ = true;
   // invoke lifecycle.created callbacks
