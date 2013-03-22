@@ -5,7 +5,11 @@
  */
 
 (function() {
-  
+
+// TODO(sjmiles): ShadowDOM polyfill pollution
+
+var sdocument = window.wrap ? wrap(document) : document;
+
 // highlander object for parsing a document tree
 
 var componentParser = {
@@ -47,12 +51,12 @@ var componentParser = {
     }
   },
   isDocumentLink: function(inElt) {
-    return (inElt.localName === 'link' 
+    return (inElt.localName === 'link'
         && inElt.getAttribute('rel') === 'component');
   },
   parseScript: function(inScriptElt) {
     // ignore scripts in primary document, they are already loaded
-    if (inScriptElt.ownerDocument === document) {
+    if (inScriptElt.ownerDocument === sdocument) {
       return;
     }
     // evaluate now
@@ -66,7 +70,7 @@ var componentParser = {
   },
   parseElement: function(inElementElt) {
     // TODO(sjmiles): ShadowDOM polyfill pollution
-    var element = window.wrap ? wrap(inElementElt) : inElementElt;
+    var element = /*window.wrap ? wrap(inElementElt) :*/ inElementElt;
     new HTMLElementElement(element);
   }
 };
@@ -79,13 +83,13 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
 var parseTimeEvent = window.WebComponents ? 'WebComponentsLoaded' : 'load';
 
-window.addEventListener(parseTimeEvent, function() {
+sdocument.addEventListener(parseTimeEvent, function() {
   // parse document
   componentParser.parse(document);
   // upgrade everything
   document.upgradeElements();
   // notify system
-  document.body.dispatchEvent(
+  sdocument.body.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true}));
 });
 
