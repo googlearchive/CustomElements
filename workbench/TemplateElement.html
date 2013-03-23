@@ -23,8 +23,7 @@ license that can be found in the LICENSE file.
           value: function() {
             this.parse();
             document.upgradeElements();
-          },
-          enumerable: true
+          }
         },
         parse: {
           value: function() {
@@ -36,16 +35,14 @@ license that can be found in the LICENSE file.
               readyCallback: {
                 value: function() {
                   template.migrateContent(this);
-                },
-                enumerable: true
+                }
               }
             });
             document.register(tag, {
               prototype: prototype
             });
             console.log('HTMLTemplateElement: registered:', tag);
-          },
-          enumerable: true
+          }
         },
         migrateContent: {
           value: function(inTarget) {
@@ -56,8 +53,7 @@ license that can be found in the LICENSE file.
                 inTarget.appendChild(n.cloneNode(true));
               }
             }         
-          },
-          enumerable: true
+          }
         }
       })
     });
