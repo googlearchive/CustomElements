@@ -72,6 +72,9 @@ function register(inName, inOptions) {
   // extensions of native specializations of HTMLElement require localName
   // to remain native, and use secondary 'is' specifier for extension type
   resolveTagName(definition);
+  // some platforms require modifications to the user-supplied prototype
+  // chain
+  resolvePrototypeChain(definition);
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registerDefinition(inName, definition);
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
@@ -100,9 +103,43 @@ function resolveTagName(inDefinition) {
   }
   // our tag is our baseTag, if it exists, and otherwise just our name
   inDefinition.tag = baseTag || inDefinition.name;
-  // if there is a base tag, use secondary 'is' specifier
   if (baseTag) {
+    // if there is a base tag, use secondary 'is' specifier
     inDefinition.is = inDefinition.name;
+  }
+}
+
+function resolvePrototypeChain(inDefinition) {
+  // TODO(sjmiles): ShadowDOM polyfill pollution
+  // under ShadowDOM polyfill we need to use Wrapper prototype chain instead
+  // of native DOM
+  if (window.WrapperElement
+        && !(inDefinition.prototype instanceof WrapperElement)) {
+    if (inDefinition.is) {
+      // for non-trivial extensions, work out both prototypes
+      var inst = domCreateElement(inDefinition.tag);
+      var native = Object.getPrototypeOf(unwrap(inst));
+      var wrapperNative = Object.getPrototypeOf(inst);
+    } else {
+      // otherwise, use the defaults
+      native = HTMLElement.prototype;
+      wrapperNative = WrapperHTMLUnknownElement.prototype;
+    }
+    if (Object.__proto__) {
+      // search and replace 'native' protoype with 'wrapperNative'
+      var p = inDefinition.prototype, pp;
+      while (true) {
+        pp = Object.getPrototypeOf(p);
+        if (pp === native || pp == HTMLUnknownElement.prototype) {
+          break;
+        }
+        p = pp;
+      }
+      p.__proto__ = wrapperNative;
+      //console.log(native, wrapperNative, p);
+    } else {
+      // TODO(sjmiles): support IE
+    }
   }
 }
 
@@ -119,69 +156,50 @@ function instantiate(inDefinition) {
 }
 
 function upgrade(inElement, inDefinition) {
-  var element = inElement;
-  // TODO(sjmiles): polyfill pollution
-  // under ShadowDOM polyfill/shim `inElement` may be a node wrapper,
-  // we need the underlying node
-  if (/*element instanceof*/ window.WrapperElement) {
-    element = unwrap(inElement);
-  }
   // make 'element' implement inDefinition.prototype
-  implement(element, inDefinition.prototype);
-  // TODO(sjmiles): polyfill pollution
-  // under ShadowDOM polyfill, we need to destroy the old wrapper
-  // as we need to fresh one for the mutated prototype
-  if (window.WrapperElement) {
-    rewrap(element, undefined);
-    element = wrap(element);
-    resetNodePointers(inElement, element);
-  }
+  implement(inElement, inDefinition);
   // some definitions specify an 'is' attribute
   if (inDefinition.is) {
-    element.setAttribute('is', inDefinition.is);
+    inElement.setAttribute('is', inDefinition.is);
   }
   // flag as upgraded
-  element.__upgraded__ = true;
+  inElement.__upgraded__ = true;
   // invoke lifecycle.created callbacks
-  created(element, inDefinition);
+  created(inElement, inDefinition);
   // OUTPUT
-  return element;
+  return inElement;
 }
 
-function implement(inElement, inPrototype) {
+function implement(inElement, inDefinition) {
+  // prototype swizzling is best
   if (Object.__proto__) {
-    inElement.__proto__ = inPrototype;
+    inElement.__proto__ = inDefinition.prototype;
   } else {
     // where above we can re-acquire inPrototype via
     // getPrototypeOf(Element), we cannot do so when
     // we use mixin, so we install a magic reference
-    inElement.__proto__ = inPrototype;
+    if (!Object.__proto__) {
+      inElement.__proto__ = inDefinition.prototype;
+    }
     mixin(inElement, inPrototype);
   }
-  // special handling for polyfill wrappers
-  // TODO(sjmiles): polyfill pollution
-  //return _publishToWrapper(inElement, inPrototype);
 }
 
-// TODO(sjmiles): polyfill pollution
 /*
-function _publishToWrapper(inElement, inPrototype) {
-  var element = (window.wrap && wrap(inElement)) || inElement;
-  // TODO(sjmiles): needed for ShadowDOMShim only
-  if (window.Nohd) {
-    // attempt to publish our public interface directly
-    // to our ShadowDOM polyfill wrapper object (excluding overrides)
-    var p = inPrototype;
-    while (p && p !== HTMLElement.prototype) {
-      Object.keys(p).forEach(function(k) {
-        if (!(k in element)) {
-          copyProperty(k, inPrototype, element);
-        }
-      });
-      p = Object.getPrototypeOf(p);
+function mixinCustomPrototype(inTarget, inSrc, inNative) {
+  console.group(inTarget.localName);
+  var p = inSrc;
+  while (p !== inNative) {
+    console.group('proto');
+    var keys = Object.keys(p);
+    for (var i=0, k; k=keys[i]; i++) {
+      console.log(k);
+      Object.defineProperty(inTarget, k, Object.getOwnPropertyDescriptor(p, k));
     }
+    console.groupEnd();
+    p = Object.getPrototypeOf(p);
   }
-  return element;
+  console.groupEnd();
 }
 */
 
