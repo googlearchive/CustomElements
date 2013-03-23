@@ -85,16 +85,21 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
 // bootstrap parsing
 
-var parseTimeEvent = window.WebComponents ? 'WebComponentsLoaded' : 'load';
-
-sdocument.addEventListener(parseTimeEvent, function() {
+function bootstrap() {
   // parse document
   componentParser.parse(document);
   // upgrade everything
   document.upgradeElements();
   // notify system
   sdocument.body.dispatchEvent(
-      new CustomEvent('WebComponentsReady', {bubbles: true}));
+    new CustomEvent('WebComponentsReady', {bubbles: true})
+  );
+}
+
+var parseTimeEvent = window.WebComponents ? 'WebComponentsLoaded' : 'load';
+sdocument.addEventListener(parseTimeEvent, function() {
+  // let call stack unwind
+  setTimeout(bootstrap, 0);
 });
 
 })();
