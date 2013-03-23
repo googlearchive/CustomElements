@@ -123,26 +123,29 @@ function upgrade(inElement, inDefinition) {
   // TODO(sjmiles): polyfill pollution
   // under ShadowDOM polyfill/shim `inElement` may be a node wrapper,
   // we need the underlying node
+  if (/*element instanceof*/ window.WrapperElement) {
+    element = unwrap(inElement);
+  }
+  // make 'element' implement inDefinition.prototype
+  implement(element, inDefinition.prototype);
+  // TODO(sjmiles): polyfill pollution
   // under ShadowDOM polyfill, we need to destroy the old wrapper
   // as we need to fresh one for the mutated prototype
-  if (/*element instanceof*/ window.WrapperElement) {
-    //element = inElement.impl || inElement;
-    element = unwrap(inElement);
+  if (window.WrapperElement) {
     rewrap(element, undefined);
+    element = wrap(element);
+    resetNodePointers(inElement, element);
   }
-  // TODO(sjmiles): polyfill pollution
-  // under ShadowDOM polyfill `implementor` may be a node wrapper
-  var implementor = implement(element, inDefinition.prototype);
-  // some definitions specify as 'is' attribute
+  // some definitions specify an 'is' attribute
   if (inDefinition.is) {
-    inElement.setAttribute('is', inDefinition.is);
+    element.setAttribute('is', inDefinition.is);
   }
   // flag as upgraded
-  implementor.__upgraded__ = true;
+  element.__upgraded__ = true;
   // invoke lifecycle.created callbacks
-  created(implementor, inDefinition);
+  created(element, inDefinition);
   // OUTPUT
-  return implementor;
+  return element;
 }
 
 function implement(inElement, inPrototype) {
@@ -157,10 +160,11 @@ function implement(inElement, inPrototype) {
   }
   // special handling for polyfill wrappers
   // TODO(sjmiles): polyfill pollution
-  return _publishToWrapper(inElement, inPrototype);
+  //return _publishToWrapper(inElement, inPrototype);
 }
 
 // TODO(sjmiles): polyfill pollution
+/*
 function _publishToWrapper(inElement, inPrototype) {
   var element = (window.wrap && wrap(inElement)) || inElement;
   // TODO(sjmiles): needed for ShadowDOMShim only
@@ -179,6 +183,7 @@ function _publishToWrapper(inElement, inPrototype) {
   }
   return element;
 }
+*/
 
 function created(inElement, inDefinition) {
   var readyCallback = inDefinition.lifecycle.readyCallback || 
