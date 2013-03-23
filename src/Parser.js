@@ -74,9 +74,7 @@ var componentParser = {
     document.querySelector("head").appendChild(inStyleElt);
   },
   parseElement: function(inElementElt) {
-    // TODO(sjmiles): ShadowDOM polyfill pollution
-    var element = /*window.wrap ? wrap(inElementElt) :*/ inElementElt;
-    new HTMLElementElement(element);
+    new HTMLElementElement(inElementElt);
   }
 };
 
@@ -87,18 +85,26 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 // bootstrap parsing
 
 function bootstrap() {
-  // parse document
-  componentParser.parse(document);
-  // notify system
-  sdocument.body.dispatchEvent(
-    new CustomEvent('WebComponentsReady', {bubbles: true})
-  );
+  // go async so call stack can unwind
+  setTimeout(function() {
+    // parse document
+    componentParser.parse(document);
+    // notify system
+    sdocument.body.dispatchEvent(
+      new CustomEvent('WebComponentsReady', {bubbles: true})
+    );
+  }, 0);
 }
 
-var parseTimeEvent = window.WebComponents ? 'WebComponentsLoaded' : 'load';
-sdocument.addEventListener(parseTimeEvent, function() {
-  // let call stack unwind
-  setTimeout(bootstrap, 0);
-});
+// TODO(sjmiles):
+// 'window' has wrappability under ShadowDOM polyfill, so 
+// we are forced to split into two version
+// !webComponents && ShadowDOM will not work
+if (window.webComponents) {
+  sdocument.addEventListener('WebComponentsLoaded', bootstrap);
+} else {
+  window.addEventListener('load', bootstrap);
+}
+
 
 })();
