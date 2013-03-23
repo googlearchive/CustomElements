@@ -274,8 +274,7 @@ function upgradeElement(inElement) {
 function upgradeElements(inRoot, inSlctr) {
   var slctr = inSlctr || registrySlctr;
   if (slctr) {
-    // TODO(sjmiles): polyfill pollution
-    var root = inRoot || (window.wrap ? wrap(document) : document);
+    var root = inRoot || document;
     forEach(root.querySelectorAll(slctr), upgradeElement);
   }
 }
