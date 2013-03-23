@@ -59,7 +59,11 @@ var componentParser = {
     if (inScriptElt.ownerDocument === sdocument) {
       return;
     }
-    // evaluate now
+    // ignore scripts inside <element>
+    if (inScriptElt.parentNode.localName === 'element') {
+      return;
+    }
+    // otherwise, evaluate now
     var code = inScriptElt.__resource || inScriptElt.textContent;
     if (code) {
       eval(code);
