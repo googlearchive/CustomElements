@@ -38,7 +38,11 @@ function parseElementElement(inElement) {
     // build an instance of options.extends
     var archetype = document.createElement(options.extends);
     // acquire the prototype
-    base = Object.getPrototypeOf(archetype);
+    // TODO(sjmiles): __proto__ may be hinted by the custom element
+    // system on platforms that don't support native __proto__
+    // on those platforms the API is mixed into archetype and the
+    // effective base is not archetype's real prototype
+    base = archetype.__proto__ || Object.getPrototypeOf(archetype);
   }
   // extend base
   options.prototype = Object.create(base);
