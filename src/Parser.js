@@ -7,7 +7,6 @@
 (function() {
 
 // TODO(sjmiles): ShadowDOM polyfill pollution
-
 var sdocument = window.wrap ? wrap(document) : document;
 
 // highlander object for parsing a document tree
@@ -39,6 +38,8 @@ var componentParser = {
         //console.log(map[e.localName] + ":", path.nodeUrl(e));
         cp[cp.map[e.localName]](e);
       });
+      // upgrade everything
+      document.upgradeElements(inDocument);
     }
   },
   parseLink: function(inLinkElt) {
@@ -88,8 +89,6 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 function bootstrap() {
   // parse document
   componentParser.parse(document);
-  // upgrade everything
-  document.upgradeElements();
   // notify system
   sdocument.body.dispatchEvent(
     new CustomEvent('WebComponentsReady', {bubbles: true})
