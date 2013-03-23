@@ -93,10 +93,10 @@ suite('HTMLElementElement', function() {
       '});' +
       '</script>' +
       '</element>' +
-      '<element name="x-bar" extends="x-foo"></element>' +
-      '<x-bar></x-bar>';
+      '<element name="x-babar" extends="x-foo"></element>' +
+      '<x-babar></x-babar>';
     new HTMLElementElement(work.querySelector('[name=x-foo]'));
-    new HTMLElementElement(work.querySelector('[name=x-bar]'));
+    new HTMLElementElement(work.querySelector('[name=x-babar]'));
     var x = work.lastChild;
     document.upgradeElement(x);
     assert.equal(x.value, 'fooValue');
