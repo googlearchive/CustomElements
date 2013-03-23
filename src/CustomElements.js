@@ -112,21 +112,36 @@ function resolveTagName(inDefinition) {
 }
 
 function resolvePrototypeChain(inDefinition) {
-  // TODO(sjmiles): ShadowDOM polyfill pollution
+  // TODO(sjmiles): contains ShadowDOM polyfill pollution
+  // if we don't support __proto__ we need to locate the native level
+  // prototype for precise mixing in
+  // we also need native prototype so we can replace it with a wrapper
+  // prototype if necessary
+  if (window.WrapperElement
+        && !(inDefinition.prototype instanceof WrapperElement)
+        || !Object.__proto__) {
+    if (inDefinition.is) {
+      // for non-trivial extensions, work out both prototypes
+      var inst = domCreateElement(inDefinition.tag);
+      var wrapperNative = Object.getPrototypeOf(inst);
+      if (window.WrapperElement) {
+        inst = unwrap(inst);
+      }
+      var native = Object.getPrototypeOf(inst);
+    } else {
+      // otherwise, use the defaults
+      native = HTMLElement.prototype;
+      if (window.WrapperElement) {
+        wrapperNative = WrapperHTMLUnknownElement.prototype;
+      }
+    }
+  }
+  // cache this in case of mixin
+  inDefinition.native = native;
   // under ShadowDOM polyfill we need to use Wrapper prototype chain instead
   // of native DOM
   if (window.WrapperElement
         && !(inDefinition.prototype instanceof WrapperElement)) {
-    if (inDefinition.is) {
-      // for non-trivial extensions, work out both prototypes
-      var inst = domCreateElement(inDefinition.tag);
-      var native = Object.getPrototypeOf(unwrap(inst));
-      var wrapperNative = Object.getPrototypeOf(inst);
-    } else {
-      // otherwise, use the defaults
-      native = HTMLElement.prototype;
-      wrapperNative = WrapperHTMLUnknownElement.prototype;
-    }
     if (Object.__proto__) {
       // search and replace 'native' protoype with 'wrapperNative'
       var p = inDefinition.prototype, pp;
@@ -176,34 +191,53 @@ function implement(inElement, inDefinition) {
   // prototype swizzling is best
   if (Object.__proto__) {
     inElement.__proto__ = inDefinition.prototype;
-  } else {
+  } 
+  // TODO(sjmiles): below here is feature detected, but really it's
+  // just for IE
+  else {
     // where above we can re-acquire inPrototype via
     // getPrototypeOf(Element), we cannot do so when
     // we use mixin, so we install a magic reference
     if (!Object.__proto__) {
       inElement.__proto__ = inDefinition.prototype;
     }
-    mixin(inElement, inDefinition.prototype);
+    customMixin(inElement, inDefinition.prototype, inDefinition.native);
   }
 }
 
-/*
-function mixinCustomPrototype(inTarget, inSrc, inNative) {
-  console.group(inTarget.localName);
+if (!console.group) {
+  console.group = function(m) {console.log("[group] " + m);};
+  console.groupEnd = function() {console.log("[end]");};
+}
+
+function customMixin(inTarget, inSrc, inNative) {
+  //console.group(inTarget.localName);
+  // TODO(sjmiles): 'used' allows us to only copy the 'youngest' version of 
+  // any property. This set should be precalculated. We also need to 
+  // consider this for supporting 'super'.
+  var used = {};
+  // start with inSrc
   var p = inSrc;
-  while (p !== inNative) {
-    console.group('proto');
-    var keys = Object.keys(p);
+  // sometimes the default is HTMLUnknownElement.prototype instead of 
+  // HTMLElement.prototype, so we add a test
+  // the idea is to avoid mixing in native prototypes, so adding
+  // the second test is WLOG
+  while (p !== inNative && p !== HTMLUnknownElement.prototype) {
+    //console.group('proto');
+    var keys = Object.getOwnPropertyNames(p);
     for (var i=0, k; k=keys[i]; i++) {
-      console.log(k);
-      Object.defineProperty(inTarget, k, Object.getOwnPropertyDescriptor(p, k));
+      if (!used[k]) {
+        //console.log(k);
+        Object.defineProperty(inTarget, k, 
+            Object.getOwnPropertyDescriptor(p, k));
+        used[k] = 1;
+      }
     }
-    console.groupEnd();
+    //console.groupEnd();
     p = Object.getPrototypeOf(p);
   }
-  console.groupEnd();
+  //console.groupEnd();
 }
-*/
 
 function created(inElement, inDefinition) {
   var readyCallback = inDefinition.lifecycle.readyCallback || 
