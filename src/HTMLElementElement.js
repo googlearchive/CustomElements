@@ -37,10 +37,6 @@ function parseElementElement(inElement) {
   if (options.extends) {
     // build an instance of options.extends
     var archetype = document.createElement(options.extends);
-    // TODO(sjmiles): polyfill pollution
-    if (window.unwrap) {
-      archetype = unwrap(archetype);
-    }
     // acquire the prototype
     base = Object.getPrototypeOf(archetype);
   }
