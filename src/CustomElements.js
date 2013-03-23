@@ -183,7 +183,7 @@ function implement(inElement, inDefinition) {
     if (!Object.__proto__) {
       inElement.__proto__ = inDefinition.prototype;
     }
-    mixin(inElement, inPrototype);
+    mixin(inElement, inDefinition.prototype);
   }
 }
 
