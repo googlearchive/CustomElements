@@ -81,6 +81,8 @@ function register(inName, inOptions) {
   // 7.1.8. Return the output of the previous step.
   definition.ctor = generateConstructor(definition);
   definition.ctor.prototype = definition.prototype;
+  // blanket upgrade (?)
+  document.upgradeElements();
   return definition.ctor;
 }
 
