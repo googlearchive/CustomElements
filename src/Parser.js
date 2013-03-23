@@ -84,6 +84,15 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
 // bootstrap parsing
 
+// IE shim for CustomEvent
+if (typeof CustomEvent !== 'function') {
+  var CustomEvent = function(inType) {
+     var e = document.createEvent('HTMLEvents');
+     e.initEvent(inType, true, true);
+     return e;
+  };
+}
+
 function bootstrap() {
   // go async so call stack can unwind
   setTimeout(function() {
@@ -105,6 +114,5 @@ if (window.webComponents) {
 } else {
   window.addEventListener('load', bootstrap);
 }
-
 
 })();
