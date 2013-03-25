@@ -59,11 +59,13 @@ function register(inName, inOptions) {
   // construct a defintion out of options
   // TODO(sjmiles): probably should clone inOptions instead of mutating it
   var definition = inOptions || {};
-  if (!definition.name) {
+  if (!inName) {
     // TODO(sjmiles): replace with more appropriate error (Erik can probably
     // offer guidance)
     throw new Error('Name argument must not be empty');
   } 
+  // record name
+  definition.name = inName;
   // must have a prototype, default to an extension of HTMLElement
   // TODO(sjmiles): probably should throw if no prototype, check spec
   if (!definition.prototype) {
@@ -71,10 +73,6 @@ function register(inName, inOptions) {
     // offer guidance)
     throw new Error('Options missing required prototype property');
   }
-  definition.prototype = definition.prototype
-      || Object.create(HTMLUnknownElement.prototype);
-  // record name
-  definition.name = inName;
   // ensure a lifecycle object so we don't have to null test it
   definition.lifecycle = definition.lifecycle || {};
   // build a list of ancestral custom elements (for native base detection)
