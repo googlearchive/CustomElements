@@ -30,7 +30,7 @@
  * @param {Object} inOptions
  *    @param {String} [inOptions.extends]
  *      (_off spec_) Tag name of an element to extend (or blank for a new 
- *      element). This paramter is not part of the specification, but instead 
+ *      element). This parameter is not part of the specification, but instead 
  *      is a hint for the polyfill because the extendee is difficult to infer.
  *      Remember that the input prototype must chain to the extended element's 
  *      prototype (or HTMLElement.prototype) regardless of the value of 
@@ -59,15 +59,27 @@ function register(inName, inOptions) {
   // construct a defintion out of options
   // TODO(sjmiles): probably should clone inOptions instead of mutating it
   var definition = inOptions || {};
+  if (!definition.name) {
+    // TODO(sjmiles): replace with more appropriate error (Erik can probably
+    // offer guidance)
+    throw new Error('Name argument must not be empty');
+  } 
+  // must have a prototype, default to an extension of HTMLElement
+  // TODO(sjmiles): probably should throw if no prototype, check spec
+  if (!definition.prototype) {
+    // TODO(sjmiles): replace with more appropriate error (Erik can probably
+    // offer guidance)
+    throw new Error('Options missing required prototype property');
+  }
+  definition.prototype = definition.prototype
+      || Object.create(HTMLUnknownElement.prototype);
   // record name
   definition.name = inName;
   // ensure a lifecycle object so we don't have to null test it
   definition.lifecycle = definition.lifecycle || {};
-  // must have a prototype, default to an extension of HTMLElement
-  // TODO(sjmiles): probably should throw if no prototype, check spec
-  definition.prototype = definition.prototype
-      || Object.create(HTMLUnknownElement.prototype);
-  // build a list of ancestral custom elements (for lifecycle management)
+  // build a list of ancestral custom elements (for native base detection)
+  // TODO(sjmiles): we used to need to store this, but current code only
+  // uses it in 'resolveTagName': it should probably be inlined
   definition.ancestry = ancestry(definition.extends);
   // extensions of native specializations of HTMLElement require localName
   // to remain native, and use secondary 'is' specifier for extension type
