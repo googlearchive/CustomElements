@@ -106,9 +106,8 @@ function bootstrap() {
 }
 
 // TODO(sjmiles):
-// 'window' has wrappability under ShadowDOM polyfill, so 
-// we are forced to split into two version
-// !webComponents && ShadowDOM will not work
+// 'window' has no wrappability under ShadowDOM polyfill, so 
+// we are forced to split into two versions
 if (window.WebComponents) {
   sdocument.addEventListener('WebComponentsLoaded', bootstrap);
 } else {
