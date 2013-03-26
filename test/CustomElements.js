@@ -19,7 +19,7 @@ suite('customElements', function() {
 
   test('document.register create via new', function() {
     // register x-foo
-    var XFoo = document.register('x-foo');
+    var XFoo = document.register('x-foo', {prototype: HTMLElement.prototype});
     // create an instance via new
     var xfoo = new XFoo();
     // test localName
@@ -34,7 +34,7 @@ suite('customElements', function() {
   
   test('document.register create via createElement', function() {
     // register x-foo
-    var XFoo = document.register('x-foo');
+    var XFoo = document.register('x-foo', {prototype: HTMLElement.prototype});
     // create an instance via createElement
     var xfoo = document.createElement('x-foo');
     // test localName
