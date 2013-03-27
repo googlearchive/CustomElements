@@ -39,7 +39,7 @@ var componentParser = {
         cp[cp.map[e.localName]](e);
       });
       // upgrade everything
-      document.upgradeElements(inDocument);
+      //document.upgradeElements(inDocument);
     }
   },
   parseLink: function(inLinkElt) {
@@ -96,6 +96,8 @@ if (typeof CustomEvent !== 'function') {
 function bootstrap() {
   // go async so call stack can unwind
   setTimeout(function() {
+    // install auto-upgrader
+    document.watchDOM(document.body);
     // parse document
     componentParser.parse(document);
     // notify system
