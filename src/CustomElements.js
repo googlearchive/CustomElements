@@ -378,7 +378,13 @@ function watchDOM(inRoot) {
     var observer = new mo(function(mutations) {
       mutations.forEach(function(mx) {
         if (mx.type == 'childList') {
-          forEach(mx.addedNodes, upgradeElements);
+          forEach(mx.addedNodes, function(n) {
+            // this node may need upgrade (if so, subtree is upgraded here)
+            if (!upgradeElement(n)) {
+              // or maybe not, but then maybe the subtree needs upgrade
+              upgradeElements(n);
+            }
+          });
         }
       })
     });
