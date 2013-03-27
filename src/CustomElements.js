@@ -372,15 +372,40 @@ function getPropertyDescriptor(inObject, inName) {
   }
 }
 
+function watchDOM(inRoot) {
+  var mo = window.MutationObserver || window.WebKitMutationObserver;
+  if (mo) {
+    var observer = new mo(function(mutations) {
+      mutations.forEach(function(mx) {
+        if (mx.type == 'childList') {
+          mx.addedNodes.forEach(upgradeElement);
+        }
+      })
+    });
+    observer.observe(inRoot, {childList: true});
+    return observer;
+  } 
+}
+
 // capture native createElement before we override it
 var domCreateElement = document.createElement.bind(document);
 
 // exports
 
-document.register = register;
-document.upgradeElement = upgradeElement;
-document.upgradeElements = upgradeElements;
-document.createElement = createElement; // override
+document.register = document.webkitRegister || document.register;
+
+if (!document.register) {
+  document.register = register;
+  document.createElement = createElement; // override
+  document.upgradeElement = upgradeElement;
+  document.upgradeElements = upgradeElements;
+  document.watchDOM = watchDOM; 
+} else {
+  var nop = function() {};
+  document.upgradeElement = nop;
+  document.upgradeElements = nop;
+  document.watchDOM = nop; 
+}
 
 // TODO(sjmiles): temporary, control scope better
 window.mixin = mixin;
