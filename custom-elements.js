@@ -6,6 +6,8 @@
 
 (function(scope) {
 
+var scope = scope || window;
+
 var thisFile = 'custom-elements.js';
 
 // NOTE: use attributes on the script tag for this file as directives
@@ -35,7 +37,7 @@ var source, base = '';
 
 // flags
 
-var flags = {};
+var flags = scope.flags || {};
 
 // acquire flags from script tag attributes
 
