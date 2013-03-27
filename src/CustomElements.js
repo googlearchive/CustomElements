@@ -378,7 +378,7 @@ function watchDOM(inRoot) {
     var observer = new mo(function(mutations) {
       mutations.forEach(function(mx) {
         if (mx.type == 'childList') {
-          mx.addedNodes.forEach(upgradeElement);
+          forEach(mx.addedNodes, upgradeElements);
         }
       })
     });
