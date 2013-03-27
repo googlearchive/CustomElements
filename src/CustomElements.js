@@ -193,6 +193,8 @@ function upgrade(inElement, inDefinition) {
   inElement.__upgraded__ = true;
   // invoke lifecycle.created callbacks
   created(inElement, inDefinition);
+  // we require child nodes be upgraded before ready
+  upgradeElements(inElement);
   // OUTPUT
   return inElement;
 }
