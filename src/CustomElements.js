@@ -191,10 +191,10 @@ function upgrade(inElement, inDefinition) {
   }
   // flag as upgraded
   inElement.__upgraded__ = true;
-  // invoke lifecycle.created callbacks
-  created(inElement, inDefinition);
   // we require child nodes be upgraded before ready
   upgradeElements(inElement);
+  // invoke readyCallback
+  ready(inElement, inDefinition);
   // OUTPUT
   return inElement;
 }
@@ -251,8 +251,8 @@ function customMixin(inTarget, inSrc, inNative) {
   //console.groupEnd();
 }
 
-function created(inElement, inDefinition) {
-  var readyCallback = inDefinition.lifecycle.readyCallback || 
+function ready(inElement, inDefinition) {
+  var readyCallback = inDefinition.lifecycle.readyCallback ||
       inElement.readyCallback;
   if (readyCallback) {
     readyCallback.call(inElement);
