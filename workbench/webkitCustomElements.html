@@ -8,21 +8,20 @@ license that can be found in the LICENSE file.
   <head>
     <title>CustomElements Workbench</title>
     <meta charset="UTF-8">
-    <script src="../custom-elements.js"></script>
   </head>
-  <body>
+  <body
     <x-foo>XFoo One</x-foo>
     <script>
-      XFoo = document.register('x-foo', {
+      XFoo = document.webkitRegister('x-foo', {
         prototype: Object.create(HTMLElement.prototype, {
           readyCallback: {
             value: function() {
-              console.log('readyCallback:', this.textContent);
+              this.textContent += ' -- [upgraded]';
             }
           },
           foo: {
             value: function() {
-              console.log('foo');
+              this.style.cssText = 'border: 1px solid lightblue; padding: 8px;';
             }
           }
         })
