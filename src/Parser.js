@@ -28,7 +28,8 @@ var componentParser = {
   },
   parse: function(inDocument) {
     if (inDocument) {
-      // upgrade everything
+      // upgrade all upgradeable static elements, anything dynamically
+      // created should be caught by a watchDOM() observer
       document.upgradeElements(inDocument);
       // all parsable elements in inDocument (depth-first pre-order traversal)
       var elts = inDocument.querySelectorAll(cp.selectors);
@@ -38,8 +39,6 @@ var componentParser = {
         //console.log(map[e.localName] + ":", path.nodeUrl(e));
         cp[cp.map[e.localName]](e);
       });
-      // upgrade everything
-      //document.upgradeElements(inDocument);
     }
   },
   parseLink: function(inLinkElt) {
@@ -96,7 +95,7 @@ if (typeof CustomEvent !== 'function') {
 function bootstrap() {
   // go async so call stack can unwind
   setTimeout(function() {
-    // install auto-upgrader
+    // install auto-upgrader on main document
     document.watchDOM(document.body);
     // parse document
     componentParser.parse(document);
@@ -108,7 +107,7 @@ function bootstrap() {
 }
 
 // TODO(sjmiles):
-// 'window' has no wrappability under ShadowDOM polyfill, so 
+// 'window' has no wrappability under ShadowDOM polyfill, so
 // we are forced to split into two versions
 if (window.WebComponents) {
   sdocument.addEventListener('WebComponentsLoaded', bootstrap);
