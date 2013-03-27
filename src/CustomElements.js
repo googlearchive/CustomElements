@@ -18,29 +18,29 @@
 
 /**
  * Registers a custom tag name with the document.
- * 
+ *
  * When a registered element is created, a `readyCallback` method is called
- * in the scope of the element. The `readyCallback` method can be specified on 
+ * in the scope of the element. The `readyCallback` method can be specified on
  * either `inOptions.prototype` or `inOptions.lifecycle` with the latter taking
  * precedence.
- * 
+ *
  * @method register
- * @param {String} inName The tag name to register. Must include a dash ('-'), 
+ * @param {String} inName The tag name to register. Must include a dash ('-'),
  *    for example 'x-component'.
  * @param {Object} inOptions
  *    @param {String} [inOptions.extends]
- *      (_off spec_) Tag name of an element to extend (or blank for a new 
- *      element). This parameter is not part of the specification, but instead 
+ *      (_off spec_) Tag name of an element to extend (or blank for a new
+ *      element). This parameter is not part of the specification, but instead
  *      is a hint for the polyfill because the extendee is difficult to infer.
- *      Remember that the input prototype must chain to the extended element's 
- *      prototype (or HTMLElement.prototype) regardless of the value of 
+ *      Remember that the input prototype must chain to the extended element's
+ *      prototype (or HTMLElement.prototype) regardless of the value of
  *      `extends`.
- *    @param {Object} inOptions.prototype The prototype to use for the new 
+ *    @param {Object} inOptions.prototype The prototype to use for the new
  *      element. The prototype must inherit from HTMLElement.
  *    @param {Object} [inOptions.lifecycle]
- *      Callbacks that fire at important phases in the life of the custom 
+ *      Callbacks that fire at important phases in the life of the custom
  *      element.
- *       
+ *
  * @example
  *      FancyButton = document.register("fancy-button", {
  *        extends: 'button',
@@ -63,7 +63,7 @@ function register(inName, inOptions) {
     // TODO(sjmiles): replace with more appropriate error (Erik can probably
     // offer guidance)
     throw new Error('Name argument must not be empty');
-  } 
+  }
   // record name
   definition.name = inName;
   // must have a prototype, default to an extension of HTMLElement
@@ -203,7 +203,7 @@ function implement(inElement, inDefinition) {
   // prototype swizzling is best
   if (Object.__proto__) {
     inElement.__proto__ = inDefinition.prototype;
-  } 
+  }
   // TODO(sjmiles): below here is feature detected, but really it's
   // just for IE
   else {
@@ -224,13 +224,13 @@ if (!console.group) {
 
 function customMixin(inTarget, inSrc, inNative) {
   //console.group(inTarget.localName);
-  // TODO(sjmiles): 'used' allows us to only copy the 'youngest' version of 
-  // any property. This set should be precalculated. We also need to 
+  // TODO(sjmiles): 'used' allows us to only copy the 'youngest' version of
+  // any property. This set should be precalculated. We also need to
   // consider this for supporting 'super'.
   var used = {};
   // start with inSrc
   var p = inSrc;
-  // sometimes the default is HTMLUnknownElement.prototype instead of 
+  // sometimes the default is HTMLUnknownElement.prototype instead of
   // HTMLElement.prototype, so we add a test
   // the idea is to avoid mixing in native prototypes, so adding
   // the second test is WLOG
@@ -240,7 +240,7 @@ function customMixin(inTarget, inSrc, inNative) {
     for (var i=0, k; k=keys[i]; i++) {
       if (!used[k]) {
         //console.log(k);
-        Object.defineProperty(inTarget, k, 
+        Object.defineProperty(inTarget, k,
             Object.getOwnPropertyDescriptor(p, k));
         used[k] = 1;
       }
@@ -309,12 +309,12 @@ function upgradeElement(inElement) {
  * causes the custom prototype to be applied, an `is` attribute to be attached
  * (as needed), and invocation of the `readyCallback`.
  * `upgradeElement` does nothing is the element is already upgraded, or
- * if it matches no registered custom tag name. 
- * 
+ * if it matches no registered custom tag name.
+ *
  * @method ugpradeElements
- * @param {Node} inRoot The root of the DOM subtree in which elements are to 
+ * @param {Node} inRoot The root of the DOM subtree in which elements are to
  *  be upgraded.
- * @param {String} [inSlctr] An optional selector for matching specific 
+ * @param {String} [inSlctr] An optional selector for matching specific
  * elements, otherwise all register element types are upgraded.
  */
 function upgradeElements(inRoot, inSlctr) {
@@ -392,7 +392,7 @@ function watchDOM(inRoot) {
     });
     observer.observe(inRoot, {childList: true});
     return observer;
-  } 
+  }
 }
 
 // capture native createElement before we override it
@@ -407,12 +407,12 @@ if (!document.register || flags.register !== 'native') {
   document.createElement = createElement; // override
   document.upgradeElement = upgradeElement;
   document.upgradeElements = upgradeElements;
-  document.watchDOM = watchDOM; 
+  document.watchDOM = watchDOM;
 } else {
   var nop = function() {};
   document.upgradeElement = nop;
   document.upgradeElements = nop;
-  document.watchDOM = nop; 
+  document.watchDOM = nop;
 }
 
 // TODO(sjmiles): temporary, control scope better
