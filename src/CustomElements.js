@@ -394,7 +394,7 @@ var domCreateElement = document.createElement.bind(document);
 
 document.register = document.webkitRegister || document.register;
 
-if (!document.register) {
+if (!document.register || flags.register !== 'native') {
   document.register = register;
   document.createElement = createElement; // override
   document.upgradeElement = upgradeElement;
