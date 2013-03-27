@@ -290,14 +290,14 @@ function createElement(inTag) {
  * causes the custom prototype to be applied, an `is` attribute to be attached
  * (as needed), and invocation of the `readyCallback`.
  * `upgradeElement` does nothing is the element is already upgraded, or
- * if it matches no registered custom tag name. 
- * 
+ * if it matches no registered custom tag name.
+ *
  * @method ugpradeElement
  * @param {Element} inElement The element to upgrade.
  * @return {Element} The upgraded element.
  */
 function upgradeElement(inElement) {
-  if (!inElement.__upgraded__) {
+  if (!inElement.__upgraded__ && inElement.nodeType === Node.ELEMENT_NODE) {
     var type = inElement.getAttribute('is') || inElement.localName;
     var definition = registry[type];
     return definition && upgrade(inElement, definition);
