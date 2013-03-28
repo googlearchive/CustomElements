@@ -6,7 +6,15 @@
 
 (function(scope) {
 
+// default to global scope
+
 var scope = scope || window;
+
+// imports
+
+var flags = scope.flags || {};
+
+// acquire flags
 
 var thisFile = 'custom-elements.js';
 
@@ -34,10 +42,6 @@ var source, base = '';
     getAttribute: function() {}
   };
 })();
-
-// flags
-
-var flags = scope.flags || {};
 
 // acquire flags from script tag attributes
 
@@ -67,8 +71,6 @@ if (flags.log) {
 window.logFlags = logFlags;
 
 // support exportas directive
-
-scope = scope || {};
 
 if (flags.exportas) {
   window[flags.exportas] = scope;
