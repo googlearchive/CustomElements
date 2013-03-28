@@ -318,10 +318,10 @@ function upgradeElement(inElement) {
  * elements, otherwise all register element types are upgraded.
  */
 function upgradeElements(inRoot, inSlctr) {
-  if (inRoot.nodeType === Node.ELEMENT_NODE) {
+  var root = inRoot || document;
+  if (root.nodeType === Node.ELEMENT_NODE) {
     var slctr = inSlctr || registrySlctr;
     if (slctr) {
-      var root = inRoot || document;
       forEach(root.querySelectorAll(slctr), upgradeElement);
     }
   }
