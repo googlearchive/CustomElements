@@ -14,7 +14,9 @@ license that can be found in the LICENSE file.
     <script>
       window.onload = function() {
         // just shows [x-foo]
-        XFoo = document.register('x-foo');
+        XFoo = document.register('x-foo', {
+          prototype: Object.create(HTMLElement.prototype)
+        });
         xfoo = new XFoo();
         document.body.appendChild(xfoo).textContent = '[x-foo]';
         //

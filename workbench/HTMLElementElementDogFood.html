@@ -20,17 +20,20 @@ license that can be found in the LICENSE file.
     });
     function parseElementElement() {
       console.log(this.getAttribute('name'));
-      var script = this.querySelector('scripts');
+      var script = this.querySelector('script');
       console.log(script.textContent);
     };
   </script>
 </head>
 <body>
   <element name="x-foo">
-    <scripts>
-      this.lifecycle({
-      });
-    </scripts>
+    <script>
+      (this !== window) && this.lifecycle({});
+    </script>
   </element>
+  <script>
+    // we didn't load Parser.js, so do this manually
+    document.upgradeElements();
+  </script>
 </body>
 </html>

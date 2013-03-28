@@ -9,7 +9,7 @@ license that can be found in the LICENSE file.
   <meta charset="utf-8">
   <script src="../custom-elements.js"></script>
   <style>
-    template {
+    e-template {
       display: none;
     }
     x-foo {
@@ -17,7 +17,7 @@ license that can be found in the LICENSE file.
     }
   </style>
   <script>
-    HTMLTemplateElement = document.register('template', {
+    HTMLTemplateElement = document.register('e-template', {
       prototype: Object.create(HTMLElement.prototype, {
         readyCallback: {
           value: function() {
@@ -61,9 +61,9 @@ license that can be found in the LICENSE file.
   </script>
 </head>
 <body>
-  <template element="x-foo">
+  <e-template element="x-foo">
     I Expand Into Good Stuff.
-  </template>
+  </e-template>
   <x-foo></x-foo>
   <x-foo></x-foo>
   <x-foo></x-foo>
