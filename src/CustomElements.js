@@ -319,7 +319,7 @@ function upgradeElement(inElement) {
  */
 function upgradeElements(inRoot, inSlctr) {
   var root = inRoot || document;
-  if (root.nodeType === Node.ELEMENT_NODE) {
+  if (root.querySelectorAll) {
     var slctr = inSlctr || registrySlctr;
     if (slctr) {
       forEach(root.querySelectorAll(slctr), upgradeElement);
