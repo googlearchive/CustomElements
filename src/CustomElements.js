@@ -322,7 +322,8 @@ function upgradeElements(inRoot, inSlctr) {
   if (root.querySelectorAll) {
     var slctr = inSlctr || registrySlctr;
     if (slctr) {
-      forEach(root.querySelectorAll(slctr), upgradeElement);
+      var nodes = root.querySelectorAll(slctr);
+      forEach(nodes, upgradeElement);
     }
   }
 }
