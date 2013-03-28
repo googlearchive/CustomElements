@@ -53,7 +53,7 @@ var componentParser = {
   },
   parseScript: function(inScriptElt) {
     // ignore scripts in primary document, they are already loaded
-    if (inScriptElt.ownerDocument === sdocument) {
+    if (inMainDocument(inScriptElt)) {
       return;
     }
     // ignore scripts inside <element>
@@ -75,6 +75,12 @@ var componentParser = {
 };
 
 var cp = componentParser;
+
+function inMainDocument(inElt) {
+  return inElt.ownerDocument === document ||
+    // TODO(sjmiles): ShadowDOMPolyfill intrusion
+    inElt.ownerDocument.impl === document;
+}
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
