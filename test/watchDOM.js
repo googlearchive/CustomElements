@@ -24,6 +24,12 @@ suite('watchDOM', function() {
       prototype: proto
     });
   }
+  
+  function testElements(node, selector, value) {
+    Array.prototype.forEach.call(node.querySelectorAll(selector), function(n) {
+      assert.equal(n.value, value);
+    });
+  }
 
   test('custom element automatically upgrades', function(done) {
     registerTestComponent('x-auto', 'auto');
@@ -36,23 +42,52 @@ suite('watchDOM', function() {
     }, 0);
   });
   
+  test('custom element automatically upgrades in subtree', function(done) {
+    registerTestComponent('x-auto-sub', 'auto-sub');
+    work.innerHTML = '<div></div>';
+    var target = work.firstChild;
+    setTimeout(function() {
+      target.innerHTML = '<x-auto-sub></x-auto-sub>';
+      var x = target.firstChild;
+      assert.isUndefined(x.value);
+      setTimeout(function() {
+        assert.equal(x.value, 'auto-sub');
+        done();
+      }, 0);
+    }, 0);
+  });
   
-  test('custom elements automatically upgrades', function(done) {
+  
+  test('custom elements automatically upgrade', function(done) {
     registerTestComponent('x-auto1', 'auto1');
     registerTestComponent('x-auto2', 'auto2');
     work.innerHTML = '<div><div><x-auto1></x-auto1><x-auto1></x-auto1>' +
       '</div></div><div><x-auto2><x-auto1></x-auto1></x-auto2>' +
       '<x-auto2><x-auto1></x-auto1></x-auto2></div>';
-    function testElements(selector, value) {
-      Array.prototype.forEach.call(work.querySelectorAll(selector), function(n) {
-        assert.equal(n.value, value);
-      });
-    }
     setTimeout(function() {
-      testElements('x-auto1', 'auto1');
-      testElements('x-auto2', 'auto2');
+      testElements(work, 'x-auto1', 'auto1');
+      testElements(work, 'x-auto2', 'auto2');
       done();
-    });
+    }, 0);
+  });
+  
+  
+  test('custom elements automatically upgrade in subtree', function(done) {
+    registerTestComponent('x-auto-sub1', 'auto-sub1');
+    registerTestComponent('x-auto-sub2', 'auto-sub2');
+    work.innerHTML = '<div></div>';
+    var target = work.firstChild;
+    setTimeout(function() {
+      target.innerHTML = '<div><div><x-auto-sub1></x-auto-sub1><x-auto-sub1></x-auto-sub1>' +
+        '</div></div><div><x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2>' +
+        '<x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2></div>';
+      setTimeout(function() {
+        testElements(target, 'x-auto-sub1', 'auto-sub1');
+        testElements(target, 'x-auto-sub2', 'auto-sub2');
+        done();
+      }, 0);
+    }, 0);
+    
   });
   
   // test ShadowDOM only in webkit for now...
@@ -68,6 +103,23 @@ suite('watchDOM', function() {
       assert.isUndefined(x.value);
       setTimeout(function() {
         assert.equal(x.value, 'auto-shadow');
+        done();
+      }, 0);
+    });
+  
+    test('custom element automatically upgrades in ShadowDOM subtree', function(done) {
+      registerTestComponent('x-sub', 'sub');
+      work.innerHTML = '<div></div>';
+      var div = work.firstChild;
+      var root = div.webkitCreateShadowRoot();
+      root.innerHTML = '<div></div>';
+      document.watchDOM(root);
+      var target = root.firstChild;
+      target.innerHTML = '<x-sub></x-sub>';
+      var x = target.firstChild;
+      assert.isUndefined(x.value);
+      setTimeout(function() {
+        assert.equal(x.value, 'sub');
         done();
       }, 0);
     });
