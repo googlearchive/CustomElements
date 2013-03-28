@@ -297,7 +297,7 @@ function createElement(inTag) {
  * @return {Element} The upgraded element.
  */
 function upgradeElement(inElement) {
-  if (!inElement.__upgraded__ && inElement.nodeType === Node.ELEMENT_NODE) {
+  if (!inElement.__upgraded__ && (inElement.nodeType === Node.ELEMENT_NODE)) {
     var type = inElement.getAttribute('is') || inElement.localName;
     var definition = registry[type];
     return definition && upgrade(inElement, definition);
@@ -318,10 +318,12 @@ function upgradeElement(inElement) {
  * elements, otherwise all register element types are upgraded.
  */
 function upgradeElements(inRoot, inSlctr) {
-  var slctr = inSlctr || registrySlctr;
-  if (slctr) {
-    var root = inRoot || document;
-    forEach(root.querySelectorAll(slctr), upgradeElement);
+  if (inRoot.nodeType === Node.ELEMENT_NODE) {
+    var slctr = inSlctr || registrySlctr;
+    if (slctr) {
+      var root = inRoot || document;
+      forEach(root.querySelectorAll(slctr), upgradeElement);
+    }
   }
 }
 
