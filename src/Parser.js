@@ -6,9 +6,6 @@
 
 (function() {
 
-// TODO(sjmiles): ShadowDOM polyfill pollution
-var sdocument = window.wrap ? wrap(document) : document;
-
 // highlander object for parsing a document tree
 
 var componentParser = {
@@ -99,18 +96,21 @@ function bootstrap() {
     document.watchDOM(document.body);
     // parse document
     componentParser.parse(document);
+    // TODO(sjmiles): ShadowDOM polyfill pollution
+    var doc = window.ShadowDOMPolyfill ?
+          ShadowDOMPolyfill.wrap(document)
+              : document;
     // notify system
-    sdocument.body.dispatchEvent(
+    doc.body.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true})
     );
   }, 0);
 }
 
-// TODO(sjmiles):
-// 'window' has no wrappability under ShadowDOM polyfill, so
+// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so
 // we are forced to split into two versions
 if (window.WebComponents) {
-  sdocument.addEventListener('WebComponentsLoaded', bootstrap);
+  document.addEventListener('WebComponentsLoaded', bootstrap);
 } else {
   window.addEventListener('load', bootstrap);
 }
