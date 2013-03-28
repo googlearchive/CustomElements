@@ -392,7 +392,7 @@ function watchDOM(inRoot) {
         }
       })
     });
-    observer.observe(inRoot, {childList: true});
+    observer.observe(inRoot, {childList: true, subtree: true});
     return observer;
   }
 }
