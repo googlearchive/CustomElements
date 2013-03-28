@@ -87,8 +87,8 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 // bootstrap parsing
 
 // IE shim for CustomEvent
-if (typeof CustomEvent !== 'function') {
-  var CustomEvent = function(inType) {
+if (typeof window.CustomEvent !== 'function') {
+  window.CustomEvent = function(inType) {
      var e = document.createEvent('HTMLEvents');
      e.initEvent(inType, true, true);
      return e;
@@ -103,8 +103,8 @@ function bootstrap() {
     // parse document
     componentParser.parse(document);
     // TODO(sjmiles): ShadowDOM polyfill pollution
-    var doc = window.ShadowDOMPolyfill ?
-          ShadowDOMPolyfill.wrap(document)
+    var doc = window.ShadowDOMPolyfill ? 
+          ShadowDOMPolyfill.wrap(document) 
               : document;
     // notify system
     doc.body.dispatchEvent(
@@ -113,7 +113,7 @@ function bootstrap() {
   }, 0);
 }
 
-// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so
+// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so 
 // we are forced to split into two versions
 if (window.WebComponents) {
   document.addEventListener('WebComponentsLoaded', bootstrap);
