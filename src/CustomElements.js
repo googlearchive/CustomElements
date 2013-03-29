@@ -397,6 +397,10 @@ function watchDOM(inRoot) {
         }
       })
     });
+    // TODO(sjmiles): ShadowDOMPolyfill Intrusion
+    if (window.ShadowDOMPolyfill && inRoot.impl) {
+      inRoot = ShadowDOMPolyfill.unwrap(inRoot);
+    }
     observer.observe(inRoot, {childList: true, subtree: true});
     return observer;
   }
