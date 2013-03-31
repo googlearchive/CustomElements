@@ -63,7 +63,7 @@ var componentParser = {
     // otherwise, evaluate now
     var code = inScriptElt.__resource || inScriptElt.textContent;
     if (code) {
-      eval(code);
+      eval.call(window, code);
     }
   },
   parseStyle: function(inStyleElt) {
