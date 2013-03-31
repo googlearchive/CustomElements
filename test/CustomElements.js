@@ -168,4 +168,81 @@ suite('customElements', function() {
     assert.equal(xbooboo.style.fontStyle, 'italic');
     assert.equal(xbooboo.style.fontSize, '32pt');
   });
+  
+  test('document.register [ready|inserted|removed]Callbacks in lifecycle', function() {
+    var ready, inserted, removed;
+    var XBooPrototype = Object.create(HTMLElement.prototype);
+    var lifecycle = {
+      readyCallback: function() {
+        ready = true;
+      },
+      insertedCallback: function() {
+        inserted = true;
+      },
+      removedCallback: function() {
+        removed = true;
+      }
+    };
+    var XBoo = document.register('x-boo-irl', {
+      prototype: XBooPrototype,
+      lifecycle: lifecycle
+    });
+    var xboo = new XBoo();
+    assert(ready, 'ready must be true [XBoo]');
+    assert(!inserted, 'inserted must be false [XBoo]');
+    assert(!removed, 'removed must be false [XBoo]');
+    work.appendChild(xboo);
+    assert(inserted, 'inserted must be true [XBoo]');
+    work.removeChild(xboo);
+    assert(removed, 'removed must be true [XBoo]');
+  });
+
+  test('document.register [ready|inserted|removed]Callbacks in prototype', function() {
+    var ready, inserted, removed;
+    var XBooPrototype = Object.create(HTMLElement.prototype);
+    XBooPrototype.readyCallback = function() {
+      ready = true;
+    }
+    XBooPrototype.insertedCallback = function() {
+      inserted = true;
+    }
+    XBooPrototype.removedCallback = function() {
+      removed = true;
+    }
+    var XBoo = document.register('x-boo-ir', {
+      prototype: XBooPrototype
+    });
+    var xboo = new XBoo();
+    assert(ready, 'ready must be true [XBoo]');
+    assert(!inserted, 'inserted must be false [XBoo]');
+    assert(!removed, 'removed must be false [XBoo]');
+    work.appendChild(xboo);
+    assert(inserted, 'inserted must be true [XBoo]');
+    work.removeChild(xboo);
+    assert(removed, 'removed must be true [XBoo]');
+    //
+    ready = inserted = removed = false;
+    var XBooBooPrototype = Object.create(XBooPrototype);
+    XBooBooPrototype.readyCallback = function() {
+      XBoo.prototype.readyCallback.call(this);
+    };
+    XBooBooPrototype.insertedCallback = function() {
+      XBoo.prototype.insertedCallback.call(this);
+    };
+    XBooBooPrototype.removedCallback = function() {
+      XBoo.prototype.removedCallback.call(this);
+    };
+    var XBooBoo = document.register('x-booboo-ir', {
+      prototype: XBooBooPrototype,
+      extends: 'x-booir'
+    });
+    var xbooboo = new XBooBoo();
+    assert(ready, 'ready must be true [XBooBoo]');
+    assert(!inserted, 'inserted must be false [XBooBoo]');
+    assert(!removed, 'removed must be false [XBooBoo]');
+    work.appendChild(xboo);
+    assert(inserted, 'inserted must be true [XBooBoo]');
+    work.removeChild(xboo);
+    assert(removed, 'removed must be true [XBooBoo]');
+  });
 });

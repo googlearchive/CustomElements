@@ -193,8 +193,8 @@ function upgrade(inElement, inDefinition) {
   inElement.__upgraded__ = true;
   // we require child nodes be upgraded before ready
   upgradeElements(inElement);
-  // invoke readyCallback
-  ready(inElement, inDefinition);
+  // lifecycle management
+  lifecycle(inElement, inDefinition);
   // OUTPUT
   return inElement;
 }
@@ -251,13 +251,34 @@ function customMixin(inTarget, inSrc, inNative) {
   //console.groupEnd();
 }
 
-function ready(inElement, inDefinition) {
-  var readyCallback = inDefinition.lifecycle.readyCallback ||
-      inElement.readyCallback;
-  if (readyCallback) {
-    readyCallback.call(inElement);
+function lifecycle(inElement, inDefinition) {
+  // attach insert|removeCallback to respective events
+  listenInsertRemove(inElement, inDefinition);
+  // invoke readyCallback
+  callback('readyCallback', inElement, inDefinition);
+}
+
+function listenInsertRemove(inElement, inDefinition) {
+  var listen = function(inType, inCallbackName) {
+    inElement.addEventListener(inType, function(inEvent) {
+      if (inEvent.target === inElement) {
+        inEvent.stopPropagation();
+        callback(inCallbackName, inElement, inDefinition);
+      }
+    }, false);
+  };
+  listen('DOMNodeInserted', 'insertedCallback');
+  listen('DOMNodeRemoved', 'removedCallback');
+}
+
+function callback(inName, inElement, inDefinition) {
+  var cb = inDefinition.lifecycle[inName] || inElement[inName];
+  if (cb) {
+    cb.call(inElement);
   }
 }
+
+// element registry (maps tag names to definitions)
 
 var registry = {};
 var registrySlctr = '';
