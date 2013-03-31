@@ -15,15 +15,15 @@ license that can be found in the LICENSE file.
   </style>
 </head>
 <body>
-  <x-foo></x-foo>
+  <x-foo id="first"></x-foo>
   <element name="x-foo">
     <scripts>
       this.register({
         prototype: {
           readyCallback: function() {
-            this.textContent = '[x-foo registered]';
+            this.textContent = '[x-foo registered (click me)]';
             this.addEventListener('click', function() {
-              alert('Hi Again');
+              alert('Hi' + (this.id ? ' from "' + this.id + '"' : ''));
             });
           }
         }
