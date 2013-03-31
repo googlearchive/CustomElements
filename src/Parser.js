@@ -42,9 +42,11 @@ var componentParser = {
     // rel=components
     if (this.isDocumentLink(inLinkElt)) {
       cp.parse(inLinkElt.__resource);
-    } else {
+    } else if (!inMainDocument(inLinkElt)) {
       // rel=stylesheet
-      // inject into main body
+      // inject into main document
+      inLinkElt.setAttribute('href', inLinkElt.__nodeUrl);
+      document.head.appendChild(inLinkElt);
     }
   },
   isDocumentLink: function(inElt) {
