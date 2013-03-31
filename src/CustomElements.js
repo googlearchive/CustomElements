@@ -254,8 +254,30 @@ function customMixin(inTarget, inSrc, inNative) {
 function lifecycle(inElement, inDefinition) {
   // attach insert|removeCallback to respective events
   listenInsertRemove(inElement, inDefinition);
+  // attach MutationObserver to listen for attribute changes
+  listenAttributes(inElement, inDefinition);
   // invoke readyCallback
-  callback('readyCallback', inElement, inDefinition);
+  callback('readyCallback', inDefinition, inElement);
+}
+
+function listenAttributes(inElement, inDefinition) {
+  var mo = window.MutationObserver || window.WebKitMutationObserver;
+  if (mo) {
+    var observer = new mo(function(mutations) {
+      mutations.forEach(function(mx) {    
+        if (mx.type === 'attributes') {
+          callback('attributeChangedCallback', inDefinition, inElement, 
+              [mx.attributeName, mx.oldValue]);
+        }
+      })
+    });
+    // TODO(sjmiles): ShadowDOMPolyfill Intrusion
+    if (window.ShadowDOMPolyfill && inElement.impl) {
+      inElement = ShadowDOMPolyfill.unwrap(inElement);
+    }
+    observer.observe(inElement, {attributes: true, attributeOldValue: true});
+  }  
+  return observer;
 }
 
 function listenInsertRemove(inElement, inDefinition) {
@@ -263,7 +285,7 @@ function listenInsertRemove(inElement, inDefinition) {
     inElement.addEventListener(inType, function(inEvent) {
       if (inEvent.target === inElement) {
         inEvent.stopPropagation();
-        callback(inCallbackName, inElement, inDefinition);
+        callback(inCallbackName, inDefinition, inElement);
       }
     }, false);
   };
@@ -271,10 +293,11 @@ function listenInsertRemove(inElement, inDefinition) {
   listen('DOMNodeRemoved', 'removedCallback');
 }
 
-function callback(inName, inElement, inDefinition) {
+var emptyArgs = [];
+function callback(inName, inDefinition, inElement, inArgs) {
   var cb = inDefinition.lifecycle[inName] || inElement[inName];
   if (cb) {
-    cb.call(inElement);
+    cb.apply(inElement, inArgs || emptyArgs);
   }
 }
 

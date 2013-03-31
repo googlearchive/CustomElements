@@ -245,4 +245,20 @@ suite('customElements', function() {
     work.removeChild(xboo);
     assert(removed, 'removed must be true [XBooBoo]');
   });
+
+  test('document.register attributeChangedCallback in prototype', function(done) {
+    var XBooPrototype = Object.create(HTMLElement.prototype);
+    XBooPrototype.attributeChangedCallback = function(inName, inOldValue) {
+      if (inName == 'foo' && inOldValue=='bar' 
+          && this.attributes.foo.value == 'zot') {
+        done();
+      }
+    }
+    var XBoo = document.register('x-boo-acp', {
+      prototype: XBooPrototype
+    });
+    var xboo = new XBoo();
+    xboo.setAttribute('foo', 'bar');
+    xboo.setAttribute('foo', 'zot');
+  });
 });
