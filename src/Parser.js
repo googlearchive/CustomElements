@@ -42,16 +42,22 @@ var componentParser = {
     // rel=components
     if (this.isDocumentLink(inLinkElt)) {
       cp.parse(inLinkElt.__resource);
-    } else if (!inMainDocument(inLinkElt)) {
+    } else if (!inMainDocument(inLinkElt) && !this.isElementElementChild(inLinkElt)) {
       // rel=stylesheet
       // inject into main document
-      inLinkElt.setAttribute('href', inLinkElt.__nodeUrl);
-      document.head.appendChild(inLinkElt);
+      var style = document.createElement('style');
+      style.textContent = inLinkElt.__resource;
+      document.head.appendChild(style);
     }
   },
   isDocumentLink: function(inElt) {
     return (inElt.localName === 'link'
         && inElt.getAttribute('rel') === 'component');
+  },
+  isElementElementChild: function(inElt) {
+    if (inElt.parentNode && inElt.parentNode.localName === 'element') {
+      return true;
+    }
   },
   parseScript: function(inScriptElt) {
     // ignore scripts in primary document, they are already loaded
@@ -59,7 +65,7 @@ var componentParser = {
       return;
     }
     // ignore scripts inside <element>
-    if (inScriptElt.parentNode.localName === 'element') {
+    if (this.isElementElementChild(inScriptElt)) {
       return;
     }
     // otherwise, evaluate now
@@ -69,7 +75,9 @@ var componentParser = {
     }
   },
   parseStyle: function(inStyleElt) {
-    document.querySelector("head").appendChild(inStyleElt);
+    if (!this.isElementElementChild(inStyleElt)) {
+      document.querySelector('head').appendChild(inStyleElt);
+    }
   },
   parseElement: function(inElementElt) {
     new HTMLElementElement(inElementElt);
