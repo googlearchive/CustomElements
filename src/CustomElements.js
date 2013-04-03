@@ -127,29 +127,30 @@ function resolvePrototypeChain(inDefinition) {
   // prototype for precise mixing in
   // we also need native prototype so we can replace it with a wrapper
   // prototype if necessary
-  if (window.WrapperElement
+  if (/*window.WrapperElement
         && !(inDefinition.prototype instanceof WrapperElement)
-        || !Object.__proto__) {
+        ||*/ !Object.__proto__) {
     if (inDefinition.is) {
       // for non-trivial extensions, work out both prototypes
       var inst = domCreateElement(inDefinition.tag);
       var wrapperNative = Object.getPrototypeOf(inst);
-      if (window.WrapperElement) {
+      /*if (window.WrapperElement) {
         inst = unwrap(inst);
-      }
+      }*/
       var native = Object.getPrototypeOf(inst);
     } else {
       // otherwise, use the defaults
       native = HTMLElement.prototype;
-      if (window.WrapperElement) {
+      /*if (window.WrapperElement) {
         wrapperNative = WrapperHTMLUnknownElement.prototype;
-      }
+      }*/
     }
   }
   // cache this in case of mixin
   inDefinition.native = native;
   // under ShadowDOM polyfill we need to use Wrapper prototype chain instead
   // of native DOM
+  /*
   if (window.WrapperElement
         && !(inDefinition.prototype instanceof WrapperElement)) {
     if (Object.__proto__) {
@@ -168,6 +169,7 @@ function resolvePrototypeChain(inDefinition) {
       // TODO(sjmiles): support IE
     }
   }
+  */
 }
 
 // SECTION 4
