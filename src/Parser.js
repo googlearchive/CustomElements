@@ -40,23 +40,14 @@ var componentParser = {
   },
   parseLink: function(inLinkElt) {
     // rel=components
-    if (this.isDocumentLink(inLinkElt)) {
+    if (isDocumentLink(inLinkElt)) {
       cp.parse(inLinkElt.__resource);
-    } else if (!inMainDocument(inLinkElt) && !this.isElementElementChild(inLinkElt)) {
+    } else if (!inMainDocument(inLinkElt) && !isElementElementChild(inLinkElt)) {
       // rel=stylesheet
       // inject into main document
       var style = document.createElement('style');
       style.textContent = inLinkElt.__resource;
       document.head.appendChild(style);
-    }
-  },
-  isDocumentLink: function(inElt) {
-    return (inElt.localName === 'link'
-        && inElt.getAttribute('rel') === 'component');
-  },
-  isElementElementChild: function(inElt) {
-    if (inElt.parentNode && inElt.parentNode.localName === 'element') {
-      return true;
     }
   },
   parseScript: function(inScriptElt) {
@@ -65,7 +56,7 @@ var componentParser = {
       return;
     }
     // ignore scripts inside <element>
-    if (this.isElementElementChild(inScriptElt)) {
+    if (isElementElementChild(inScriptElt)) {
       return;
     }
     // otherwise, evaluate now
@@ -75,7 +66,7 @@ var componentParser = {
     }
   },
   parseStyle: function(inStyleElt) {
-    if (!this.isElementElementChild(inStyleElt)) {
+    if (!isElementElementChild(inStyleElt)) {
       document.querySelector('head').appendChild(inStyleElt);
     }
   },
@@ -90,6 +81,17 @@ function inMainDocument(inElt) {
   return inElt.ownerDocument === document ||
     // TODO(sjmiles): ShadowDOMPolyfill intrusion
     inElt.ownerDocument.impl === document;
+}
+
+function isDocumentLink(inElt) {
+  return (inElt.localName === 'link'
+      && inElt.getAttribute('rel') === 'component');
+}
+
+function isElementElementChild(inElt) {
+  if (inElt.parentNode && inElt.parentNode.localName === 'element') {
+    return true;
+  }
 }
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
