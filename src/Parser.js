@@ -6,11 +6,13 @@
 
 (function() {
 
+var IMPORT_LINK_TYPE = 'import';
+
 // highlander object for parsing a document tree
 
 var componentParser = {
   selectors: [
-    'link[rel=component]',
+    'link[rel=' + IMPORT_LINK_TYPE + ']',
     'link[rel=stylesheet]',
     'script[src]',
     'script',
@@ -85,7 +87,7 @@ function inMainDocument(inElt) {
 
 function isDocumentLink(inElt) {
   return (inElt.localName === 'link'
-      && inElt.getAttribute('rel') === 'component');
+      && inElt.getAttribute('rel') === IMPORT_LINK_TYPE);
 }
 
 function isElementElementChild(inElt) {
