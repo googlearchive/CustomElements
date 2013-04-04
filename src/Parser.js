@@ -115,8 +115,8 @@ function bootstrap() {
     // parse document
     componentParser.parse(document);
     // TODO(sjmiles): ShadowDOM polyfill pollution
-    var doc = window.ShadowDOMPolyfill ? 
-          ShadowDOMPolyfill.wrap(document) 
+    var doc = window.ShadowDOMPolyfill ?
+          ShadowDOMPolyfill.wrap(document)
               : document;
     // notify system
     doc.body.dispatchEvent(
@@ -125,10 +125,11 @@ function bootstrap() {
   }, 0);
 }
 
-// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so 
+// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so
 // we are forced to split into two versions
-if (window.WebComponents) {
-  document.addEventListener('WebComponentsLoaded', bootstrap);
+
+if (window.HTMLImports) {
+  document.addEventListener('HTMLImportsLoaded', bootstrap);
 } else {
   window.addEventListener('load', bootstrap);
 }
