@@ -4,11 +4,26 @@
  * license that can be found in the LICENSE file.
  */
 module.exports = function(grunt) {
+  var os = require('os');
+  var browsers = ['Chrome', 'Firefox'];
+  if (os.type() === 'Darwin') {
+    browsers.push('ChromeCanary');
+  }
+  if (os.type() === 'Windows_NT') {
+    browsers.push('IE');
+  }
   CustomElements = [
     'src/CustomElements.js',
     'src/HTMLElementElement.js'
   ];
   grunt.initConfig({
+    karma: {
+      CustomElements: {
+        configFile: 'conf/karma.conf.js',
+        keepalive: true,
+        browsers: browsers
+      }
+    },
     uglify: {
       CustomElements: {
         /*
@@ -43,10 +58,12 @@ module.exports = function(grunt) {
   // plugins
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
+  grunt.loadNpmTasks('grunt-karma');
 
   // tasks
   grunt.registerTask('default', ['uglify']);
   grunt.registerTask('minify', ['uglify']);
   grunt.registerTask('docs', ['yuidoc']);
+  grunt.registerTask('test', ['karma']);
 };
 
