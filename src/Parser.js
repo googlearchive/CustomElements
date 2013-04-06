@@ -44,12 +44,9 @@ var componentParser = {
     // rel=components
     if (isDocumentLink(inLinkElt)) {
       cp.parse(inLinkElt.__resource);
-    } else if (!inMainDocument(inLinkElt) && !isElementElementChild(inLinkElt)) {
-      // rel=stylesheet
-      // inject into main document
-      var style = document.createElement('style');
-      style.textContent = inLinkElt.__resource;
-      document.head.appendChild(style);
+    } else if (!inMainDocument(inLinkElt) && inLinkElt.parentNode && 
+      !isElementElementChild(inLinkElt)) {
+      document.head.appendChild(inLinkElt);
     }
   },
   parseScript: function(inScriptElt) {
