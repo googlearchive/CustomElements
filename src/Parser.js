@@ -25,8 +25,15 @@ var componentParser = {
     element: 'parseElement',
     style: 'parseStyle'
   },
+  parsed: {},
   parse: function(inDocument) {
-    if (inDocument) {
+    // TODO(sorvell): parse each document only once.
+    // We should be able to mark documents that have been parsed.
+    // A loading issue is preventing us from doing that, so temporarily
+    // use a url cache.
+    var url = inDocument.URL || inDocument._URL;
+    if (inDocument && !this.parsed[url]) {
+      this.parsed[url] = true;
       // upgrade all upgradeable static elements, anything dynamically
       // created should be caught by a watchDOM() observer
       document.upgradeElements(inDocument);
