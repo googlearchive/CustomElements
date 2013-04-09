@@ -103,6 +103,7 @@ Polyfill parses <element> tags and handles element upgrades asynchronously. To k
 finished all start up tasks, listen to the `WebComponentsReady` event on `document` or `window`.
 
 Example:
+
 	<script>
 		// hide body to prevent FOUC
 		document.body.style.opacity = 0;
