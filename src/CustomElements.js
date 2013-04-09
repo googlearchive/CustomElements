@@ -430,10 +430,6 @@ function watchDOM(inRoot) {
       mutations.forEach(function(mx) {
         if (mx.type == 'childList') {
           forEach(mx.addedNodes, function(n) {
-            // TODO(sjmiles): ShadowDOMPolyfill Intrusion
-            if (window.ShadowDOMPolyfill) {
-              n = ShadowDOMPolyfill.wrap(n);
-            }
             // this node may need upgrade (if so, subtree is upgraded here)
             if (!upgradeElement(n)) {
               // or maybe not, but then maybe the subtree needs upgrade
@@ -443,10 +439,6 @@ function watchDOM(inRoot) {
         }
       })
     });
-    // TODO(sjmiles): ShadowDOMPolyfill Intrusion
-    if (window.ShadowDOMPolyfill && inRoot.impl) {
-      inRoot = ShadowDOMPolyfill.unwrap(inRoot);
-    }
     observer.observe(inRoot, {childList: true, subtree: true});
     return observer;
   }
