@@ -99,6 +99,19 @@ Use the minified version (`custom-elements.min.js`) if you need to load the file
 
 ### Polyfill Notes
 
+Polyfill parses <element> tags and handles element upgrades asynchronously. To know when the polyfill has
+finished all start up tasks, listen to the `WebComponentsReady` event on `document` or `window`.
+
+Example:
+	<script>
+		// hide body to prevent FOUC
+		document.body.style.opacity = 0;
+		window.addEventListener('WebComponentsReady', function() {
+			// show body now that everything is ready
+			document.body.style.opacity = 1;
+		});
+	</script>
+
 The Custom Elements specification is still under discussion. The polyfill implements certain features in advance of the specification. In particular, there are several notification (_callback_) methods that are used if implemented on the element prototype.
 
 * `readyCallback()` is called when a custom element is created.
