@@ -43,11 +43,14 @@ var componentParser = {
     }
   },
   parseLink: function(inLinkElt) {
-    // rel=components
+    // imports
     if (isDocumentLink(inLinkElt)) {
-      cp.parse(inLinkElt.__resource);
-    } else if (!inMainDocument(inLinkElt) && inLinkElt.parentNode && 
-      !isElementElementChild(inLinkElt)) {
+      if (inLinkElt.content) {
+        cp.parse(inLinkElt.content);
+      }
+    } else if (!inMainDocument(inLinkElt)
+        && inLinkElt.parentNode
+        && !isElementElementChild(inLinkElt)) {
       document.head.appendChild(inLinkElt);
     }
   },
