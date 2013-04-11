@@ -75,13 +75,19 @@ function executeComponentScript(inScript, inContext, inName) {
   context = inContext;
   // source location
   var owner = context.ownerDocument;
+  var url = (owner._URL || owner.URL);
+  var match = url.match(/.*\/([^.]*)[.]?.*$/);
+  if (match) {
+    var name = match[1];
+    url += name != inName ? ':' + inName : '';
+  }
   // compose script
   var code = "__componentScript('"
     + inName
     + "', function(){"
     + inScript
     + "});"
-    + "\n//@ sourceURL=" + (owner._URL || owner.URL) + "\n"
+    + "\n//@ sourceURL=" + url + "\n"
   ;
   // inject script
   eval(code);
