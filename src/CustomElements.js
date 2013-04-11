@@ -125,51 +125,19 @@ function resolvePrototypeChain(inDefinition) {
   // TODO(sjmiles): contains ShadowDOM polyfill pollution
   // if we don't support __proto__ we need to locate the native level
   // prototype for precise mixing in
-  // we also need native prototype so we can replace it with a wrapper
-  // prototype if necessary
-  if (/*window.WrapperElement
-        && !(inDefinition.prototype instanceof WrapperElement)
-        ||*/ !Object.__proto__) {
+  if (!Object.__proto__) {
     if (inDefinition.is) {
       // for non-trivial extensions, work out both prototypes
-      var inst = domCreateElement(inDefinition.tag);
-      var wrapperNative = Object.getPrototypeOf(inst);
-      /*if (window.WrapperElement) {
-        inst = unwrap(inst);
-      }*/
+      //var inst = domCreateElement(inDefinition.tag);
+      var inst = document.createElement(inDefinition.tag);
       var native = Object.getPrototypeOf(inst);
     } else {
-      // otherwise, use the defaults
+      // otherwise, use the default
       native = HTMLElement.prototype;
-      /*if (window.WrapperElement) {
-        wrapperNative = WrapperHTMLUnknownElement.prototype;
-      }*/
     }
   }
   // cache this in case of mixin
   inDefinition.native = native;
-  // under ShadowDOM polyfill we need to use Wrapper prototype chain instead
-  // of native DOM
-  /*
-  if (window.WrapperElement
-        && !(inDefinition.prototype instanceof WrapperElement)) {
-    if (Object.__proto__) {
-      // search and replace 'native' protoype with 'wrapperNative'
-      var p = inDefinition.prototype, pp;
-      while (true) {
-        pp = Object.getPrototypeOf(p);
-        if (pp === native || pp == HTMLUnknownElement.prototype) {
-          break;
-        }
-        p = pp;
-      }
-      p.__proto__ = wrapperNative;
-      //console.log(native, wrapperNative, p);
-    } else {
-      // TODO(sjmiles): support IE
-    }
-  }
-  */
 }
 
 // SECTION 4
@@ -205,27 +173,16 @@ function implement(inElement, inDefinition) {
   // prototype swizzling is best
   if (Object.__proto__) {
     inElement.__proto__ = inDefinition.prototype;
-  }
-  // TODO(sjmiles): below here is feature detected, but really it's
-  // just for IE
-  else {
+  } else {
     // where above we can re-acquire inPrototype via
     // getPrototypeOf(Element), we cannot do so when
     // we use mixin, so we install a magic reference
-    if (!Object.__proto__) {
-      inElement.__proto__ = inDefinition.prototype;
-    }
     customMixin(inElement, inDefinition.prototype, inDefinition.native);
+    inElement.__proto__ = inDefinition.prototype;
   }
 }
 
-if (!console.group) {
-  console.group = function(m) {console.log("[group] " + m);};
-  console.groupEnd = function() {console.log("[end]");};
-}
-
 function customMixin(inTarget, inSrc, inNative) {
-  //console.group(inTarget.localName);
   // TODO(sjmiles): 'used' allows us to only copy the 'youngest' version of
   // any property. This set should be precalculated. We also need to
   // consider this for supporting 'super'.
@@ -237,20 +194,16 @@ function customMixin(inTarget, inSrc, inNative) {
   // the idea is to avoid mixing in native prototypes, so adding
   // the second test is WLOG
   while (p !== inNative && p !== HTMLUnknownElement.prototype) {
-    //console.group('proto');
     var keys = Object.getOwnPropertyNames(p);
     for (var i=0, k; k=keys[i]; i++) {
       if (!used[k]) {
-        //console.log(k);
         Object.defineProperty(inTarget, k,
             Object.getOwnPropertyDescriptor(p, k));
         used[k] = 1;
       }
     }
-    //console.groupEnd();
     p = Object.getPrototypeOf(p);
   }
-  //console.groupEnd();
 }
 
 function lifecycle(inElement, inDefinition) {
@@ -262,10 +215,15 @@ function lifecycle(inElement, inDefinition) {
   callback('readyCallback', inDefinition, inElement);
 }
 
+var MO = window.MutationObserver || window.WebKitMutationObserver 
+    || window.JsMutationObserver;
+if (!MO) {
+  console.warn("no mutation observer support");
+}  
+
 function listenAttributes(inElement, inDefinition) {
-  var mo = window.MutationObserver || window.WebKitMutationObserver;
-  if (mo) {
-    var observer = new mo(function(mutations) {
+  if (MO) {
+    var observer = new MO(function(mutations) {
       mutations.forEach(function(mx) {    
         if (mx.type === 'attributes') {
           callback('attributeChangedCallback', inDefinition, inElement, 
@@ -278,7 +236,7 @@ function listenAttributes(inElement, inDefinition) {
       inElement = ShadowDOMPolyfill.unwrap(inElement);
     }
     observer.observe(inElement, {attributes: true, attributeOldValue: true});
-  }  
+  }
   return observer;
 }
 
@@ -378,70 +336,8 @@ function upgradeElements(inRoot, inSlctr) {
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
-// copy all properties from inProps (et al) to inObj
-function mixin(inObj/*, inProps, inMoreProps, ...*/) {
-  var obj = inObj || {};
-  for (var i = 1; i < arguments.length; i++) {
-    var p = arguments[i];
-    // TODO(sjmiles): on IE we are using mixin
-    // to generate custom element instances, as we have
-    // no way to alter element prototypes after creation
-    // (nor a way to create an element with a custom prototype)
-    // however, prototype sources (inSource) are ultimately
-    // chained to a native prototype (HTMLElement or inheritor)
-    // and trying to copy HTMLElement properties to itself throwss
-    // in IE
-    // we don't actually want to copy those properties anyway, but I
-    // can't find a way to determine if a prototype is a native
-    // or custom inheritor of HTMLElement
-    // ad hoc solution is to simply stop at the first exception
-    // an alternative exists if we have a tagName hint: then we can
-    // work out where the native objects are in the prototype chain
-    try {
-      for (var n in p) {
-        copyProperty(n, p, obj);
-      }
-    } catch(x) {
-      //console.log(x);
-    }
-  }
-  return obj;
-}
-
-// copy property inName from inSource object to inTarget object
-function copyProperty(inName, inSource, inTarget) {
-  var pd = getPropertyDescriptor(inSource, inName);
-  Object.defineProperty(inTarget, inName, pd);
-}
-
-// get property descriptor for inName on inObject, even if
-// inName exists on some link in inObject's prototype chain
-function getPropertyDescriptor(inObject, inName) {
-  if (inObject) {
-    var pd = Object.getOwnPropertyDescriptor(inObject, inName);
-    return pd || getPropertyDescriptor(Object.getPrototypeOf(inObject), inName);
-  }
-}
-
 function watchDOM(inRoot) {
-  var mo = window.MutationObserver || window.WebKitMutationObserver;
-  if (mo) {
-    var observer = new mo(function(mutations) {
-      mutations.forEach(function(mx) {
-        if (mx.type == 'childList') {
-          forEach(mx.addedNodes, function(n) {
-            // this node may need upgrade (if so, subtree is upgraded here)
-            if (!upgradeElement(n)) {
-              // or maybe not, but then maybe the subtree needs upgrade
-              upgradeElements(n);
-            }
-          });
-        }
-      })
-    });
-    observer.observe(inRoot, {childList: true, subtree: true});
-    return observer;
-  }
+  domObserver.observe(inRoot, {childList: true, subtree: true});
 }
 
 // capture native createElement before we override it
@@ -452,6 +348,21 @@ var domCreateElement = document.createElement.bind(document);
 document.register = document.webkitRegister || document.register;
 
 if (!document.register || flags.register !== 'native') {
+  if (MO) {
+    var domObserver = new MO(function(mutations) {
+      mutations.forEach(function(mx) {
+        if (mx.type == 'childList') {
+          forEach(mx.addedNodes, function(n) {
+            // this node may need upgrade (if so, subtree is upgraded here)
+            if (!upgradeElement(n)) {
+              // or maybe not, but then the subtree may need upgrade
+              upgradeElements(n);
+            }
+          });
+        }
+      })
+    });
+  }
   document.register = register;
   document.createElement = createElement; // override
   document.upgradeElement = upgradeElement;
@@ -463,8 +374,5 @@ if (!document.register || flags.register !== 'native') {
   document.upgradeElements = nop;
   document.watchDOM = nop;
 }
-
-// TODO(sjmiles): temporary, control scope better
-window.mixin = mixin;
 
 })();
