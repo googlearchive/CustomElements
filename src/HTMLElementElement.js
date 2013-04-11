@@ -76,6 +76,9 @@ function executeComponentScript(inScript, inContext, inName) {
   // source location
   var owner = context.ownerDocument;
   var url = (owner._URL || owner.URL);
+  // ensure the component has a unique source map so it can be debugged
+  // if the name matches the filename part of the owning document's url,
+  // use this, otherwise, add ":<name>" to the document url.
   var match = url.match(/.*\/([^.]*)[.]?.*$/);
   if (match) {
     var name = match[1];
