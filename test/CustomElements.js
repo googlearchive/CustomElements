@@ -234,7 +234,7 @@ suite('customElements', function() {
     };
     var XBooBoo = document.register('x-booboo-ir', {
       prototype: XBooBooPrototype,
-      extends: 'x-booir'
+      extends: 'x-boo-ir'
     });
     var xbooboo = new XBooBoo();
     assert(ready, 'ready must be true [XBooBoo]');
