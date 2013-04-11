@@ -3,4 +3,4 @@
 	url = https://github.com/toolkitchen/buildbot.git
 [submodule "MutationObservers"]
 	path = MutationObservers
-	url = git@github.com:toolkitchen/MutationObservers.git
+	url = https://github.com/toolkitchen/MutationObservers.git
