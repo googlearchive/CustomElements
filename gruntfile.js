@@ -13,6 +13,8 @@ module.exports = function(grunt) {
     browsers.push('IE');
   }
   CustomElements = [
+    'src/sidetable.js',
+    'MutationObservers/MutationObserver.js',
     'src/CustomElements.js',
     'src/HTMLElementElement.js'
   ];
