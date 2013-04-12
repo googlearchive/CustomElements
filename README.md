@@ -20,7 +20,7 @@ Invoke `document.register()` somewhere in script.
 
     var XFooPrototype = Object.create(HTMLElement.prototype);
     XFooPrototype.readyCallback = function() {
-      this.textContent = 'I'm an x-foo!';
+      this.textContent = "I'm an x-foo!";
     };
 
     var XFoo = document.register('x-foo', {
@@ -71,7 +71,7 @@ Example extending `button`:
   
     var XFooPrototype = Object.create(HTMLButtonElement.prototype);
     XFooPrototype.readyCallback = function() {
-      this.textContent = 'I'm an x-foo!';
+      this.textContent = "I'm an x-foo!";
     };
 
     var XFoo = document.register('x-foo', {
