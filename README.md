@@ -24,10 +24,9 @@ Invoke `document.register` somewhere in script.
 	XFooPrototype.readyCallback = function() {
 		this.textContent = 'I'm an x-foo!';
 	};
-	
-    var XFoo = document.register('x-foo', {
-    	prototype: FooPrototype
-    });
+  var XFoo = document.register('x-foo', {
+  	prototype: FooPrototype
+  });
 	
 #### <element>
 
@@ -40,15 +39,14 @@ Invoke `document.register` somewhere in script.
 			// we only want to do work when this == <element>
 			if (this !== window) {
 				var section = this.querySelector('section');
-			}
-			// has built-in 'window' protection
-			this.register({
-			  prototype: {
-			  	readyCallback: function() {
-			  		this.innerHTML = this.section.innerHTML;
-			  	}
-			  }
-			});
+				this.register({
+				  prototype: {
+				  	readyCallback: function() {
+				  		this.innerHTML = '<i>' + section.innerHTML + '</i>';
+				  	}
+				  }
+				});
+		  }
 		</script>
 	</element>
 
