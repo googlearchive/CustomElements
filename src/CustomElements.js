@@ -347,7 +347,7 @@ var domCreateElement = document.createElement.bind(document);
 
 document.register = document.webkitRegister || document.register;
 
-if (!document.register || flags.register !== 'native') {
+if (!document.register || CustomElements.flags.register !== 'native') {
   if (MO) {
     var domObserver = new MO(function(mutations) {
       mutations.forEach(function(mx) {
