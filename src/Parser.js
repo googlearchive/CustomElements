@@ -66,6 +66,7 @@ var componentParser = {
     // otherwise, evaluate now
     var code = inScriptElt.__resource || inScriptElt.textContent;
     if (code) {
+      code += "\n//@ sourceURL=" + inScriptElt.__nodeUrl + "\n";
       eval.call(window, code);
     }
   },
