@@ -14,7 +14,9 @@
  * @class Document
 */
 
-(function() {
+(function(scope) {
+
+scope = scope || {flags:{}};
 
 /**
  * Registers a custom tag name with the document.
@@ -347,7 +349,7 @@ var domCreateElement = document.createElement.bind(document);
 
 document.register = document.webkitRegister || document.register;
 
-if (!document.register || flags.register !== 'native') {
+if (!document.register || scope.flags.register !== 'native') {
   if (MO) {
     var domObserver = new MO(function(mutations) {
       mutations.forEach(function(mx) {
@@ -375,4 +377,4 @@ if (!document.register || flags.register !== 'native') {
   document.watchDOM = nop;
 }
 
-})();
+})(window.CustomElements);

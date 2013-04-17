@@ -55,7 +55,13 @@ function parseElementElement(inElement) {
     executeComponentScript(script.textContent, inElement, options.name);
   };
   // register our new element
-  document.register(options.name, options);
+  var ctor = document.register(options.name, options);
+  inElement.ctor = ctor;
+  // store optional constructor reference
+  var refName = inElement.getAttribute('constructor');
+  if (refName) {
+    window[refName] = ctor;
+  }
 }
   
 // each property in inDictionary takes a value

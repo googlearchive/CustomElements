@@ -4,3 +4,6 @@
 [submodule "MutationObservers"]
 	path = MutationObservers
 	url = https://github.com/toolkitchen/MutationObservers.git
+[submodule "tools"]
+	path = tools
+	url = https://github.com/toolkitchen/tools.git

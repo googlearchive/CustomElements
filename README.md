@@ -2,87 +2,115 @@
 
 ### Why Custom Elements?
 
-This repository contains a Javascript polyfill for the Custom Elements [specification](https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/custom/index.html)
-
 Custom Elements let authors define their own elements. Authors associate JavaScript code with custom tag names, and then use those custom tag names as they would any standard tag.
 
 For example, after registering a special kind of button called `super-button`, use the super button just like this:
 
-		<super-button></super-button>
+    <super-button></super-button>
 
 Custom elements are still elements. We can create, use, manipulate, and compose them just as easily as any standard `<div>` or `<span>` today.
 
-The Custom Elements specification also supports declaring custom elements in markup, using the `<element>` tag. The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScript into reusable, encapsulated components. As before, custom elements built this way work just like standard elements.
-
 ### Basic usage
 
-#### document.register
+As with any element, custom elements can be created in JavaScript or declared.
+**Their name must always contain a dash (-).**
 
-Invoke `document.register` somewhere in script.
+#### Element registration
 
-	var XFooPrototype = Object.create(HTMLElement.prototype);
-	XFooPrototype.readyCallback = function() {
-		this.textContent = 'I'm an x-foo!';
-	};
-  var XFoo = document.register('x-foo', {
-  	prototype: FooPrototype
-  });
-	
-#### <element>
+Before you can use a custom element, it needs to be registered using one of the following
+methods. Otherwise, the browser considers it an <code>HTMLUnknownElement</code>.
 
-	<element name='x-foo'>
-		<section>
-			<b>I'm an x-foo!</b>
-		</section>
-		<script>
-			// when <element> is in document, we might run in wrong context,
-			// we only want to do work when this == <element>
-			if (this !== window) {
-				var section = this.querySelector('section');
-				this.register({
-				  prototype: {
-				  	readyCallback: function() {
-				  		this.innerHTML = '<i>' + section.innerHTML + '</i>';
-				  	}
-				  }
-				});
-		  }
-		</script>
-	</element>
+##### &lt;element&gt;
 
-#### Notes
+The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScript into reusable, encapsulated components.
 
-* In the `document.register` example above, `XFoo` is the new element's constructor. Browser limitations require that we supply the constructor while you supply the prototype. You can use `readyCallback` to do initialization work that might otherwise be in the constructor.
-     
-	After registration, elements with the custom tag name are expressed with new features, so
+Here's the declarative version of the previous example:
 
-		<x-foo></x-foo>
-	
-	displays as
+    <element name="x-foo">
+      <section>
+        I'm an x-foo!
+      </section>
+      <script>
+        // When <element> is in document, we might run in wrong context.
+        // Only do work when this == <element>.
+        if (this !== window) {
+          var section = this.querySelector('section');
 
-		I'm an x-foo!  
+          // Has built-in 'window' protection.
+          this.register({
+            prototype: {
+              readyCallback: function() {
+                this.innerHTML = section.innerHTML;
+              },
+              foo: function() {
+                console.log('foo() called');
+              }
+            }
+         });
+        }
+      </script>
+    </element>
 
-* Custom element names must always contain a dash (-)
-* Using `document.register` the input prototype must be chained to `HTMLElement.prototype` (i.e. must be `instanceof HTMLElement.prototype`).
+**Extending existing elements**
 
-	If input prototype uses a specialization of `HTMLElement.prototype`, you must declare the type using the `extends` option when calling `document.register`
+Using `<element>`, the prototype must be a simple object, but the `extends` attribute
+can be used to extend existing DOM elements. The system chains the correct prototype
+based the value of this attribute.
   
-	Example extending Button:
-	
-		var XFooPrototype = Object.create(HTMLButtonElement.prototype);
-		XFooPrototype.readyCallback = function() {
-			this.textContent = 'I'm an x-foo!';
-		};
-	      var XFoo = document.register('x-foo', {
-	    	  prototype: FooPrototype,
-	    	  extends: 'button'
-	      });
+Example of extending `button`:
 
-* Using `<element>`, the input prototype must be a simple object, and the system chains the correct prototype based on the `extends` attribute.
-	
-	Example extending Button:
+    <element name="x-foo" extends="button">
 
-		<element name='x-foo' extends='button'>
+##### document.register()
+
+To register a new custom element in JavaScript, invoke `document.register()` somewhere in the page.
+As before, custom elements built this way work just like standard elements.
+
+    var XFooPrototype = Object.create(HTMLElement.prototype);
+    XFooPrototype.readyCallback = function() {
+      this.textContent = "I'm an x-foo!";
+    };
+    XFooPrototype.foo = function() {
+      console.log('foo() called');
+    };
+
+    var XFoo = document.register('x-foo', {
+      prototype: XFooPrototype
+    });
+
+**Note:** the prototype must be chained to `HTMLElement.prototype` (i.e. `instanceof HTMLElement.prototype`).
+
+**Extending existing elements**
+
+If you want to inherit from a specialized form of `HTMLElement` (e.g. `HTMLButtonElement`),
+declare the type using the `extends` option when calling `document.register()`:
+  
+Example extending `button`:
+  
+    var XFooPrototype = Object.create(HTMLButtonElement.prototype);
+    XFooPrototype.readyCallback = function() {
+      this.textContent = "I'm an x-foo!";
+    };
+
+    var XFoo = document.register('x-foo', {
+      prototype: XFooPrototype,
+      extends: 'button'
+    });
+
+#### Using a custom element
+
+After registration, you can constructor an instance of your element just like
+standard DOM elements:
+
+    <x-foo></x-foo>
+
+In the `document.register()` example above, `XFoo` was defined as the new element's constructor. Browser limitations require that we supply the constructor while you supply the prototype. Use the `readyCallback` to do initialization work that might otherwise be in the constructor.
+
+    var xFoo = new XFoo();
+    document.body.appendChild(xFoo);
+
+    var xFoo2 = document.createElement('x-foo');
+    xFoo2.foo(); // "foo() called"
 
 ## Polyfill details
 
@@ -90,37 +118,37 @@ Invoke `document.register` somewhere in script.
 
 Include the `custom-elements.js` or `custom-elements.min.js` (minified) file in your project.
 
-	<script src="CustomElements/custom-elements.js"></script>
+    <script src="CustomElements/custom-elements.js"></script>
 
 `custom-elements.js` is the debug loader and uses `document.write` to load additional modules. 
 Use the minified version (`custom-elements.min.js`) if you need to load the file dynamically.
 
 ### Polyfill Notes
 
-Polyfill parses <element> tags and handles element upgrades asynchronously. To know when the polyfill has
+The polyfill parses `<element>` tags and handles element upgrades _asynchronously_. To know when the polyfill has
 finished all start up tasks, listen to the `WebComponentsReady` event on `document` or `window`.
 
 Example:
 
-	<script>
-		// hide body to prevent FOUC
-		document.body.style.opacity = 0;
-		window.addEventListener('WebComponentsReady', function() {
-			// show body now that everything is ready
-			document.body.style.opacity = 1;
-		});
-	</script>
+    <script>
+      // hide body to prevent FOUC
+      document.body.style.opacity = 0;
+      window.addEventListener('WebComponentsReady', function() {
+        // show body now that everything is ready
+        document.body.style.opacity = 1;
+      });
+    </script>
 
-The Custom Elements specification is still under discussion. The polyfill implements certain features in advance of the specification. In particular, there are several notification (_callback_) methods that are used if implemented on the element prototype.
+The Custom Elements specification is still under discussion. The polyfill implements certain features in advance of the specification. In particular, there are several notification callback methods that are used if implemented on the element prototype.
 
 * `readyCallback()` is called when a custom element is created.
 * `insertedCallback()` is called when a custom element is inserted into a DOM subtree.
 * `removedCallback()` is called when a custom element is removed from a DOM subtree.
 * `attributeChanged(attributeName)` is called when a custom element's attribute value has changed
 
-`readyCallback` is invoked _synchronously_ with element instantiation, the other callbacks are called _asyncronously_. The asynchronous callbacks generally use MutationObserver timing model, which means they are called before layouts, paints, or other triggered events, so the developer need not worry about flashing content or other bad things happening before the callback has a chance to react to changes.
+`readyCallback` is invoked _synchronously_ with element instantiation, the other callbacks are called _asyncronously_. The asynchronous callbacks generally use the MutationObserver timing model, which means they are called before layouts, paints, or other triggered events, so the developer need not worry about flashing content or other bad things happening before the callback has a chance to react to changes.
 
-The `extends` option to `document.register` (discussed above)  is exclusive to this polyfill.
+The `extends` option to `document.register()` (discussed above)  is exclusive to this polyfill.
 
 ## Tools & Testing
 
