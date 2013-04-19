@@ -18,6 +18,33 @@
 
 scope = scope || {flags:{}};
 
+// native document.register?
+
+hasNative = document.register && scope.flags.register === 'native';
+
+if (hasNative) {
+
+  // exports
+
+  var nop = function() {};
+  document.upgradeElement = nop;
+  document.upgradeElements = nop;
+  document.watchDOM = nop;
+
+  scope.bootInsertions = nop;
+
+} else {
+
+// imports
+
+var MO = window.MutationObserver
+    || window.WebKitMutationObserver
+    || window.JsMutationObserver;
+
+if (!MO) {
+  throw new Error("no mutation observer support");
+}
+
 /**
  * Registers a custom tag name with the document.
  *
@@ -87,6 +114,10 @@ function register(inName, inOptions) {
   // some platforms require modifications to the user-supplied prototype
   // chain
   resolvePrototypeChain(definition);
+  // overrides to implement callbacks
+  // TODO(sjmiles): should support access via .attributes NamedNodeMap
+  definition.prototype.setAttribute = setAttribute;
+  definition.prototype.removeAttribute = removeAttribute;
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registerDefinition(inName, definition);
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
@@ -155,18 +186,18 @@ function instantiate(inDefinition) {
 }
 
 function upgrade(inElement, inDefinition) {
-  // make 'element' implement inDefinition.prototype
-  implement(inElement, inDefinition);
   // some definitions specify an 'is' attribute
   if (inDefinition.is) {
     inElement.setAttribute('is', inDefinition.is);
   }
+  // make 'element' implement inDefinition.prototype
+  implement(inElement, inDefinition);
   // flag as upgraded
   inElement.__upgraded__ = true;
   // we require child nodes be upgraded before ready
   upgradeElements(inElement);
   // lifecycle management
-  lifecycle(inElement, inDefinition);
+  ready(inElement);
   // OUTPUT
   return inElement;
 }
@@ -208,53 +239,33 @@ function customMixin(inTarget, inSrc, inNative) {
   }
 }
 
-function lifecycle(inElement, inDefinition) {
-  // attach insert|removeCallback to respective events
-  listenInsertRemove(inElement, inDefinition);
-  // attach MutationObserver to listen for attribute changes
-  listenAttributes(inElement, inDefinition);
+function ready(inElement) {
   // invoke readyCallback
-  callback('readyCallback', inDefinition, inElement);
-}
-
-var MO = window.MutationObserver || window.WebKitMutationObserver 
-    || window.JsMutationObserver;
-if (!MO) {
-  console.warn("no mutation observer support");
-}  
-
-function listenAttributes(inElement, inDefinition) {
-  if (MO) {
-    var observer = new MO(function(mutations) {
-      mutations.forEach(function(mx) {    
-        if (mx.type === 'attributes') {
-          callback('attributeChangedCallback', inDefinition, inElement, 
-              [mx.attributeName, mx.oldValue]);
-        }
-      })
-    });
-    // TODO(sjmiles): ShadowDOMPolyfill Intrusion
-    if (window.ShadowDOMPolyfill && inElement.impl) {
-      inElement = ShadowDOMPolyfill.unwrap(inElement);
-    }
-    observer.observe(inElement, {attributes: true, attributeOldValue: true});
+  if (inElement.readyCallback) {
+    inElement.readyCallback();
   }
-  return observer;
 }
 
-function listenInsertRemove(inElement, inDefinition) {
-  var listen = function(inType, inCallbackName) {
-    inElement.addEventListener(inType, function(inEvent) {
-      if (inEvent.target === inElement) {
-        inEvent.stopPropagation();
-        callback(inCallbackName, inDefinition, inElement);
-      }
-    }, false);
-  };
-  listen('DOMNodeInserted', 'insertedCallback');
-  listen('DOMNodeRemoved', 'removedCallback');
+function setAttribute(name, value) {
+  changeAttribute.call(this, name, value, originalSetAttribute);
 }
 
+function removeAttribute(name, value) {
+  changeAttribute.call(this, name, value, originalRemoveAttribute);
+}
+
+function changeAttribute(name, value, operation) {
+  var oldValue = this.getAttribute(name);
+  operation.apply(this, arguments);
+  if (this.attributeChangedCallback) {
+    this.attributeChangedCallback(name, oldValue);
+  }
+}
+
+var originalSetAttribute = HTMLElement.prototype.setAttribute;
+var originalRemoveAttribute = HTMLElement.prototype.removeAttribute;
+
+/*
 var emptyArgs = [];
 function callback(inName, inDefinition, inElement, inArgs) {
   var cb = inDefinition.lifecycle[inName] || inElement[inName];
@@ -262,6 +273,7 @@ function callback(inName, inDefinition, inElement, inArgs) {
     cb.apply(inElement, inArgs || emptyArgs);
   }
 }
+*/
 
 // element registry (maps tag names to definitions)
 
@@ -334,47 +346,92 @@ function upgradeElements(inRoot, inSlctr) {
   }
 }
 
-// utilities
+// DOM watching for upgrades
 
-var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
+var domObserver = new MO(function(mutations) {
+  mutations.forEach(function(mx) {
+    if (mx.type === 'childList') {
+      forEach(mx.addedNodes, function(n) {
+        // this node may need upgrade (if so, subtree is upgraded here)
+        if (!upgradeElement(n)) {
+          // or maybe not, but then the subtree may need upgrade
+          upgradeElements(n);
+        }
+      });
+    }
+  })
+});
 
 function watchDOM(inRoot) {
   domObserver.observe(inRoot, {childList: true, subtree: true});
 }
 
+// install auto-upgrader on main document (must be before insertion observer)
+watchDOM(document);
+
+// DOM watching for insertion/removal
+
+function inserted(inNode) {
+  if (inNode.insertedCallback) {
+    inNode.insertedCallback();
+  }
+}
+
+function removed(inNode) {
+  if (inNode.removedCallback) {
+    inNode.removedCallback();
+  }
+}
+
+function forCustomElements(inRoot, inCb) {
+  inCb(inRoot);
+  if (inRoot.querySelectorAll && registrySlctr) {
+    var nodes = inRoot.querySelectorAll(registrySlctr);
+    forEach(nodes, inCb);
+  }
+}
+
+var insertionObserver = new MO(function(mutations) {
+  mutations.forEach(function(mx) {
+    if (mx.type === 'childList') {
+      forEach(mx.addedNodes, function(n) {
+        forCustomElements(n, inserted);
+      });
+      forEach(mx.removedNodes, function(n) {
+        forCustomElements(n, removed);
+      });
+    }
+  });
+});
+
+// must be called after dom observer
+insertionObserver.observe(document, {childList: true, subtree: true});
+
+// utilities
+
+var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
+
 // capture native createElement before we override it
+
 var domCreateElement = document.createElement.bind(document);
 
 // exports
 
-document.register = document.webkitRegister || document.register;
+document.register = register;
+document.createElement = createElement; // override
+document.upgradeElement = upgradeElement;
+document.upgradeElements = upgradeElements;
+document.watchDOM = watchDOM;
 
-if (!document.register || scope.flags.register !== 'native') {
-  if (MO) {
-    var domObserver = new MO(function(mutations) {
-      mutations.forEach(function(mx) {
-        if (mx.type == 'childList') {
-          forEach(mx.addedNodes, function(n) {
-            // this node may need upgrade (if so, subtree is upgraded here)
-            if (!upgradeElement(n)) {
-              // or maybe not, but then the subtree may need upgrade
-              upgradeElements(n);
-            }
-          });
-        }
-      })
-    });
-  }
-  document.register = register;
-  document.createElement = createElement; // override
-  document.upgradeElement = upgradeElement;
-  document.upgradeElements = upgradeElements;
-  document.watchDOM = watchDOM;
-} else {
-  var nop = function() {};
-  document.upgradeElement = nop;
-  document.upgradeElements = nop;
-  document.watchDOM = nop;
+// invoke insertedCallback on elements already in DOM
+scope.bootInsertions = function() {
+  forCustomElements(document, inserted);
+};
+
 }
+
+// export
+
+scope.hasNative = hasNative;
 
 })(window.CustomElements);

@@ -6,9 +6,9 @@
 
 suite('HTMLElementElement', function() {
   var assert = chai.assert;
-  
+
   var work;
-  
+
   setup(function() {
     work = document.createElement('div');
     document.body.appendChild(work);
@@ -17,7 +17,7 @@ suite('HTMLElementElement', function() {
   teardown(function() {
     document.body.removeChild(work);
   });
-  
+
   test('component upgraded', function() {
     work.innerHTML = '<element name="x-test-element"></element>' +
       '<x-test-element>Foo</x-test-element>';
@@ -26,7 +26,7 @@ suite('HTMLElementElement', function() {
     document.upgradeElement(xtest);
     assert.equal(xtest.__upgraded__, true);
   });
-  
+
   test('component with script', function() {
     work.innerHTML = '<element name="x-test-script-element">' +
       '<script>' +
@@ -44,7 +44,7 @@ suite('HTMLElementElement', function() {
     assert.equal(x.__upgraded__, true);
     assert.equal(x.value, 'x-test-script-element');
   });
-  
+
   test('readyCallback in prototype', function() {
     work.innerHTML = '<element name="x-test-script-element">' +
       '<script>' +
@@ -63,7 +63,8 @@ suite('HTMLElementElement', function() {
     document.upgradeElement(x);
     assert.equal(x.textContent, 'Hello World');
   });
-  
+
+  /*
   test('readyCallback in lifecycle', function() {
     work.innerHTML = '<element name="x-test-script-element">' +
       '<script>' +
@@ -82,7 +83,8 @@ suite('HTMLElementElement', function() {
     document.upgradeElement(x);
     assert.equal(x.textContent, 'Hello World');
   });
-  
+  */
+ 
   test('extend element', function() {
     work.innerHTML = '<element name="x-foo">' +
       '<script>' +
@@ -101,7 +103,7 @@ suite('HTMLElementElement', function() {
     document.upgradeElement(x);
     assert.equal(x.value, 'fooValue');
   });
-  
+
   test('extend native element', function() {
     work.innerHTML = '<element name="x-button" extends="button">' +
       '<script>' +
