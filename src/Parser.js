@@ -101,42 +101,8 @@ function isElementElementChild(inElt) {
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
-// bootstrap parsing
+// exports
 
-// IE shim for CustomEvent
-if (typeof window.CustomEvent !== 'function') {
-  window.CustomEvent = function(inType) {
-     var e = document.createEvent('HTMLEvents');
-     e.initEvent(inType, true, true);
-     return e;
-  };
-}
-
-function bootstrap() {
-  // go async so call stack can unwind
-  setTimeout(function() {
-    // install auto-upgrader on main document
-    document.watchDOM(document.body);
-    // parse document
-    componentParser.parse(document);
-    // TODO(sjmiles): ShadowDOM polyfill pollution
-    var doc = window.ShadowDOMPolyfill ?
-          ShadowDOMPolyfill.wrap(document)
-              : document;
-    // notify system
-    doc.body.dispatchEvent(
-      new CustomEvent('WebComponentsReady', {bubbles: true})
-    );
-  }, 0);
-}
-
-// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so
-// we are forced to split into two versions
-
-if (window.HTMLImports) {
-  document.addEventListener('HTMLImportsLoaded', bootstrap);
-} else {
-  window.addEventListener('load', bootstrap);
-}
+CustomElements.parser = componentParser;
 
 })();
