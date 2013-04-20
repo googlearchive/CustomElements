@@ -24,8 +24,6 @@ methods. Otherwise, the browser considers it an <code>HTMLUnknownElement</code>.
 
 The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScript into reusable, encapsulated components.
 
-Here's the declarative version of the previous example:
-
     <element name="x-foo">
       <section>
         I'm an x-foo!
@@ -65,6 +63,8 @@ Example of extending `button`:
 
 To register a new custom element in JavaScript, invoke `document.register()` somewhere in the page.
 As before, custom elements built this way work just like standard elements.
+
+Here's the imperative version of the previous example:
 
     var XFooPrototype = Object.create(HTMLElement.prototype);
     XFooPrototype.readyCallback = function() {
