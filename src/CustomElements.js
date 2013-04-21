@@ -16,7 +16,9 @@
 
 (function(scope) {
 
-scope = scope || {flags:{}};
+if (!scope) {
+  scope = window.CustomElements = {flags:{}};
+}
 
 // native document.register?
 
