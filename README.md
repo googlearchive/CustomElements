@@ -24,7 +24,7 @@ methods. Otherwise, the browser considers it an <code>HTMLUnknownElement</code>.
 
 The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScript into reusable, encapsulated components.
 
-    <element name="x-foo">
+    <element name="x-foo" constructor="XFoo">
       <section>
         I'm an x-foo!
       </section>
@@ -48,6 +48,8 @@ The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScrip
         }
       </script>
     </element>
+
+The `constructor` attribute name goes on global scope and can be used to construct the element in JavaScript.
 
 **Extending existing elements**
 
@@ -104,7 +106,7 @@ standard DOM elements:
 
     <x-foo></x-foo>
 
-In the `document.register()` example above, `XFoo` was defined as the new element's constructor. Browser limitations require that we supply the constructor while you supply the prototype. Use the `readyCallback` to do initialization work that might otherwise be in the constructor.
+In the declarative and `document.register()` examples above, `XFoo` was defined as the new element's constructor. Browser limitations require that we supply the constructor while you supply the prototype. Use the `readyCallback` to do initialization work that might otherwise be in the constructor.
 
     var xFoo = new XFoo();
     document.body.appendChild(xFoo);
