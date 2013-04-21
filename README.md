@@ -24,9 +24,7 @@ methods. Otherwise, the browser considers it an <code>HTMLUnknownElement</code>.
 
 The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScript into reusable, encapsulated components.
 
-Here's the declarative version of the previous example:
-
-    <element name="x-foo">
+    <element name="x-foo" constructor="XFoo">
       <section>
         I'm an x-foo!
       </section>
@@ -51,6 +49,8 @@ Here's the declarative version of the previous example:
       </script>
     </element>
 
+The `constructor` attribute name goes on global scope and can be used to construct the element in JavaScript.
+
 **Extending existing elements**
 
 Using `<element>`, the prototype must be a simple object, but the `extends` attribute
@@ -65,6 +65,8 @@ Example of extending `button`:
 
 To register a new custom element in JavaScript, invoke `document.register()` somewhere in the page.
 As before, custom elements built this way work just like standard elements.
+
+Here's the imperative version of the previous example:
 
     var XFooPrototype = Object.create(HTMLElement.prototype);
     XFooPrototype.readyCallback = function() {
@@ -104,7 +106,7 @@ standard DOM elements:
 
     <x-foo></x-foo>
 
-In the `document.register()` example above, `XFoo` was defined as the new element's constructor. Browser limitations require that we supply the constructor while you supply the prototype. Use the `readyCallback` to do initialization work that might otherwise be in the constructor.
+In the declarative and `document.register()` examples above, `XFoo` was defined as the new element's constructor. Browser limitations require that we supply the constructor while you supply the prototype. Use the `readyCallback` to do initialization work that might otherwise be in the constructor.
 
     var xFoo = new XFoo();
     document.body.appendChild(xFoo);
