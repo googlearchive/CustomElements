@@ -99,7 +99,7 @@ Example extending `button`:
 
 #### Using a custom element
 
-After registration, you can constructor an instance of your element just like
+After registration, you can construct an instance of your element just like
 standard DOM elements:
 
     <x-foo></x-foo>
