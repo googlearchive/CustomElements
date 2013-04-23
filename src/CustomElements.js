@@ -113,10 +113,11 @@ function register(inName, inOptions) {
   // 7.1.8. Return the output of the previous step.
   definition.ctor = generateConstructor(definition);
   definition.ctor.prototype = definition.prototype;
-  // blanket upgrade (?)
-  // TODO(sjmiles): add flag to enable this after the initial sweep
-  // of static content
-  //scope.addedNode(document);
+  // if initial parsing is complete
+  if (scope.ready) {
+    // upgrade any pre-existing nodes of this type
+    scope.upgradeAll(document);
+  }
   return definition.ctor;
 }
 
@@ -185,7 +186,7 @@ function upgrade(inElement, inDefinition) {
   inElement.__upgraded__ = true;
   // there should never be a shadow root on inElement at this point
   // we require child nodes be upgraded before ready
-  scope.addedSubtree(inElement);
+  scope.upgradeSubtree(inElement);
   // lifecycle management
   ready(inElement);
   // OUTPUT
