@@ -1,0 +1,243 @@
+ /*
+Copyright 2013 The Toolkitchen Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+*/
+
+(function(scope){
+
+/*
+if (HTMLElement.prototype.webkitShadowRoot) {
+  Object.defineProperty(HTMLElement.prototype, 'shadowRoot', {
+    get: function() {
+      return this.webkitShadowRoot;
+    }
+  };
+}
+*/
+
+// walk the subtree rooted at node, applying 'find(element, data)' function 
+// to each element
+// if 'find' returns true for 'element', do not search element's subtree  
+function findAll(node, find, data) {
+  var e = node.firstElementChild;
+  if (e === undefined) {
+    e = node.firstChild;
+    while (e && e.nodeType !== Node.ELEMENT_NODE) {
+      e = e.nextSibling;
+    }
+  }
+  while (e) {
+    if (find(e, data) !== true) {
+      findAll(e, find, data);
+    }
+    e = e.nextElementSibling;          
+  }
+  return null;
+}
+
+// walk the subtree rooted at node, including descent into shadow-roots, 
+// applying 'cb' to each element
+function forSubtree(node, cb) {
+  //logFlags.dom && node.childNodes && node.childNodes.length && console.group('subTree: ', node);
+  findAll(node, function(e) {
+    if (cb(e)) {
+      return true;
+    }
+    if (e.webkitShadowRoot) {
+      forSubtree(e.webkitShadowRoot, cb);
+    }
+  });
+  //logFlags.dom && node.childNodes && node.childNodes.length && console.groupEnd();
+}
+
+// manage lifecycle on added node
+function added(node) {
+  if (upgrade(node)) {
+    inserted(node);   
+    return true; 
+  }
+  inserted(node);
+}
+
+// manage lifecycle on added node's subtree only
+function addedSubtree(node) {
+  forSubtree(node, function(e) {
+    if (added(e)) {
+      return true; 
+    }
+  });
+}
+
+// manage lifecycle on added node and it's subtree
+function addedNode(node) {
+  return added(node) || addedSubtree(node);
+}
+
+// upgrade custom elements at node, if applicable
+function upgrade(node) {
+  if (!node.__upgraded__ && node.nodeType === Node.ELEMENT_NODE) {
+    var type = node.getAttribute('is') || node.localName;
+    var definition = scope.registry[type];
+    if (definition) {
+      logFlags.dom && console.group('upgrade:', node.localName);
+      scope.upgrade(node);
+      logFlags.dom && console.groupEnd();
+      return true;
+    }
+  }
+}
+
+function inDocument(element) {
+  var p = element;
+  while (p) {
+    if (p == document) {
+      return true;
+    }
+    p = p.parentNode || p.host;
+  }  
+};
+
+function inserted(element) {
+  // TODO(sjmiles): temporary: do work on all custom elements so we can track 
+  // behavior even when callbacks not defined
+  if (element.insertedCallback || element.__upgraded__) {
+    // TODO(sjmiles): must test for inserted-ness, this is probably the
+    // wrong definition
+    //if (element.parentNode) {
+    if (inDocument(element)) {
+      logFlags.dom && console.log('inserted:', element.localName);
+      element.__inserted = (element.__inserted || 0) + 1;
+      if (element.__inserted > 1) {
+        console.warn('inserted:', element.localName, 'insertion count:', 
+          element.__inserted)
+      } else if (element.insertedCallback) {
+        element.insertedCallback();
+      } 
+    }
+  }
+}
+
+function removedSubtree(node) {
+  forSubtree(node, function(e) {
+    removed(e);
+  });
+}
+
+function removed(element) {
+  // TODO(sjmiles): temporary: do work on all custom elements so we can track 
+  // behavior even when callbacks not defined
+  if (element.removedCallback || element.__upgraded__) {
+    element.__inserted = (element.__inserted || 0) - 1;
+    if (element.__inserted < 0) {
+      console.log('removed:', element.localName, 'insertion count:', element.__inserted)
+    } else if (element.removedCallback) {
+      element.removedCallback();
+    } 
+  }
+}
+
+function watchShadow(node) {
+  if (node.webkitShadowRoot && !node.webkitShadowRoot.__watched) {
+    //console.log('watching shadow', node.localName);
+    observe(node.webkitShadowRoot);
+    node.webkitShadowRoot.__watched = true;
+  }
+}
+
+function watchAllShadows(node) {
+  // TODO(sjmiles): must watch node itself
+  forSubtree(node, function(e) {
+    watchShadow(node);
+  });
+}
+
+function filter(inNode) {
+  switch (inNode.localName) {
+    case 'style':
+    case 'script':
+    case 'template':
+    case undefined:
+      return true;
+  }
+}
+
+function handler(mutations) {
+  //
+  if (logFlags.dom) {
+    var mx = mutations[0];
+    if (mx && mx.type === 'childList' && mx.addedNodes) {
+        if (mx.addedNodes) {
+          var d = mx.addedNodes[0];
+          while (d && d !== document && !d.host) {
+            d = d.parentNode;
+          }
+          var u = d && (d.URL || d._URL || (d.host && d.host.localName)) || '';
+          u = u.split('/?').shift().split('/').pop();
+        }
+    }
+    console.group('mutations (%d) [%s]', mutations.length, u || '');
+  }
+  //
+  mutations.forEach(function(mx) {
+    //logFlags.dom && console.group('mutation');
+    if (mx.type === 'childList') {
+      forEach(mx.addedNodes, function(n) {
+        //logFlags.dom && console.log(n.localName);
+        if (filter(n)) {
+          return;
+        }
+        // watch shadow-roots on nodes that have had them attached manually
+        // TODO(sjmiles): remove if createShadowRoot is overridden
+        //watchAllShadows(n);
+        // nodes added may need lifecycle management
+        addedNode(n);
+      });
+      // removed nodes may need lifecycle management
+      forEach(mx.removedNodes, function(n) {
+        //logFlags.dom && console.log(n.localName);
+        if (filter(n)) {
+          return;
+        }
+        removedSubtree(n);
+      });
+    }
+    //logFlags.dom && console.groupEnd();
+  });
+  logFlags.dom && console.groupEnd();
+};
+
+var observer = new MutationObserver(handler);
+
+function takeRecords() {
+  // TODO(sjmiles): ask Raf why we have to call handler ourselves
+  handler(observer.takeRecords());
+}
+
+var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
+
+function observe(inRoot) {
+  observer.observe(inRoot, {childList: true, subtree: true});
+}
+
+function observeDocument(document) {
+  observe(document);
+}
+
+function upgradeDocument(document) {
+  logFlags.dom && console.group('upgradeDocument: ', (document.URL || document._URL || '').split('/').pop());
+  addedNode(document);
+  console.groupEnd();
+}
+
+// exports
+
+scope.watchShadow = watchShadow;
+scope.watchAllShadows = watchAllShadows;
+scope.addedNode = addedNode;
+scope.addedSubtree = addedSubtree;
+scope.observeDocument = observeDocument;
+scope.takeRecords = takeRecords;
+scope.upgradeDocument = upgradeDocument;
+
+})(window.CustomElements);

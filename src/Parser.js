@@ -29,17 +29,18 @@ var componentParser = {
     if (!inDocument.__parsed) {
       // only parse once
       inDocument.__parsed = true;
-      // upgrade all upgradeable static elements, anything dynamically
-      // created should be caught by a watchDOM() observer
-      document.upgradeElements(inDocument);
       // all parsable elements in inDocument (depth-first pre-order traversal)
       var elts = inDocument.querySelectorAll(cp.selectors);
-      // for each parsable node type in inDocument, call the parsing method
-      // to it's local name
+      // for each parsable node type, call the mapped parsing method
       forEach(elts, function(e) {
         //console.log(map[e.localName] + ":", path.nodeUrl(e));
         cp[cp.map[e.localName]](e);
       });
+      // upgrade all upgradeable static elements, anything dynamically
+      // created should be caught by observer
+      CustomElements.upgradeDocument(inDocument);
+      // observe document for dom changes
+      CustomElements.observeDocument(inDocument);
     }
   },
   parseLink: function(inLinkElt) {

@@ -21,8 +21,6 @@ function bootstrap() {
   setTimeout(function() {
     // parse document
     CustomElements.parser.parse(document);
-    // call insertedCallback on all custom elements in document
-    CustomElements.bootInsertions();
     // notify system
     document.body.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true})

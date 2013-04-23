@@ -22,30 +22,17 @@ if (!scope) {
 
 // native document.register?
 
-hasNative = document.register && scope.flags.register === 'native';
-
-if (hasNative) {
+scope.hasNative = document.register && scope.flags.register === 'native';
+if (scope.hasNative) {
 
   // exports
-
   var nop = function() {};
   document.upgradeElement = nop;
   document.upgradeElements = nop;
   document.watchDOM = nop;
-
   scope.bootInsertions = nop;
 
 } else {
-
-// imports
-
-var MO = window.MutationObserver
-    || window.WebKitMutationObserver
-    || window.JsMutationObserver;
-
-if (!MO) {
-  throw new Error("no mutation observer support");
-}
 
 /**
  * Registers a custom tag name with the document.
@@ -127,7 +114,9 @@ function register(inName, inOptions) {
   definition.ctor = generateConstructor(definition);
   definition.ctor.prototype = definition.prototype;
   // blanket upgrade (?)
-  document.upgradeElements();
+  // TODO(sjmiles): add flag to enable this after the initial sweep
+  // of static content
+  //scope.addedNode(document);
   return definition.ctor;
 }
 
@@ -157,13 +146,11 @@ function resolveTagName(inDefinition) {
 }
 
 function resolvePrototypeChain(inDefinition) {
-  // TODO(sjmiles): contains ShadowDOM polyfill pollution
   // if we don't support __proto__ we need to locate the native level
   // prototype for precise mixing in
   if (!Object.__proto__) {
     if (inDefinition.is) {
       // for non-trivial extensions, work out both prototypes
-      //var inst = domCreateElement(inDefinition.tag);
       var inst = document.createElement(inDefinition.tag);
       var native = Object.getPrototypeOf(inst);
     } else {
@@ -196,8 +183,9 @@ function upgrade(inElement, inDefinition) {
   implement(inElement, inDefinition);
   // flag as upgraded
   inElement.__upgraded__ = true;
+  // there should never be a shadow root on inElement at this point
   // we require child nodes be upgraded before ready
-  upgradeElements(inElement);
+  scope.addedSubtree(inElement);
   // lifecycle management
   ready(inElement);
   // OUTPUT
@@ -248,6 +236,11 @@ function ready(inElement) {
   }
 }
 
+// attribute watching
+
+var originalSetAttribute = HTMLElement.prototype.setAttribute;
+var originalRemoveAttribute = HTMLElement.prototype.removeAttribute;
+
 function setAttribute(name, value) {
   changeAttribute.call(this, name, value, originalSetAttribute);
 }
@@ -264,31 +257,12 @@ function changeAttribute(name, value, operation) {
   }
 }
 
-var originalSetAttribute = HTMLElement.prototype.setAttribute;
-var originalRemoveAttribute = HTMLElement.prototype.removeAttribute;
-
-/*
-var emptyArgs = [];
-function callback(inName, inDefinition, inElement, inArgs) {
-  var cb = inDefinition.lifecycle[inName] || inElement[inName];
-  if (cb) {
-    cb.apply(inElement, inArgs || emptyArgs);
-  }
-}
-*/
-
 // element registry (maps tag names to definitions)
 
 var registry = {};
-var registrySlctr = '';
 
 function registerDefinition(inName, inDefinition) {
   registry[inName] = inDefinition;
-  registrySlctr += (registrySlctr ? ',' : '');
-  if (inDefinition.extends) {
-    registrySlctr += inDefinition.tag + '[is=' + inDefinition.is + '],';
-  }
-  registrySlctr += inName;
 }
 
 function generateConstructor(inDefinition) {
@@ -305,17 +279,6 @@ function createElement(inTag) {
   return domCreateElement(inTag);
 }
 
-/**
- * Upgrade an element to a custom element. Upgrading an element
- * causes the custom prototype to be applied, an `is` attribute to be attached
- * (as needed), and invocation of the `readyCallback`.
- * `upgradeElement` does nothing is the element is already upgraded, or
- * if it matches no registered custom tag name.
- *
- * @method ugpradeElement
- * @param {Element} inElement The element to upgrade.
- * @return {Element} The upgraded element.
- */
 function upgradeElement(inElement) {
   if (!inElement.__upgraded__ && (inElement.nodeType === Node.ELEMENT_NODE)) {
     var type = inElement.getAttribute('is') || inElement.localName;
@@ -323,96 +286,6 @@ function upgradeElement(inElement) {
     return definition && upgrade(inElement, definition);
   }
 }
-
-/**
- * Upgrade all elements under `inRoot` that match selector `inSlctr`.
- * causes the custom prototype to be applied, an `is` attribute to be attached
- * (as needed), and invocation of the `readyCallback`.
- * `upgradeElement` does nothing is the element is already upgraded, or
- * if it matches no registered custom tag name.
- *
- * @method ugpradeElements
- * @param {Node} inRoot The root of the DOM subtree in which elements are to
- *  be upgraded.
- * @param {String} [inSlctr] An optional selector for matching specific
- * elements, otherwise all register element types are upgraded.
- */
-function upgradeElements(inRoot, inSlctr) {
-  var root = inRoot || document;
-  if (root.querySelectorAll) {
-    var slctr = inSlctr || registrySlctr;
-    if (slctr) {
-      var nodes = root.querySelectorAll(slctr);
-      forEach(nodes, upgradeElement);
-    }
-  }
-}
-
-// DOM watching for upgrades
-
-var domObserver = new MO(function(mutations) {
-  mutations.forEach(function(mx) {
-    if (mx.type === 'childList') {
-      forEach(mx.addedNodes, function(n) {
-        // this node may need upgrade (if so, subtree is upgraded here)
-        if (!upgradeElement(n)) {
-          // or maybe not, but then the subtree may need upgrade
-          upgradeElements(n);
-        }
-      });
-    }
-  })
-});
-
-function watchDOM(inRoot) {
-  domObserver.observe(inRoot, {childList: true, subtree: true});
-}
-
-// install auto-upgrader on main document (must be before insertion observer)
-watchDOM(document);
-
-// DOM watching for insertion/removal
-
-function inserted(inNode) {
-  if (inNode.insertedCallback) {
-    inNode.insertedCallback();
-  }
-}
-
-function removed(inNode) {
-  if (inNode.removedCallback) {
-    inNode.removedCallback();
-  }
-}
-
-function forCustomElements(inRoot, inCb) {
-  inCb(inRoot);
-  if (inRoot.querySelectorAll && registrySlctr) {
-    var nodes = inRoot.querySelectorAll(registrySlctr);
-    forEach(nodes, inCb);
-  }
-}
-
-var insertionObserver = new MO(function(mutations) {
-  mutations.forEach(function(mx) {
-    if (mx.type === 'childList') {
-      forEach(mx.addedNodes, function(n) {
-        forCustomElements(n, inserted);
-      });
-      forEach(mx.removedNodes, function(n) {
-        forCustomElements(n, removed);
-      });
-    }
-  });
-});
-
-// must be called after dom observer
-insertionObserver.observe(document, {childList: true, subtree: true});
-
-// utilities
-
-var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
-
 // capture native createElement before we override it
 
 var domCreateElement = document.createElement.bind(document);
@@ -421,19 +294,22 @@ var domCreateElement = document.createElement.bind(document);
 
 document.register = register;
 document.createElement = createElement; // override
-document.upgradeElement = upgradeElement;
-document.upgradeElements = upgradeElements;
-document.watchDOM = watchDOM;
 
-// invoke insertedCallback on elements already in DOM
-scope.bootInsertions = function() {
-  forCustomElements(document, inserted);
-};
+scope.registry = registry;
+
+/**
+ * Upgrade an element to a custom element. Upgrading an element
+ * causes the custom prototype to be applied, an `is` attribute 
+ * to be attached (as needed), and invocation of the `readyCallback`.
+ * `upgrade` does nothing if the element is already upgraded, or
+ * if it matches no registered custom tag name.
+ *
+ * @method ugprade
+ * @param {Element} inElement The element to upgrade.
+ * @return {Element} The upgraded element.
+ */
+scope.upgrade = upgradeElement;
 
 }
-
-// export
-
-scope.hasNative = hasNative;
 
 })(window.CustomElements);
