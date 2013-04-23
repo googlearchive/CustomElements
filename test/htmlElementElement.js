@@ -23,7 +23,7 @@ suite('HTMLElementElement', function() {
       '<x-test-element>Foo</x-test-element>';
     new HTMLElementElement(work.querySelector('element'));
     var xtest = work.lastChild;
-    document.upgradeElement(xtest);
+    CustomElements.upgrade(xtest);
     assert.equal(xtest.__upgraded__, true);
   });
 
@@ -40,7 +40,7 @@ suite('HTMLElementElement', function() {
       '<x-test-script-element></x-test-script-element>';
     new HTMLElementElement(work.querySelector('element'));
     var x = work.lastChild;
-    document.upgradeElement(x);
+    CustomElements.upgrade(x);
     assert.equal(x.__upgraded__, true);
     assert.equal(x.value, 'x-test-script-element');
   });
@@ -60,30 +60,9 @@ suite('HTMLElementElement', function() {
       '<x-test-script-element></x-test-script-element>';
     new HTMLElementElement(work.querySelector('element'));
     var x = work.lastChild;
-    document.upgradeElement(x);
+    CustomElements.upgrade(x);
     assert.equal(x.textContent, 'Hello World');
   });
-
-  /*
-  test('readyCallback in lifecycle', function() {
-    work.innerHTML = '<element name="x-test-script-element">' +
-      '<script>' +
-        'this.register({' +
-          'lifecycle: {' +
-            'readyCallback: function() {' +
-              'this.textContent = "Hello World"' +
-            '}' +
-          '}' +
-      '});' +
-      '</script>' +
-      '</element>' +
-      '<x-test-script-element></x-test-script-element>';
-    new HTMLElementElement(work.querySelector('element'));
-    var x = work.lastChild;
-    document.upgradeElement(x);
-    assert.equal(x.textContent, 'Hello World');
-  });
-  */
  
   test('extend element', function() {
     work.innerHTML = '<element name="x-foo">' +
@@ -100,7 +79,7 @@ suite('HTMLElementElement', function() {
     new HTMLElementElement(work.querySelector('[name=x-foo]'));
     new HTMLElementElement(work.querySelector('[name=x-babar]'));
     var x = work.lastChild;
-    document.upgradeElement(x);
+    CustomElements.upgrade(x);
     assert.equal(x.value, 'fooValue');
   });
 
@@ -119,7 +98,7 @@ suite('HTMLElementElement', function() {
       '<button is="x-button"></button>';
     new HTMLElementElement(work.querySelector('element'));
     var x = work.lastChild;
-    document.upgradeElement(x);
+    CustomElements.upgrade(x);
     assert.equal(x.type, 'submit');
     assert.equal(x.textContent, 'Hello World');
   });

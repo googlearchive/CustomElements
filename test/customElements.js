@@ -104,48 +104,6 @@ suite('customElements', function() {
     assert.equal(xbarbarbar.textContent, 'x-barbarbar');
   });
 
-/*
-  test('document.register readyCallback in lifecycle', function() {
-    var XZotPrototype = Object.create(HTMLElement.prototype);
-    XZotPrototype.bluate = function() {
-      this.color = 'lightblue';
-    };
-    var XZot = document.register('x-zot', {
-      prototype: XZotPrototype,
-      lifecycle: {
-        readyCallback: function() {
-          this.style.fontStyle = 'italic';
-        }
-      }
-    });
-    var xzot = new XZot();
-    assert.equal(xzot.style.fontStyle, 'italic');
-    xzot.bluate();
-    assert.equal(xzot.color, 'lightblue');
-    //
-    var XBazPrototype = Object.create(XZotPrototype);
-    XBazPrototype.splat = function() {
-      this.textContent = 'splat';
-    };
-    var XBaz = document.register('x-baz', {
-      prototype: XBazPrototype,
-      extends: 'x-zot',
-      lifecycle: {
-        readyCallback: function() {
-          this.style.fontSize = '32pt';
-        }
-      }
-    });
-    var xbaz = new XBaz();
-    assert.equal(xbaz.style.fontStyle, '');
-    assert.equal(xbaz.style.fontSize, '32pt');
-    xbaz.bluate();
-    assert.equal(xbaz.color, 'lightblue');
-    xbaz.splat();
-    assert.equal(xbaz.textContent, 'splat');
-  });
-*/
-
   test('document.register readyCallback in prototype', function() {
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.readyCallback = function() {
@@ -172,41 +130,6 @@ suite('customElements', function() {
   });
 
 
-/*
-  test('document.register [ready|inserted|removed]Callbacks in lifecycle', function(done) {
-    var ready, inserted, removed;
-    var XBooPrototype = Object.create(HTMLElement.prototype);
-    var lifecycle = {
-      readyCallback: function() {
-        ready = true;
-      },
-      insertedCallback: function() {
-        inserted = true;
-      },
-      removedCallback: function() {
-        removed = true;
-      }
-    };
-    var XBoo = document.register('x-boo-irl', {
-      prototype: XBooPrototype,
-      lifecycle: lifecycle
-    });
-    var xboo = new XBoo();
-    assert(ready, 'ready must be true [XBoo]');
-    assert(!inserted, 'inserted must be false [XBoo]');
-    assert(!removed, 'removed must be false [XBoo]');
-    work.appendChild(xboo);
-    setTimeout(function() {
-      assert(inserted, 'inserted must be true [XBoo]');
-      work.removeChild(xboo);
-      setTimeout(function() {
-        assert(removed, 'removed must be true [XBoo]');
-        done();
-      }, 0);
-    }, 0)
-  });
-*/
-
   test('document.register [ready|inserted|removed]Callbacks in prototype', function(done) {
     var ready, inserted, removed;
     var XBooPrototype = Object.create(HTMLElement.prototype);
@@ -232,8 +155,6 @@ suite('customElements', function() {
       work.removeChild(xboo);
       setTimeout(function() {
         assert(removed, 'removed must be true [XBoo]');
-        done();
-        /*
         //
         ready = inserted = removed = false;
         var XBooBooPrototype = Object.create(XBooPrototype);
@@ -263,7 +184,6 @@ suite('customElements', function() {
             done();
           }, 0);
         }, 0);
-        */
        }, 0);
      }, 0);
   });
