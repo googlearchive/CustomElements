@@ -95,25 +95,34 @@ function inDocument(element) {
       return true;
     }
     p = p.parentNode || p.host;
-  }  
+  }
 };
 
 function inserted(element) {
-  // TODO(sjmiles): temporary: do work on all custom elements so we can track 
-  // behavior even when callbacks not defined
-  if (element.insertedCallback || element.__upgraded__) {
-    // TODO(sjmiles): must test for inserted-ness, this is probably the
-    // wrong definition
-    //if (element.parentNode) {
+  // TODO(sjmiles): it's possible we were inserted and removed in the space
+  // of one microtask, in which case we won't be 'inDocument' here
+  // But there are other cases where we are testing for inserted without
+  // specific knowledge of mutations, and must test 'inDocument' to determine
+  // whether to call inserted
+  // If we can factor these cases into separate code paths we can have
+  // better diagnostics.
+  // TODO(sjmiles): when logging, do work on all custom elements so we can
+  // track behavior even when callbacks not defined
+  if (element.insertedCallback || (element.__upgraded__ && logFlags.dom)) {
+    logFlags.dom && console.log('inserted:', element.localName);
     if (inDocument(element)) {
-      logFlags.dom && console.log('inserted:', element.localName);
       element.__inserted = (element.__inserted || 0) + 1;
+      // if we are in a 'removed' state, bluntly adjust to an 'inserted' state
+      if (element.__inserted < 1) {
+        element.__inserted = 1;
+      }
+      // if we are 'over inserted', squelch the callback
       if (element.__inserted > 1) {
-        console.warn('inserted:', element.localName, 'insertion count:', 
-          element.__inserted)
+        logFlags.dom && console.warn('inserted:', element.localName,
+          'insert/remove count:', element.__inserted)
       } else if (element.insertedCallback) {
         element.insertedCallback();
-      } 
+      }
     }
   }
 }
@@ -125,28 +134,37 @@ function removedSubtree(node) {
 }
 
 function removed(element) {
-  // TODO(sjmiles): temporary: do work on all custom elements so we can track 
+  // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
-  if (element.removedCallback || element.__upgraded__) {
-    element.__inserted = (element.__inserted || 0) - 1;
-    if (element.__inserted < 0) {
-      console.log('removed:', element.localName, 'insertion count:', element.__inserted)
-    } else if (element.removedCallback) {
-      element.removedCallback();
-    } 
+  if (element.removedCallback || (element.__upgraded__ && logFlags.dom)) {
+    logFlags.dom && console.log('removed:', element.localName);
+    if (!inDocument(element)) {
+      element.__inserted = (element.__inserted || 0) - 1;
+      // if we are in a 'inserted' state, bluntly adjust to an 'removed' state
+      if (element.__inserted > 0) {
+        element.__inserted = 0;
+      }
+      // if we are 'over removed', squelch the callback
+      if (element.__inserted < 0) {
+        logFlags.dom && console.warn('removed:', element.localName,
+            'insert/remove count:', element.__inserted)
+      } else if (element.removedCallback) {
+        element.removedCallback();
+      }
+    }
   }
 }
 
 function watchShadow(node) {
   if (node.webkitShadowRoot && !node.webkitShadowRoot.__watched) {
-    //console.log('watching shadow', node.localName);
+    logFlags.dom && console.log('watching shadow-root for: ', node.localName);
     observe(node.webkitShadowRoot);
     node.webkitShadowRoot.__watched = true;
   }
 }
 
 function watchAllShadows(node) {
-  // TODO(sjmiles): must watch node itself
+  watchShadow(node);
   forSubtree(node, function(e) {
     watchShadow(node);
   });
@@ -189,6 +207,8 @@ function handler(mutations) {
         }
         // watch shadow-roots on nodes that have had them attached manually
         // TODO(sjmiles): remove if createShadowRoot is overridden
+        // TODO(sjmiles): removed as an optimization, manual shadow roots
+        // must be watched explicitly
         //watchAllShadows(n);
         // nodes added may need lifecycle management
         addedNode(n);
@@ -227,17 +247,20 @@ function observeDocument(document) {
 function upgradeDocument(document) {
   logFlags.dom && console.group('upgradeDocument: ', (document.URL || document._URL || '').split('/').pop());
   addedNode(document);
-  console.groupEnd();
+  logFlags.dom && console.groupEnd();
 }
 
 // exports
 
 scope.watchShadow = watchShadow;
 scope.watchAllShadows = watchAllShadows;
-scope.addedNode = addedNode;
-scope.addedSubtree = addedSubtree;
+
+scope.upgradeAll = addedNode;
+scope.upgradeSubtree = addedSubtree;
+
 scope.observeDocument = observeDocument;
-scope.takeRecords = takeRecords;
 scope.upgradeDocument = upgradeDocument;
+
+scope.takeRecords = takeRecords;
 
 })(window.CustomElements);
