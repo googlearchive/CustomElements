@@ -12,6 +12,8 @@ var modules = [
     'src/sidetable.js',
     'MutationObservers/MutationObserver.js',
     'src/CustomElements.js',
+    'src/MutationObserver.js',
+    'src/Observer.js',
     'src/HTMLElementElement.js',
     'src/Parser.js',
     'src/boot.js'
