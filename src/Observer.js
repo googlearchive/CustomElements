@@ -127,7 +127,8 @@ function inserted(element) {
   }
 }
 
-function removedSubtree(node) {
+function removedNode(node) {
+  removed(node);
   forSubtree(node, function(e) {
     removed(e);
   });
@@ -219,7 +220,7 @@ function handler(mutations) {
         if (filter(n)) {
           return;
         }
-        removedSubtree(n);
+        removedNode(n);
       });
     }
     //logFlags.dom && console.groupEnd();
