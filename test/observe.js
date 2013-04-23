@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-suite('watchDOM', function() {
+suite('observe', function() {
   var work;
   var assert = chai.assert;
 

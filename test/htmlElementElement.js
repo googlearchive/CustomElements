@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-suite('HTMLElementElement', function() {
+suite('htmlElementElement', function() {
   var assert = chai.assert;
 
   var work;
