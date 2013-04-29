@@ -72,7 +72,7 @@ var componentParser = {
     }
   },
   parseStyle: function(inStyleElt) {
-    if (!isElementElementChild(inStyleElt)) {
+    if (!inMainDocument(inStyleElt) && !isElementElementChild(inStyleElt)) {
       document.querySelector('head').appendChild(inStyleElt);
     }
   },
