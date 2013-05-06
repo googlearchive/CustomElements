@@ -31,7 +31,7 @@ function findAll(node, find, data) {
     if (find(e, data) !== true) {
       findAll(e, find, data);
     }
-    e = e.nextElementSibling;          
+    e = e.nextElementSibling;
   }
   return null;
 }
@@ -113,7 +113,6 @@ function inserted(element) {
   // TODO(sjmiles): when logging, do work on all custom elements so we can
   // track behavior even when callbacks not defined
   if (element.insertedCallback || (element.__upgraded__ && logFlags.dom)) {
-    logFlags.dom && console.log('inserted:', element.localName);
     if (inDocument(element)) {
       element.__inserted = (element.__inserted || 0) + 1;
       // if we are in a 'removed' state, bluntly adjust to an 'inserted' state
@@ -125,6 +124,7 @@ function inserted(element) {
         logFlags.dom && console.warn('inserted:', element.localName,
           'insert/remove count:', element.__inserted)
       } else if (element.insertedCallback) {
+        logFlags.dom && console.log('inserted:', element.localName);
         element.insertedCallback();
       }
     }
@@ -157,6 +157,16 @@ function removed(element) {
         element.removedCallback();
       }
     }
+  }
+}
+
+function inDocument(element) {
+  var p = element;
+  while (p) {
+    if (p == document) {
+      return true;
+    }
+    p = p.parentNode || p.host;
   }
 }
 
