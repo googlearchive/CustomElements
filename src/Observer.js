@@ -57,7 +57,7 @@ function forSubtree(node, cb) {
 // manage lifecycle on added node
 function added(node) {
   if (upgrade(node)) {
-    inserted(node);   
+    insertedNode(node);
     return true; 
   }
   inserted(node);
@@ -91,15 +91,16 @@ function upgrade(node) {
   }
 }
 
-function inDocument(element) {
-  var p = element;
-  while (p) {
-    if (p == document) {
-      return true;
-    }
-    p = p.parentNode || p.host;
+function insertedNode(node) {
+  inserted(node);
+  if (inDocument(node)) {
+    forSubtree(node, function(e) {
+      inserted(e);
+    });
   }
-};
+}
+
+// TODO(sjmiles): if there are descents into trees that can never have inDocument(*) true, fix this
 
 function inserted(element) {
   // TODO(sjmiles): it's possible we were inserted and removed in the space
