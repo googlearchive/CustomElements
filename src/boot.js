@@ -23,6 +23,10 @@ function bootstrap() {
     CustomElements.parser.parse(document);
     // set internal flag
     CustomElements.ready = true;
+    CustomElements.readyTime = new Date().getTime();
+    if (window.HTMLImports) {
+      CustomElements.elapsed = CustomElements.readyTime - HTMLImports.readyTime;
+    }
     // notify system
     document.body.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true})
