@@ -48,6 +48,9 @@ function forSubtree(node, cb) {
       forSubtree(e.webkitShadowRoot, cb);
     }
   });
+  if (node.webkitShadowRoot) {
+    forSubtree(node.webkitShadowRoot, cb);
+  }
   //logFlags.dom && node.childNodes && node.childNodes.length && console.groupEnd();
 }
 
