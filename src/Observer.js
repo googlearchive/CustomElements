@@ -21,7 +21,7 @@ if (HTMLElement.prototype.webkitShadowRoot) {
 // if 'find' returns true for 'element', do not search element's subtree  
 function findAll(node, find, data) {
   var e = node.firstElementChild;
-  if (e === undefined) {
+  if (!e) {
     e = node.firstChild;
     while (e && e.nodeType !== Node.ELEMENT_NODE) {
       e = e.nextSibling;
