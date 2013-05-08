@@ -19,7 +19,7 @@ suite('customElements', function() {
 
   test('document.register create via new', function() {
     // register x-foo
-    var XFoo = document.register('x-foo', {prototype: HTMLElement.prototype});
+    var XFoo = document.register('x-foo', {prototype: Object.create(HTMLElement.prototype)});
     // create an instance via new
     var xfoo = new XFoo();
     // test localName
@@ -34,11 +34,11 @@ suite('customElements', function() {
 
   test('document.register create via createElement', function() {
     // register x-foo
-    var XFoo = document.register('x-foo', {prototype: HTMLElement.prototype});
+    var XFoo = document.register('x-foo2', {prototype:  Object.create(HTMLElement.prototype)});
     // create an instance via createElement
-    var xfoo = document.createElement('x-foo');
+    var xfoo = document.createElement('x-foo2');
     // test localName
-    assert.equal(xfoo.localName, 'x-foo');
+    assert.equal(xfoo.localName, 'x-foo2');
     // attach content
     xfoo.textContent = '[x-foo2]';
     // test textContent
@@ -50,7 +50,7 @@ suite('customElements', function() {
     XFooPrototype.bluate = function() {
       this.color = 'lightblue';
     };
-    var XFoo = document.register('x-foo', {
+    var XFoo = document.register('x-foo3', {
       prototype: XFooPrototype
     });
     // create an instance
