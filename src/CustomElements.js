@@ -22,15 +22,17 @@ if (!scope) {
 
 // native document.register?
 
-scope.hasNative = document.register && scope.flags.register === 'native';
+scope.hasNative = (document.webkitRegister || document.register) && scope.flags.register === 'native';
 if (scope.hasNative) {
 
-  // exports
+  // normalize
+  document.register = document.register || document.webkitRegister;
+
   var nop = function() {};
-  document.upgradeElement = nop;
-  document.upgradeElements = nop;
-  document.watchDOM = nop;
-  scope.bootInsertions = nop;
+
+  // exports
+  scope.registry = {};
+  scope.upgradeElement = nop;
 
 } else {
 
