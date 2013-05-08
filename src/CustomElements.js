@@ -255,7 +255,8 @@ function removeAttribute(name, value) {
 function changeAttribute(name, value, operation) {
   var oldValue = this.getAttribute(name);
   operation.apply(this, arguments);
-  if (this.attributeChangedCallback) {
+  if (this.attributeChangedCallback 
+      && (this.getAttribute(name) !== oldValue)) {
     this.attributeChangedCallback(name, oldValue);
   }
 }
