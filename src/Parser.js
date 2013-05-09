@@ -29,17 +29,18 @@ var componentParser = {
     if (!inDocument.__parsed) {
       // only parse once
       inDocument.__parsed = true;
-      // upgrade all upgradeable static elements, anything dynamically
-      // created should be caught by a watchDOM() observer
-      document.upgradeElements(inDocument);
       // all parsable elements in inDocument (depth-first pre-order traversal)
       var elts = inDocument.querySelectorAll(cp.selectors);
-      // for each parsable node type in inDocument, call the parsing method
-      // to it's local name
+      // for each parsable node type, call the mapped parsing method
       forEach(elts, function(e) {
         //console.log(map[e.localName] + ":", path.nodeUrl(e));
         cp[cp.map[e.localName]](e);
       });
+      // upgrade all upgradeable static elements, anything dynamically
+      // created should be caught by observer
+      CustomElements.upgradeDocument(inDocument);
+      // observe document for dom changes
+      CustomElements.observeDocument(inDocument);
     }
   },
   parseLink: function(inLinkElt) {
@@ -71,7 +72,7 @@ var componentParser = {
     }
   },
   parseStyle: function(inStyleElt) {
-    if (!isElementElementChild(inStyleElt)) {
+    if (!inMainDocument(inStyleElt) && !isElementElementChild(inStyleElt)) {
       document.querySelector('head').appendChild(inStyleElt);
     }
   },
@@ -101,42 +102,8 @@ function isElementElementChild(inElt) {
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
-// bootstrap parsing
+// exports
 
-// IE shim for CustomEvent
-if (typeof window.CustomEvent !== 'function') {
-  window.CustomEvent = function(inType) {
-     var e = document.createEvent('HTMLEvents');
-     e.initEvent(inType, true, true);
-     return e;
-  };
-}
-
-function bootstrap() {
-  // go async so call stack can unwind
-  setTimeout(function() {
-    // install auto-upgrader on main document
-    document.watchDOM(document.body);
-    // parse document
-    componentParser.parse(document);
-    // TODO(sjmiles): ShadowDOM polyfill pollution
-    var doc = window.ShadowDOMPolyfill ?
-          ShadowDOMPolyfill.wrap(document)
-              : document;
-    // notify system
-    doc.body.dispatchEvent(
-      new CustomEvent('WebComponentsReady', {bubbles: true})
-    );
-  }, 0);
-}
-
-// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so
-// we are forced to split into two versions
-
-if (window.HTMLImports) {
-  document.addEventListener('HTMLImportsLoaded', bootstrap);
-} else {
-  window.addEventListener('load', bootstrap);
-}
+CustomElements.parser = componentParser;
 
 })();

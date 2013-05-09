@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-suite('watchDOM', function() {
+suite('observe', function() {
   var work;
   var assert = chai.assert;
 
@@ -97,7 +97,7 @@ suite('watchDOM', function() {
       work.innerHTML = '<div></div>';
       var div = work.firstChild;
       var root = div.webkitCreateShadowRoot();
-      document.watchDOM(root);
+      CustomElements.watchShadow(root);
       root.innerHTML = '<x-auto-shadow></x-auto-shadow>';
       var x = root.firstChild;
       assert.isUndefined(x.value);
@@ -113,7 +113,7 @@ suite('watchDOM', function() {
       var div = work.firstChild;
       var root = div.webkitCreateShadowRoot();
       root.innerHTML = '<div></div>';
-      document.watchDOM(root);
+      CustomElements.watchShadow(root);
       var target = root.firstChild;
       target.innerHTML = '<x-sub></x-sub>';
       var x = target.firstChild;

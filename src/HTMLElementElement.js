@@ -81,7 +81,8 @@ function executeComponentScript(inScript, inContext, inName) {
   context = inContext;
   // source location
   var owner = context.ownerDocument;
-  var url = (owner._URL || owner.URL);
+  var url = (owner._URL || owner.URL || owner.impl 
+      && (owner.impl._URL || owner.impl.URL));
   // ensure the component has a unique source map so it can be debugged
   // if the name matches the filename part of the owning document's url,
   // use this, otherwise, add ":<name>" to the document url.
