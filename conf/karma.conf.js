@@ -11,17 +11,18 @@ basePath = '../';
 
 // list of files / patterns to load in the browser
 files = [
-  MOCHA,
-  MOCHA_ADAPTER,
   'conf/mocha.conf.js',
   'node_modules/chai/chai.js',
   'test/*.js',
   'custom-elements.js',
-  {pattern: 'src/*', included: false}
+  {pattern: 'src/*', included: false},
+  {pattern: 'tools/**/*.js', included: false}
 ];
 
 // list of files to exclude
 exclude = [];
+
+frameworks = ['mocha'];
 
 // use dots reporter, as travis terminal does not support escaping sequences
 // possible values: 'dots', 'progress', 'junit', 'teamcity'
@@ -58,11 +59,11 @@ autoWatch = true;
 // - PhantomJS
 // - IE (only Windows)
 // CLI --browsers Chrome,Firefox,Safari
-browsers = ['Chrome', 'ChromeCanary', 'Firefox']
+browsers = ['ChromeCanary'];
 
 // If browser does not capture in given timeout [ms], kill it
 // CLI --capture-timeout 5000
-captureTimeout = 5000;
+captureTimeout = 50000;
 
 // Auto run tests on start (when browsers are captured) and exit
 // CLI --single-run --no-single-run
@@ -77,6 +78,9 @@ preprocessors = {
 };
 
 plugins = [
+  'karma-mocha',
   'karma-chrome-launcher',
-  'karma-firefox-launcher'
+  'karma-firefox-launcher',
+  'karma-script-launcher',
+  'karma-crbot-reporter'
 ]
