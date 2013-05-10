@@ -29,7 +29,9 @@ license that can be found in the LICENSE file.
     <!--<script src="mozilla-register-test.js"></script>-->
     <!--  -->
     <script>
-      mocha.run();
+      window.onload = function() {
+        mocha.run();
+      }
     </script>
   </body>
 </html>
