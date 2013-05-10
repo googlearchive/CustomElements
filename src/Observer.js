@@ -112,7 +112,9 @@ function inserted(element) {
   // better diagnostics.
   // TODO(sjmiles): when logging, do work on all custom elements so we can
   // track behavior even when callbacks not defined
+  //console.log('inserted: ', element.localName);
   if (element.insertedCallback || (element.__upgraded__ && logFlags.dom)) {
+    logFlags.dom && console.group('inserted:', element.localName);
     if (inDocument(element)) {
       element.__inserted = (element.__inserted || 0) + 1;
       // if we are in a 'removed' state, bluntly adjust to an 'inserted' state
@@ -128,6 +130,7 @@ function inserted(element) {
         element.insertedCallback();
       }
     }
+    logFlags.dom && console.groupEnd();
   }
 }
 
@@ -163,7 +166,7 @@ function removed(element) {
 function inDocument(element) {
   var p = element;
   while (p) {
-    if (p == document) {
+    if (p == element.ownerDocument) {
       return true;
     }
     p = p.parentNode || p.host;
