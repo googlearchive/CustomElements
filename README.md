@@ -154,4 +154,4 @@ The `extends` option to `document.register()` (discussed above)  is exclusive to
 
 ## Tools & Testing
 
-For running tests or building minified files, consult the [tooling information](http://polymer-project.github.io/tooling-strategy.html).
+For running tests or building minified files, consult the [tooling information](http://Polymer.github.io/tooling-strategy.html).
