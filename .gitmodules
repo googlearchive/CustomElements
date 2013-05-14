@@ -1,9 +1,9 @@
 [submodule "buildbot"]
 	path = buildbot
-	url = https://github.com/toolkitchen/buildbot.git
+	url = https://github.com/polymer-project/buildbot.git
 [submodule "MutationObservers"]
 	path = MutationObservers
-	url = https://github.com/toolkitchen/MutationObservers.git
+	url = https://github.com/polymer-project/MutationObservers.git
 [submodule "tools"]
 	path = tools
-	url = https://github.com/toolkitchen/tools.git
+	url = https://github.com/polymer-project/tools.git
