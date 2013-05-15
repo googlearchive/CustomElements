@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 The Toolkitchen Authors. All rights reserved.
+ * Copyright 2013 The Polymer Authors. All rights reserved.
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
@@ -145,7 +145,7 @@ function getPropertyDescriptor(inObject, inName) {
 // exports
 
 window.HTMLElementElement = HTMLElementElement;
-// TODO(sjmiles): completely ad-hoc, used by toolkit.register
+// TODO(sjmiles): completely ad-hoc, used by Polymer.register
 window.mixin = mixin;
 
 })();
