@@ -14,7 +14,7 @@ module.exports = function(grunt) {
   }
   CustomElements = [
     'src/sidetable.js',
-    'MutationObservers/MutationObserver.js',
+    'src/MutationObserver.js',
     'src/CustomElements.js',
     'src/HTMLElementElement.js',
     'src/Parser.js',
