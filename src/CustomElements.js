@@ -107,7 +107,10 @@ function register(inName, inOptions) {
   resolvePrototypeChain(definition);
   // overrides to implement callbacks
   // TODO(sjmiles): should support access via .attributes NamedNodeMap
+  // TODO(sjmiles): preserve user defined overrides, if any
+  definition.prototype._setAttribute = definition.prototype.setAttribute;
   definition.prototype.setAttribute = setAttribute;
+  definition.prototype._removeAttribute = definition.prototype.removeAttribute;
   definition.prototype.removeAttribute = removeAttribute;
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registerDefinition(inName, definition);
@@ -245,11 +248,11 @@ var originalSetAttribute = HTMLElement.prototype.setAttribute;
 var originalRemoveAttribute = HTMLElement.prototype.removeAttribute;
 
 function setAttribute(name, value) {
-  changeAttribute.call(this, name, value, originalSetAttribute);
+  changeAttribute.call(this, name, value, this._setAttribute || originalSetAttribute);
 }
 
 function removeAttribute(name, value) {
-  changeAttribute.call(this, name, value, originalRemoveAttribute);
+  changeAttribute.call(this, name, value, this._removeAttribute || originalRemoveAttribute);
 }
 
 function changeAttribute(name, value, operation) {
