@@ -203,4 +203,21 @@ suite('customElements', function() {
     xboo.setAttribute('foo', 'bar');
     xboo.setAttribute('foo', 'zot');
   });
+
+  test('node.cloneNode upgrades', function(done) {
+    var XBooPrototype = Object.create(HTMLElement.prototype);
+    XBooPrototype.readyCallback = function() {
+      this.__ready__ = true;
+    };
+    var XBoo = document.register('x-boo-clone', {
+      prototype: XBooPrototype
+    });
+    var xboo = new XBoo();
+    work.appendChild(xboo);
+    setTimeout(function() {
+      var xboo2 = xboo.cloneNode(true);
+      assert(xboo2.__ready__, 'clone readyCallback must be called');
+      done();
+    }, 0);
+  });
 });

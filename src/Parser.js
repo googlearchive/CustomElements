@@ -49,31 +49,23 @@ var componentParser = {
       if (inLinkElt.content) {
         cp.parse(inLinkElt.content);
       }
-    } else if (!inMainDocument(inLinkElt)
-        && inLinkElt.parentNode
-        && !isElementElementChild(inLinkElt)) {
+    } else if (canAddToMainDoument(inLinkElt)) {
       document.head.appendChild(inLinkElt);
     }
   },
   parseScript: function(inScriptElt) {
-    // ignore scripts in primary document, they are already loaded
-    if (inMainDocument(inScriptElt)) {
-      return;
-    }
-    // ignore scripts inside <element>
-    if (isElementElementChild(inScriptElt)) {
-      return;
-    }
-    // otherwise, evaluate now
-    var code = inScriptElt.__resource || inScriptElt.textContent;
-    if (code) {
-      code += "\n//@ sourceURL=" + inScriptElt.__nodeUrl + "\n";
-      eval.call(window, code);
+    if (canAddToMainDoument(inScriptElt)) {
+      // otherwise, evaluate now
+      var code = inScriptElt.__resource || inScriptElt.textContent;
+      if (code) {
+        code += "\n//@ sourceURL=" + inScriptElt.__nodeUrl + "\n";
+        eval.call(window, code);
+      }
     }
   },
   parseStyle: function(inStyleElt) {
-    if (!inMainDocument(inStyleElt) && !isElementElementChild(inStyleElt)) {
-      document.querySelector('head').appendChild(inStyleElt);
+    if (canAddToMainDoument(inStyleElt)) {
+      document.head.appendChild(inStyleElt);
     }
   },
   parseElement: function(inElementElt) {
@@ -82,6 +74,15 @@ var componentParser = {
 };
 
 var cp = componentParser;
+
+// nodes can be moved to the main document
+// if they are not in the main document, are not children of <element>
+// and are in a tree at parse time.
+function canAddToMainDoument(node) {
+  return !inMainDocument(node)
+    && node.parentNode
+    && !isElementElementChild(node);
+}
 
 function inMainDocument(inElt) {
   return inElt.ownerDocument === document ||
