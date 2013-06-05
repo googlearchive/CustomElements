@@ -107,7 +107,11 @@ function register(inName, inOptions) {
   resolvePrototypeChain(definition);
   // overrides to implement callbacks
   // TODO(sjmiles): should support access via .attributes NamedNodeMap
+  // TODO(sjmiles): preserve user defined overrides, if any
+  // TODO(sjmiles): none of this is robust under inheritance
+  definition.prototype._setAttribute = definition.prototype.setAttribute;
   definition.prototype.setAttribute = setAttribute;
+  definition.prototype._removeAttribute = definition.prototype.removeAttribute;
   definition.prototype.removeAttribute = removeAttribute;
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registerDefinition(inName, definition);
@@ -152,13 +156,12 @@ function resolvePrototypeChain(inDefinition) {
   // if we don't support __proto__ we need to locate the native level
   // prototype for precise mixing in
   if (!Object.__proto__) {
+    // default prototype
+    var native = HTMLElement.prototype;
+    // work out prototype when using type-extension
     if (inDefinition.is) {
-      // for non-trivial extensions, work out both prototypes
       var inst = document.createElement(inDefinition.tag);
-      var native = Object.getPrototypeOf(inst);
-    } else {
-      // otherwise, use the default
-      native = HTMLElement.prototype;
+      native = Object.getPrototypeOf(inst);
     }
   }
   // cache this in case of mixin
@@ -245,11 +248,11 @@ var originalSetAttribute = HTMLElement.prototype.setAttribute;
 var originalRemoveAttribute = HTMLElement.prototype.removeAttribute;
 
 function setAttribute(name, value) {
-  changeAttribute.call(this, name, value, originalSetAttribute);
+  changeAttribute.call(this, name, value, this._setAttribute || originalSetAttribute);
 }
 
 function removeAttribute(name, value) {
-  changeAttribute.call(this, name, value, originalRemoveAttribute);
+  changeAttribute.call(this, name, value, this._removeAttribute || originalRemoveAttribute);
 }
 
 function changeAttribute(name, value, operation) {
