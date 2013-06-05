@@ -290,14 +290,27 @@ function upgradeElement(inElement) {
     return definition && upgrade(inElement, definition);
   }
 }
+
+function cloneNode(deep) {
+  // call original clone
+  var n = domCloneNode.call(this, deep);
+  // upgrade the element and subtree
+  scope.upgradeAll(n);
+  return n;
+}
 // capture native createElement before we override it
 
 var domCreateElement = document.createElement.bind(document);
+
+// capture native cloneNode before we override it
+
+var domCloneNode = Node.prototype.cloneNode;
 
 // exports
 
 document.register = register;
 document.createElement = createElement; // override
+Node.prototype.cloneNode = cloneNode; // override
 
 scope.registry = registry;
 
