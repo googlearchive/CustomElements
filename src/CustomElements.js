@@ -105,14 +105,8 @@ function register(inName, inOptions) {
   // some platforms require modifications to the user-supplied prototype
   // chain
   resolvePrototypeChain(definition);
-  // overrides to implement callbacks
-  // TODO(sjmiles): should support access via .attributes NamedNodeMap
-  // TODO(sjmiles): preserve user defined overrides, if any
-  // TODO(sjmiles): none of this is robust under inheritance
-  definition.prototype._setAttribute = definition.prototype.setAttribute;
-  definition.prototype.setAttribute = setAttribute;
-  definition.prototype._removeAttribute = definition.prototype.removeAttribute;
-  definition.prototype.removeAttribute = removeAttribute;
+  // overrides to implement attributeChanged callback
+  overrideAttributeApi(definition.prototype);
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registerDefinition(inName, definition);
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
@@ -244,15 +238,18 @@ function ready(inElement) {
 
 // attribute watching
 
-var originalSetAttribute = HTMLElement.prototype.setAttribute;
-var originalRemoveAttribute = HTMLElement.prototype.removeAttribute;
-
-function setAttribute(name, value) {
-  changeAttribute.call(this, name, value, this._setAttribute || originalSetAttribute);
-}
-
-function removeAttribute(name, value) {
-  changeAttribute.call(this, name, value, this._removeAttribute || originalRemoveAttribute);
+function overrideAttributeApi(prototype) {
+  // overrides to implement callbacks
+  // TODO(sjmiles): should support access via .attributes NamedNodeMap
+  // TODO(sjmiles): preserves user defined overrides, if any
+  var setAttribute = prototype.setAttribute;
+  prototype.setAttribute = function(name, value) {
+    changeAttribute.call(this, name, value, setAttribute);
+  }
+  var removeAttribute = prototype.removeAttribute;
+  prototype.removeAttribute = function(name, value) {
+    changeAttribute.call(this, name, value, removeAttribute);
+  }
 }
 
 function changeAttribute(name, value, operation) {

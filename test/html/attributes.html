@@ -11,12 +11,12 @@
       <script>
         (this !== window) && this.register({
           prototype: {
-            getAttributeOk: false,
+            removeAttributeOk: false,
             setAttributeOk: false,
             attributeChangedOk: false,
-            getAttribute: function(name) {
-              this.getAttributeOk = true;
-              return HTMLElement.prototype.getAttribute.call(this, name);
+            removeAttribute: function(name) {
+              this.removeAttributeOk = true;
+              return HTMLElement.prototype.removeAttribute.call(this, name);
             },
             setAttribute: function(name, value) {
               this.setAttributeOk = true;
@@ -32,14 +32,16 @@
     <script>
       addEventListener('WebComponentsReady', function() {
         var xfoo = document.createElement('x-foo');
-        chai.assert.isFalse(xfoo.getAttributeOk);
+        chai.assert.isFalse(xfoo.removeAttributeOk);
         chai.assert.isFalse(xfoo.setAttributeOk);
         chai.assert.isFalse(xfoo.attributeChangedOk);
         xfoo.setAttribute('squid', 'tentacles');
         chai.assert.isTrue(xfoo.setAttributeOk);
         chai.assert.isTrue(xfoo.attributeChangedOk);
-        xfoo.getAttribute('squid');
-        chai.assert.isTrue(xfoo.getAttributeOk);
+        xfoo.attributeChangedOk = false;
+        xfoo.removeAttribute('squid');
+        chai.assert.isTrue(xfoo.removeAttributeOk);
+        chai.assert.isTrue(xfoo.setAttributeOk);
         done();
       });
     </script>
