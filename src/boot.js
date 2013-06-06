@@ -40,7 +40,11 @@ function bootstrap() {
 if (window.HTMLImports) {
   document.addEventListener('HTMLImportsLoaded', bootstrap);
 } else {
-  window.addEventListener('load', bootstrap);
+  if (document.readyState === 'complete') {
+    boostrap();
+  } else {
+    window.addEventListener('DOMContentLoaded', bootstrap);
+  }
 }
 
 })();
