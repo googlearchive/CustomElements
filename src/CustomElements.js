@@ -113,6 +113,8 @@ function register(inName, inOptions) {
   // 7.1.8. Return the output of the previous step.
   definition.ctor = generateConstructor(definition);
   definition.ctor.prototype = definition.prototype;
+  // force our .constructor to be our actual constructor
+  definition.prototype.constructor = definition.ctor;
   // if initial parsing is complete
   if (scope.ready) {
     // upgrade any pre-existing nodes of this type
