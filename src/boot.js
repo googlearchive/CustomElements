@@ -40,7 +40,7 @@ function bootstrap() {
 if (window.HTMLImports) {
   document.addEventListener('HTMLImportsLoaded', bootstrap);
 } else {
-  if (document.readyState === 'complete') {
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
     boostrap();
   } else {
     window.addEventListener('DOMContentLoaded', bootstrap);
