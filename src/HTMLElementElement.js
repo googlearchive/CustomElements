@@ -112,40 +112,24 @@ window.__componentScript = function(inName, inFunc) {
 
 // utility
 
-// copy all properties from inProps (et al) to inObj
-function mixin(inObj/*, inProps, inMoreProps, ...*/) {
-  var obj = inObj || {};
-  for (var i = 1; i < arguments.length; i++) {
-    var p = arguments[i];
-    try {
-      for (var n in p) {
-        copyProperty(n, p, obj);
+// copy top level properties from props to obj
+function mixin(obj, props) {
+  obj = obj || {};
+  try {
+    for (var n in props) {
+      var pd = Object.getOwnPropertyDescriptor(props, n);
+      if (pd) {
+        pd.enumerable = true;
+        Object.defineProperty(obj, n, pd);
       }
-    } catch(x) {
     }
+  } catch(x) {
   }
   return obj;
-}
-
-// copy property inName from inSource object to inTarget object
-function copyProperty(inName, inSource, inTarget) {
-  var pd = getPropertyDescriptor(inSource, inName);
-  Object.defineProperty(inTarget, inName, pd);
-}
-
-// get property descriptor for inName on inObject, even if
-// inName exists on some link in inObject's prototype chain
-function getPropertyDescriptor(inObject, inName) {
-  if (inObject) {
-    var pd = Object.getOwnPropertyDescriptor(inObject, inName);
-    return pd || getPropertyDescriptor(Object.getPrototypeOf(inObject), inName);
-  }
 }
 
 // exports
 
 window.HTMLElementElement = HTMLElementElement;
-// TODO(sjmiles): completely ad-hoc, used by Polymer.register
-window.mixin = mixin;
 
 })();
