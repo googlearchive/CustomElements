@@ -224,4 +224,5 @@
 
 htmlSuite('customElements (html)', function() {
   htmlTest('html/attributes.html');
+  htmlTest('html/descriptors.html');
 });

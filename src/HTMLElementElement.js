@@ -116,13 +116,12 @@ window.__componentScript = function(inName, inFunc) {
 function mixin(obj, props) {
   obj = obj || {};
   try {
-    for (var n in props) {
+    Object.getOwnPropertyNames(props).forEach(function(n) {
       var pd = Object.getOwnPropertyDescriptor(props, n);
       if (pd) {
-        pd.enumerable = true;
         Object.defineProperty(obj, n, pd);
       }
-    }
+    });
   } catch(x) {
   }
   return obj;
