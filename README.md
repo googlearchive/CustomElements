@@ -112,7 +112,7 @@ If you've used `extends` to create a custom element that derives from an existin
     <button is="x-foo-button"></button>
 
 In the declarative and `document.register()` example above, `XFoo` was defined as the new element's constructor.
-THis can also be used to create an instance:
+This can also be used to create an instance:
 
     var xFoo = new XFoo();
     document.body.appendChild(xFoo);
