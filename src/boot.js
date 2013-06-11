@@ -14,7 +14,8 @@ function bootstrap() {
     CustomElements.parser.parse(document);
     // one more pass before register is 'live'
     CustomElements.upgradeDocument(document);  
-    // set internal 'ready' flag, now document.register will trigger synchronous upgrades
+    // set internal 'ready' flag, now document.register will trigger 
+    // synchronous upgrades
     CustomElements.ready = true;
     // capture blunt profiling data
     CustomElements.readyTime = new Date().getTime();
@@ -37,11 +38,10 @@ if (typeof window.CustomEvent !== 'function') {
   };
 }
 
-var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
-
 if (document.readyState === 'complete') {
-  boostrap();
+  bootstrap();
 } else {
+  var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
   window.addEventListener(loadEvent, bootstrap);
 }
 
