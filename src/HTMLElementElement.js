@@ -97,7 +97,7 @@ function executeComponentScript(inScript, inContext, inName) {
     + "', function(){"
     + inScript
     + "});"
-    + "\n//@ sourceURL=" + url + "\n"
+    + "\n//# sourceURL=" + url + "\n"
   ;
   // inject script
   eval(code);
