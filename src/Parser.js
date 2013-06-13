@@ -6,7 +6,9 @@
 
 (function() {
 
-var IMPORT_LINK_TYPE = 'import';
+// import
+
+var IMPORT_LINK_TYPE = window.HTMLImports ? HTMLImports.IMPORT_LINK_TYPE : 'none';
 
 // highlander object for parsing a document tree
 
