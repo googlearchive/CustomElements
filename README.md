@@ -13,7 +13,7 @@ Custom elements are still elements. We can create, use, manipulate, and compose 
 ### Basic usage
 
 As with any element, custom elements can be created in JavaScript or declared.
-**Their name must always contain a dash (-).**
+**Custom element names must always contain a dash (-).**
 
 #### Element registration
 
@@ -89,13 +89,13 @@ declare the type using the `extends` option when calling `document.register()`:
   
 Example extending `button`:
   
-    var XFooPrototype = Object.create(HTMLButtonElement.prototype);
-    XFooPrototype.readyCallback = function() {
-      this.textContent = "I'm an x-foo!";
+    var XFooButtonPrototype = Object.create(HTMLButtonElement.prototype);
+    XFooButtonPrototype.readyCallback = function() {
+      this.textContent = "I'm an x-foo button!";
     };
 
-    var XFoo = document.register('x-foo', {
-      prototype: XFooPrototype,
+    var XFooButton = document.register('x-foo-button', {
+      prototype: XFooButtonPrototype,
       extends: 'button'
     });
 
@@ -106,13 +106,22 @@ standard DOM elements:
 
     <x-foo></x-foo>
 
-In the declarative and `document.register()` examples above, `XFoo` was defined as the new element's constructor. Browser limitations require that we supply the constructor while you supply the prototype. Use the `readyCallback` to do initialization work that might otherwise be in the constructor.
+If you've used `extends` to create a custom element that derives from an existing DOM element
+(e.g. something other than `HTMLElement`), use the `is` syntax:
+
+    <button is="x-foo-button"></button>
+
+In the declarative and `document.register()` example above, `XFoo` was defined as the new element's constructor.
+This can also be used to create an instance:
 
     var xFoo = new XFoo();
     document.body.appendChild(xFoo);
 
-    var xFoo2 = document.createElement('x-foo');
-    xFoo2.foo(); // "foo() called"
+    var xFooButton = document.createElement('button', 'x-foo-button');
+    xFooButton.foo(); // "foo() called"
+
+Browser limitations require that we supply the constructor while you supply the `prototype`.
+Use the `readyCallback` to do initialization work that might otherwise be in a constructor.
 
 ## Polyfill details
 

@@ -105,16 +105,16 @@ function register(inName, inOptions) {
   // some platforms require modifications to the user-supplied prototype
   // chain
   resolvePrototypeChain(definition);
-  // overrides to implement callbacks
-  // TODO(sjmiles): should support access via .attributes NamedNodeMap
-  definition.prototype.setAttribute = setAttribute;
-  definition.prototype.removeAttribute = removeAttribute;
+  // overrides to implement attributeChanged callback
+  overrideAttributeApi(definition.prototype);
   // 7.1.5: Register the DEFINITION with DOCUMENT
   registerDefinition(inName, definition);
   // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
   // 7.1.8. Return the output of the previous step.
   definition.ctor = generateConstructor(definition);
   definition.ctor.prototype = definition.prototype;
+  // force our .constructor to be our actual constructor
+  definition.prototype.constructor = definition.ctor;
   // if initial parsing is complete
   if (scope.ready) {
     // upgrade any pre-existing nodes of this type
@@ -152,13 +152,12 @@ function resolvePrototypeChain(inDefinition) {
   // if we don't support __proto__ we need to locate the native level
   // prototype for precise mixing in
   if (!Object.__proto__) {
+    // default prototype
+    var native = HTMLElement.prototype;
+    // work out prototype when using type-extension
     if (inDefinition.is) {
-      // for non-trivial extensions, work out both prototypes
       var inst = document.createElement(inDefinition.tag);
-      var native = Object.getPrototypeOf(inst);
-    } else {
-      // otherwise, use the default
-      native = HTMLElement.prototype;
+      native = Object.getPrototypeOf(inst);
     }
   }
   // cache this in case of mixin
@@ -241,15 +240,18 @@ function ready(inElement) {
 
 // attribute watching
 
-var originalSetAttribute = HTMLElement.prototype.setAttribute;
-var originalRemoveAttribute = HTMLElement.prototype.removeAttribute;
-
-function setAttribute(name, value) {
-  changeAttribute.call(this, name, value, originalSetAttribute);
-}
-
-function removeAttribute(name, value) {
-  changeAttribute.call(this, name, value, originalRemoveAttribute);
+function overrideAttributeApi(prototype) {
+  // overrides to implement callbacks
+  // TODO(sjmiles): should support access via .attributes NamedNodeMap
+  // TODO(sjmiles): preserves user defined overrides, if any
+  var setAttribute = prototype.setAttribute;
+  prototype.setAttribute = function(name, value) {
+    changeAttribute.call(this, name, value, setAttribute);
+  }
+  var removeAttribute = prototype.removeAttribute;
+  prototype.removeAttribute = function(name, value) {
+    changeAttribute.call(this, name, value, removeAttribute);
+  }
 }
 
 function changeAttribute(name, value, operation) {

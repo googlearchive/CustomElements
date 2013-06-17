@@ -6,23 +6,25 @@ license that can be found in the LICENSE file.
 -->
 <html>
   <head>
-    <title>Mocha Test: CustomElements</title>
+    <title>Test: Custom Elements</title>
     <meta charset="UTF-8">
-    <!-- -->
     <link rel="stylesheet" href="../node_modules/mocha/mocha.css" />
     <script src="../node_modules/mocha/mocha.js"></script>
     <script src="../node_modules/chai/chai.js"></script>
-    <!-- -->
-    <script src="../custom-elements.min.js"></script>
+    <script src="../tools/test/mocha-htmltest.js"></script>
+    <script src="../custom-elements.js"></script>
   </head>
   <body>
     <div id="mocha"></div>
     <script>
-      mocha.setup({ui: 'tdd'});
+      mocha.setup({ui: 'tdd', slow: 1000});
     </script>
-    <!--  -->
-    <script src="CustomElements.js"></script>
-    <!--  -->
+    <!-- -->
+    <script src="js/customElements.js"></script>
+    <script src="js/upgrade.js"></script>
+    <script src="js/htmlElementElement.js"></script>
+    <script src="js/observe.js"></script>
+    <!-- -->
     <script>
       mocha.run();
     </script>
