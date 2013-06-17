@@ -13,7 +13,7 @@ Custom elements are still elements. We can create, use, manipulate, and compose 
 ### Basic usage
 
 As with any element, custom elements can be created in JavaScript or declared.
-**Their name must always contain a dash (-).**
+**Custom clement names must always contain a dash (-).**
 
 #### Element registration
 
