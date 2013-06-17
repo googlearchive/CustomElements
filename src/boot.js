@@ -7,7 +7,29 @@
 
 // bootstrap parsing
 
-// IE shim for CustomEvent
+function bootstrap() {
+  // go async so call stack can unwind
+  setTimeout(function() {
+    // parse document
+    CustomElements.parser.parse(document);
+    // one more pass before register is 'live'
+    CustomElements.upgradeDocument(document);  
+    // set internal 'ready' flag, now document.register will trigger 
+    // synchronous upgrades
+    CustomElements.ready = true;
+    // capture blunt profiling data
+    CustomElements.readyTime = new Date().getTime();
+    if (window.HTMLImports) {
+      CustomElements.elapsed = CustomElements.readyTime - HTMLImports.readyTime;
+    }
+    // notify the system that we are bootstrapped
+    document.body.dispatchEvent(
+      new CustomEvent('WebComponentsReady', {bubbles: true})
+    );
+  }, 0);
+}
+
+// CustomEvent shim for IE
 if (typeof window.CustomEvent !== 'function') {
   window.CustomEvent = function(inType) {
      var e = document.createEvent('HTMLEvents');
@@ -16,31 +38,11 @@ if (typeof window.CustomEvent !== 'function') {
   };
 }
 
-function bootstrap() {
-  // go async so call stack can unwind
-  setTimeout(function() {
-    // parse document
-    CustomElements.parser.parse(document);
-    // set internal flag
-    CustomElements.ready = true;
-    CustomElements.readyTime = new Date().getTime();
-    if (window.HTMLImports) {
-      CustomElements.elapsed = CustomElements.readyTime - HTMLImports.readyTime;
-    }
-    // notify system
-    document.body.dispatchEvent(
-      new CustomEvent('WebComponentsReady', {bubbles: true})
-    );
-  }, 0);
-}
-
-// TODO(sjmiles): 'window' has no wrappability under ShadowDOM polyfill, so
-// we are forced to split into two versions
-
-if (window.HTMLImports) {
-  document.addEventListener('HTMLImportsLoaded', bootstrap);
+if (document.readyState === 'complete') {
+  bootstrap();
 } else {
-  window.addEventListener('load', bootstrap);
+  var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
+  window.addEventListener(loadEvent, bootstrap);
 }
 
 })();

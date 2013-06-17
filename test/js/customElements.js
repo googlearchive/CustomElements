@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
-suite('customElements', function() {
+ suite('customElements', function() {
   var work;
   var assert = chai.assert;
 
@@ -220,4 +220,9 @@ suite('customElements', function() {
       done();
     }, 0);
   });
+});
+
+htmlSuite('customElements (html)', function() {
+  htmlTest('html/attributes.html');
+  htmlTest('html/descriptors.html');
 });
