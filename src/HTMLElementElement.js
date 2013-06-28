@@ -5,7 +5,7 @@
  */
 
 (function(){
-  
+
 var HTMLElementElement = function(inElement) {
   inElement.register = HTMLElementElement.prototype.register;
   parseElementElement(inElement);
@@ -49,7 +49,7 @@ function parseElementElement(inElement) {
   // install options
   inElement.options = options;
   // locate user script
-  var script = inElement.querySelector('script,scripts');
+  var script = inElement.querySelector('script:not([type]),script[type="text/javascript"],scripts');
   if (script) {
     // execute user script in 'inElement' context
     executeComponentScript(script.textContent, inElement, options.name);
@@ -63,7 +63,7 @@ function parseElementElement(inElement) {
     window[refName] = ctor;
   }
 }
-  
+
 // each property in inDictionary takes a value
 // from the matching attribute in inElement, if any
 function takeAttributes(inElement, inDictionary) {
@@ -81,7 +81,7 @@ function executeComponentScript(inScript, inContext, inName) {
   context = inContext;
   // source location
   var owner = context.ownerDocument;
-  var url = (owner._URL || owner.URL || owner.impl 
+  var url = (owner._URL || owner.URL || owner.impl
       && (owner.impl._URL || owner.impl.URL));
   // ensure the component has a unique source map so it can be debugged
   // if the name matches the filename part of the owning document's url,
