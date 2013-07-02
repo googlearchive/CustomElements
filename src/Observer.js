@@ -6,6 +6,9 @@ license that can be found in the LICENSE file.
 
 (function(scope){
 
+// prevent error when loader is not in use/logging not instantiated
+var logFlags = window.logFlags || {};
+
 /*
 if (HTMLElement.prototype.webkitShadowRoot) {
   Object.defineProperty(HTMLElement.prototype, 'shadowRoot', {

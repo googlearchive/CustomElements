@@ -16,6 +16,7 @@ module.exports = function(grunt) {
     'src/sidetable.js',
     'MutationObservers/MutationObserver.js',
     'src/CustomElements.js',
+    'src/Observer.js',
     'src/HTMLElementElement.js',
     'src/Parser.js',
     'src/boot.js'
