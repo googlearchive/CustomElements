@@ -53,7 +53,7 @@ module.exports = function(grunt) {
       CustomElements: {
         options: {
           // sourceMap: 'custom-elements.min.source-map.js'
-          banner: grunt.file.read('LICENSE');
+          banner: grunt.file.read('LICENSE')
         },
         files: {
           'custom-elements.min.js': CustomElements
