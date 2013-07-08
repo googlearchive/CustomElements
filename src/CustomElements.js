@@ -298,6 +298,7 @@ function cloneNode(deep) {
   var n = domCloneNode.call(this, deep);
   // upgrade the element and subtree
   scope.upgradeAll(n);
+  // return the clone
   return n;
 }
 // capture native createElement before we override it
