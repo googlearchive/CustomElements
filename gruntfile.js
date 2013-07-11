@@ -12,14 +12,7 @@ module.exports = function(grunt) {
   if (os.type() === 'Windows_NT') {
     browsers.push('IE');
   }
-  CustomElements = [
-    'src/sidetable.js',
-    'MutationObservers/MutationObserver.js',
-    'src/CustomElements.js',
-    'src/HTMLElementElement.js',
-    'src/Parser.js',
-    'src/boot.js'
-  ];
+  CustomElements = grunt.file.readJSON('build.json');
   // karma setup
   var browsers;
   (function() {
@@ -58,11 +51,10 @@ module.exports = function(grunt) {
     },
     uglify: {
       CustomElements: {
-        /*
         options: {
-          sourceMap: 'custom-elements.min.source-map.js'
+          // sourceMap: 'custom-elements.min.source-map.js'
+          banner: grunt.file.read('LICENSE')
         },
-        */
         files: {
           'custom-elements.min.js': CustomElements
         }
@@ -90,7 +82,7 @@ module.exports = function(grunt) {
   // plugins
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
-  grunt.loadNpmTasks('grunt-karma-0.9.1');
+  grunt.loadNpmTasks('grunt-karma');
 
   // tasks
   grunt.registerTask('default', ['uglify']);
