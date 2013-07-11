@@ -18,7 +18,7 @@ function bootstrap() {
     // synchronous upgrades
     CustomElements.ready = true;
     // capture blunt profiling data
-    CustomElements.readyTime = new Date().getTime();
+    CustomElements.readyTime = Date.now();
     if (window.HTMLImports) {
       CustomElements.elapsed = CustomElements.readyTime - HTMLImports.readyTime;
     }
