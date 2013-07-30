@@ -159,6 +159,17 @@ function resolvePrototypeChain(inDefinition) {
       var inst = document.createElement(inDefinition.tag);
       native = Object.getPrototypeOf(inst);
     }
+    // ensure __proto__ reference is installed at each point on the prototype
+    // chain.
+    // NOTE: On platforms without __proto__, a mixin strategy is used instead
+    // of prototype swizzling. In this case, this generated __proto__ provides
+    // limited support for prototype traversal.
+    var proto = inDefinition.prototype, ancestor;
+    while (proto && (proto !== native)) {
+      var ancestor = Object.getPrototypeOf(proto);
+      proto.__proto__ = ancestor;
+      proto = ancestor;
+    }
   }
   // cache this in case of mixin
   inDefinition.native = native;
