@@ -9,14 +9,14 @@
 var thisFile = 'custom-elements.js';
 var scopeName = 'CustomElements';
 var modules = [
-    'src/sidetable.js',
-    'MutationObservers/MutationObserver.js',
-    'src/CustomElements.js',
-    'src/MutationObserver.js',
-    'src/Observer.js',
-    'src/HTMLElementElement.js',
-    'src/Parser.js',
-    'src/boot.js'
+  'src/sidetable.js',
+  'MutationObservers/MutationObserver.js',
+  'src/MutationObserver.js',
+  'src/Observer.js',
+  'src/CustomElements.js',
+  'src/HTMLElementElement.js',
+  'src/Parser.js',
+  'src/boot.js'
 ];
 
 // export

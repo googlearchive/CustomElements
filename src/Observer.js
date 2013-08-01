@@ -36,6 +36,15 @@ function findAll(node, find, data) {
   return null;
 }
 
+// walk all shadowRoots on a given node.
+function forRoots(node, cb) {
+  var root = node.webkitShadowRoot;
+  while(root) {
+    forSubtree(root, cb);
+    root = root.olderShadowRoot;
+  }
+}
+
 // walk the subtree rooted at node, including descent into shadow-roots, 
 // applying 'cb' to each element
 function forSubtree(node, cb) {
@@ -44,13 +53,9 @@ function forSubtree(node, cb) {
     if (cb(e)) {
       return true;
     }
-    if (e.webkitShadowRoot) {
-      forSubtree(e.webkitShadowRoot, cb);
-    }
+    forRoots(e, cb);
   });
-  if (node.webkitShadowRoot) {
-    forSubtree(node.webkitShadowRoot, cb);
-  }
+  forRoots(node, cb);
   //logFlags.dom && node.childNodes && node.childNodes.length && console.groupEnd();
 }
 
@@ -176,8 +181,19 @@ function inDocument(element) {
 function watchShadow(node) {
   if (node.webkitShadowRoot && !node.webkitShadowRoot.__watched) {
     logFlags.dom && console.log('watching shadow-root for: ', node.localName);
-    observe(node.webkitShadowRoot);
-    node.webkitShadowRoot.__watched = true;
+    // watch all unwatched roots...
+    var root = node.webkitShadowRoot;
+    while (root) {
+      watchRoot(root);
+      root = root.olderShadowRoot;
+    }
+  }
+}
+
+function watchRoot(root) {
+  if (!root.__watched) {
+    observe(root);
+    root.__watched = true;
   }
 }
 
