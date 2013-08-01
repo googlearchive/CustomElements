@@ -123,5 +123,24 @@ suite('observe', function() {
         done();
       }, 0);
     });
+    
+    test('custom element automatically upgrades in older shadow subtree', function(done) {
+      registerTestComponent('x-sub2', 'sub2');
+      work.innerHTML = '<div></div>';
+      var div = work.firstChild;
+      var root = div.webkitCreateShadowRoot();
+      var youngerRoot = div.webkitCreateShadowRoot();
+      youngerRoot.olderShadowRoot = root;
+      root.innerHTML = '<div></div>';
+      CustomElements.watchShadow(div);
+      var target = root.firstChild;
+      target.innerHTML = '<x-sub2></x-sub2>';
+      var x = target.firstChild;
+      assert.isUndefined(x.value);
+      setTimeout(function() {
+        assert.equal(x.value, 'sub2');
+        done();
+      }, 0);
+    });
   }
 });
