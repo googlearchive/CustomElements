@@ -22,7 +22,7 @@ if (!scope) {
 
 // native document.register?
 
-scope.hasNative = scope.flags.register && (document.webkitRegister || document.register);
+scope.hasNative = !scope.flags.register && (document.webkitRegister || document.register);
 if (scope.hasNative) {
 
   // normalize
