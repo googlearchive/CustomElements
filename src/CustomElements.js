@@ -22,7 +22,7 @@ if (!scope) {
 
 // native document.register?
 
-scope.hasNative = (document.webkitRegister || document.register) && scope.flags.register !== 'polyfill';
+scope.hasNative = !scope.flags.register && (document.webkitRegister || document.register);
 if (scope.hasNative) {
 
   // normalize
@@ -88,7 +88,7 @@ if (scope.hasNative) {
     // TODO(sjmiles): probably should clone inOptions instead of mutating it
     var definition = inOptions || {};
     if (!inName) {
-      // TODO(sjmiles): replace with more appropriate error (Erik can probably
+      // TODO(sjmiles): replace with more appropriate error (EricB can probably
       // offer guidance)
       throw new Error('Name argument must not be empty');
     }
@@ -97,7 +97,7 @@ if (scope.hasNative) {
     // must have a prototype, default to an extension of HTMLElement
     // TODO(sjmiles): probably should throw if no prototype, check spec
     if (!definition.prototype) {
-      // TODO(sjmiles): replace with more appropriate error (Erik can probably
+      // TODO(sjmiles): replace with more appropriate error (EricB can probably
       // offer guidance)
       throw new Error('Options missing required prototype property');
     }
