@@ -16,18 +16,24 @@
 
 (function(scope) {
 
+// imports
+
 if (!scope) {
   scope = window.CustomElements = {flags:{}};
 }
+var flags = scope.flags;
 
 // native document.register?
 
-scope.hasNative = !scope.flags.register && (document.webkitRegister || document.register);
-if (scope.hasNative) {
+var hasNative = Boolean(document.webkitRegister || document.register);
+var useNative = !flags.register && hasNative;
+
+if (useNative) {
 
   // normalize
   document.register = document.register || document.webkitRegister;
 
+  // stub
   var nop = function() {};
 
   // exports
@@ -348,7 +354,9 @@ if (scope.hasNative) {
    * @return {Element} The upgraded element.
    */
   scope.upgrade = upgradeElement;
-
 }
+
+scope.hasNative = hasNative;
+scope.useNative = useNative;
 
 })(window.CustomElements);
