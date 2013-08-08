@@ -16,18 +16,24 @@
 
 (function(scope) {
 
+// imports
+
 if (!scope) {
   scope = window.CustomElements = {flags:{}};
 }
+var flags = scope.flags;
 
 // native document.register?
 
-scope.hasNative = scope.flags.register && (document.webkitRegister || document.register);
-if (scope.hasNative) {
+var hasNative = Boolean(document.webkitRegister || document.register);
+var useNative = !flags.register && hasNative;
+
+if (useNative) {
 
   // normalize
   document.register = document.register || document.webkitRegister;
 
+  // stub
   var nop = function() {};
 
   // exports
@@ -88,7 +94,7 @@ if (scope.hasNative) {
     // TODO(sjmiles): probably should clone inOptions instead of mutating it
     var definition = inOptions || {};
     if (!inName) {
-      // TODO(sjmiles): replace with more appropriate error (Erik can probably
+      // TODO(sjmiles): replace with more appropriate error (EricB can probably
       // offer guidance)
       throw new Error('Name argument must not be empty');
     }
@@ -97,7 +103,7 @@ if (scope.hasNative) {
     // must have a prototype, default to an extension of HTMLElement
     // TODO(sjmiles): probably should throw if no prototype, check spec
     if (!definition.prototype) {
-      // TODO(sjmiles): replace with more appropriate error (Erik can probably
+      // TODO(sjmiles): replace with more appropriate error (EricB can probably
       // offer guidance)
       throw new Error('Options missing required prototype property');
     }
@@ -348,7 +354,9 @@ if (scope.hasNative) {
    * @return {Element} The upgraded element.
    */
   scope.upgrade = upgradeElement;
-
 }
+
+scope.hasNative = hasNative;
+scope.useNative = useNative;
 
 })(window.CustomElements);
