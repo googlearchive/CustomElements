@@ -211,10 +211,10 @@ if (useNative) {
     // flag as upgraded
     inElement.__upgraded__ = true;
     // there should never be a shadow root on inElement at this point
-    // we require child nodes be upgraded before ready
+    // we require child nodes be upgraded before `created`
     scope.upgradeSubtree(inElement);
     // lifecycle management
-    ready(inElement);
+    created(inElement);
     // OUTPUT
     return inElement;
   }
@@ -256,10 +256,10 @@ if (useNative) {
     }
   }
 
-  function ready(inElement) {
-    // invoke readyCallback
-    if (inElement.readyCallback) {
-      inElement.readyCallback();
+  function created(inElement) {
+    // invoke createdCallback
+    if (inElement.createdCallback) {
+      inElement.createdCallback();
     }
   }
 

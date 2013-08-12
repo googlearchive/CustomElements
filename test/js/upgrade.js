@@ -26,16 +26,16 @@ suite('upgradeElements', function() {
   }
   
   test('CustomElements.upgrade upgrades custom element syntax', function() {
-    registerTestComponent('x-foo', 'foo');
-    work.innerHTML = '<x-foo>Foo</x-foo>';
+    registerTestComponent('x-foo31', 'foo');
+    work.innerHTML = '<x-foo31>Foo</x-foo31>';
     var xfoo = work.firstChild;
     CustomElements.upgrade(xfoo);
     assert.equal(xfoo.value, 'foo');
   });
 
   test('mutation observer upgrades custom element syntax', function(done) {
-    registerTestComponent('x-foo', 'foo');
-    work.innerHTML = '<x-foo>Foo</x-foo>';
+    registerTestComponent('x-foo32', 'foo');
+    work.innerHTML = '<x-foo32>Foo</x-foo32>';
     var xfoo = work.firstChild;
     setTimeout(function() {
       assert.equal(xfoo.value, 'foo');
@@ -44,8 +44,8 @@ suite('upgradeElements', function() {
   });
   
   test('document.register upgrades custom element syntax', function() {
-    work.innerHTML = '<x-foo>Foo</x-foo>';
-    registerTestComponent('x-foo', 'foo');
+    work.innerHTML = '<x-foo33>Foo</x-foo33>';
+    registerTestComponent('x-foo33', 'foo');
     var xfoo = work.firstChild;
     assert.equal(xfoo.value, 'foo');
   });

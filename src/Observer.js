@@ -118,7 +118,7 @@ function inserted(element) {
   // TODO(sjmiles): when logging, do work on all custom elements so we can
   // track behavior even when callbacks not defined
   //console.log('inserted: ', element.localName);
-  if (element.insertedCallback || (element.__upgraded__ && logFlags.dom)) {
+  if (element.enteredDocumentCallback || (element.__upgraded__ && logFlags.dom)) {
     logFlags.dom && console.group('inserted:', element.localName);
     if (inDocument(element)) {
       element.__inserted = (element.__inserted || 0) + 1;
@@ -130,9 +130,9 @@ function inserted(element) {
       if (element.__inserted > 1) {
         logFlags.dom && console.warn('inserted:', element.localName,
           'insert/remove count:', element.__inserted)
-      } else if (element.insertedCallback) {
+      } else if (element.enteredDocumentCallback) {
         logFlags.dom && console.log('inserted:', element.localName);
-        element.insertedCallback();
+        element.enteredDocumentCallback();
       }
     }
     logFlags.dom && console.groupEnd();
@@ -149,7 +149,7 @@ function removedNode(node) {
 function removed(element) {
   // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
-  if (element.removedCallback || (element.__upgraded__ && logFlags.dom)) {
+  if (element.leftDocumentCallback || (element.__upgraded__ && logFlags.dom)) {
     logFlags.dom && console.log('removed:', element.localName);
     if (!inDocument(element)) {
       element.__inserted = (element.__inserted || 0) - 1;
@@ -161,8 +161,8 @@ function removed(element) {
       if (element.__inserted < 0) {
         logFlags.dom && console.warn('removed:', element.localName,
             'insert/remove count:', element.__inserted)
-      } else if (element.removedCallback) {
-        element.removedCallback();
+      } else if (element.leftDocumentCallback) {
+        element.leftDocumentCallback();
       }
     }
   }
