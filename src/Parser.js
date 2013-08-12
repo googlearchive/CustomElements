@@ -14,12 +14,10 @@ var IMPORT_LINK_TYPE = window.HTMLImports ? HTMLImports.IMPORT_LINK_TYPE : 'none
 
 var parser = {
   selectors: [
-    'link[rel=' + IMPORT_LINK_TYPE + ']',
-    'element'
+    'link[rel=' + IMPORT_LINK_TYPE + ']'
   ],
   map: {
-    link: 'parseLink',
-    element: 'parseElement'
+    link: 'parseLink'
   },
   parse: function(inDocument) {
     if (!inDocument.__parsed) {
@@ -48,9 +46,6 @@ var parser = {
     if (linkElt.content) {
       parser.parse(linkElt.content);
     }
-  },
-  parseElement: function(inElementElt) {
-    new HTMLElementElement(inElementElt);
   }
 };
 

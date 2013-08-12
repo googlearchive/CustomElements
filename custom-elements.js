@@ -14,7 +14,6 @@ var modules = [
   'src/MutationObserver.js',
   'src/Observer.js',
   'src/CustomElements.js',
-  'src/HTMLElementElement.js',
   'src/Parser.js',
   'src/boot.js'
 ];
