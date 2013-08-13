@@ -25,7 +25,9 @@ license that can be found in the LICENSE file.
     <script src="js/observe.js"></script>
     <!-- -->
     <script>
-      mocha.run();
+      document.addEventListener('WebComponentsReady', function() {
+        mocha.run();
+      });
     </script>
   </body>
 </html>

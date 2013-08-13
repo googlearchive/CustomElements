@@ -36,12 +36,8 @@ suite('observe', function() {
     var x = work.firstChild;
     assert.isUndefined(x.value);
     registerTestComponent('x-auto', 'auto');
-    // TODO(sjmiles): native needs no timeout, neither should polyfill
-    // unless we run before WebComponentsReady.
-    setTimeout(function() {
-      assert.equal(x.value, 'auto');
-      done();
-    }, 0);
+    assert.equal(x.value, 'auto');
+    done();
   });
 
   test('custom element automatically upgrades in subtree', function(done) {
@@ -51,12 +47,8 @@ suite('observe', function() {
     var x = target.firstChild;
     assert.isUndefined(x.value);
     registerTestComponent('x-auto-sub', 'auto-sub');
-    // TODO(sjmiles): native needs no timeout, neither should polyfill
-    // unless we run before WebComponentsReady.
-    setTimeout(function() {
-      assert.equal(x.value, 'auto-sub');
-      done();
-    }, 0);
+    assert.equal(x.value, 'auto-sub');
+    done();
   });
 
   test('custom elements automatically upgrade', function(done) {
@@ -65,13 +57,10 @@ suite('observe', function() {
     work.innerHTML = '<div><div><x-auto1></x-auto1><x-auto1></x-auto1>' +
       '</div></div><div><x-auto2><x-auto1></x-auto1></x-auto2>' +
       '<x-auto2><x-auto1></x-auto1></x-auto2></div>';
-    // TODO(sjmiles): native needs no timeout, neither should polyfill
-    // unless we run before WebComponentsReady.
-    setTimeout(function() {
-      testElements(work, 'x-auto1', 'auto1');
-      testElements(work, 'x-auto2', 'auto2');
-      done();
-    }, 0);
+    CustomElements.takeRecords();
+    testElements(work, 'x-auto1', 'auto1');
+    testElements(work, 'x-auto2', 'auto2');
+    done();
   });
 
   test('custom elements automatically upgrade in subtree', function(done) {
@@ -79,19 +68,12 @@ suite('observe', function() {
     registerTestComponent('x-auto-sub2', 'auto-sub2');
     work.innerHTML = '<div></div>';
     var target = work.firstChild;
-    // TODO(sjmiles): native needs no timeout, neither should polyfill
-    // unless we run before WebComponentsReady.
-    setTimeout(function() {
-      target.innerHTML = '<div><div><x-auto-sub1></x-auto-sub1><x-auto-sub1></x-auto-sub1>' +
-        '</div></div><div><x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2>' +
-        '<x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2></div>';
-      setTimeout(function() {
-        testElements(target, 'x-auto-sub1', 'auto-sub1');
-        testElements(target, 'x-auto-sub2', 'auto-sub2');
-        done();
-      }, 0);
-    }, 0);
-    
+    target.innerHTML = '<div><div><x-auto-sub1></x-auto-sub1><x-auto-sub1></x-auto-sub1>' +
+      '</div></div><div><x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2>' +
+      '<x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2></div>';
+    CustomElements.takeRecords();
+    testElements(target, 'x-auto-sub1', 'auto-sub1');
+    testElements(target, 'x-auto-sub2', 'auto-sub2');
+    done();
   });
-
 });

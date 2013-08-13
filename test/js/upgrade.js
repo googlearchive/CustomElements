@@ -36,11 +36,10 @@ suite('upgradeElements', function() {
   test('mutation observer upgrades custom element syntax', function(done) {
     registerTestComponent('x-foo32', 'foo');
     work.innerHTML = '<x-foo32>Foo</x-foo32>';
+    CustomElements.takeRecords();
     var xfoo = work.firstChild;
-    setTimeout(function() {
-      assert.equal(xfoo.value, 'foo');
-      done();
-    });
+    assert.equal(xfoo.value, 'foo');
+    done();
   });
   
   test('document.register upgrades custom element syntax', function() {
