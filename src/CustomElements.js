@@ -303,12 +303,14 @@ if (useNative) {
     };
   }
 
-  function createElement(inTag) {
-    var definition = registry[inTag];
+  function createElement(tag, typeExtension) {
+    // TODO(sjmiles): ignore 'tag' when using 'typeExtension', we could
+    // error check it, or perhaps there should only ever be one argument
+    var definition = registry[typeExtension || tag];
     if (definition) {
       return new definition.ctor();
     }
-    return domCreateElement(inTag);
+    return domCreateElement(tag, typeExtension);
   }
 
   function upgradeElement(inElement) {
