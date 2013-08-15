@@ -14,7 +14,6 @@ var modules = [
   'src/MutationObserver.js',
   'src/Observer.js',
   'src/CustomElements.js',
-  'src/HTMLElementElement.js',
   'src/Parser.js',
   'src/boot.js'
 ];
@@ -32,10 +31,10 @@ var script = document.querySelector('script[src*="' + thisFile + '"]');
 var src = script.attributes.src.value;
 var basePath = src.slice(0, src.indexOf(thisFile));
 
-if (!window.Loader) {
+if (!window.PolymerLoader) {
   var path = basePath + 'tools/loader/loader.js';
   document.write('<script src="' + path + '"></script>');
 }
-document.write('<script>Loader.load("' + scopeName + '")</script>');
+document.write('<script>PolymerLoader.load("' + scopeName + '")</script>');
 
 })();

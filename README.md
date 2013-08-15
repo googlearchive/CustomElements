@@ -37,7 +37,7 @@ The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScrip
           // Has built-in 'window' protection.
           this.register({
             prototype: {
-              readyCallback: function() {
+              createdCallback: function() {
                 this.innerHTML = section.innerHTML;
               },
               foo: function() {
@@ -69,7 +69,7 @@ As before, custom elements built this way work just like standard elements.
 Here's the imperative version of the previous example:
 
     var XFooPrototype = Object.create(HTMLElement.prototype);
-    XFooPrototype.readyCallback = function() {
+    XFooPrototype.createdCallback = function() {
       this.textContent = "I'm an x-foo!";
     };
     XFooPrototype.foo = function() {
@@ -90,7 +90,7 @@ declare the type using the `extends` option when calling `document.register()`:
 Example extending `button`:
   
     var XFooButtonPrototype = Object.create(HTMLButtonElement.prototype);
-    XFooButtonPrototype.readyCallback = function() {
+    XFooButtonPrototype.createdCallback = function() {
       this.textContent = "I'm an x-foo button!";
     };
 
@@ -121,7 +121,7 @@ This can also be used to create an instance:
     xFooButton.foo(); // "foo() called"
 
 Browser limitations require that we supply the constructor while you supply the `prototype`.
-Use the `readyCallback` to do initialization work that might otherwise be in a constructor.
+Use the `createdCallback` to do initialization work that might otherwise be in a constructor.
 
 ## Polyfill details
 
@@ -152,12 +152,12 @@ Example:
 
 The Custom Elements specification is still under discussion. The polyfill implements certain features in advance of the specification. In particular, there are several notification callback methods that are used if implemented on the element prototype.
 
-* `readyCallback()` is called when a custom element is created.
-* `insertedCallback()` is called when a custom element is inserted into a DOM subtree.
-* `removedCallback()` is called when a custom element is removed from a DOM subtree.
+* `createdCallback()` is called when a custom element is created.
+* `enteredDocumentCallback()` is called when a custom element is inserted into a DOM subtree.
+* `leftDocumentCallback()` is called when a custom element is removed from a DOM subtree.
 * `attributeChangedCallback(attributeName)` is called when a custom element's attribute value has changed
 
-`readyCallback` is invoked _synchronously_ with element instantiation, the other callbacks are called _asyncronously_. The asynchronous callbacks generally use the MutationObserver timing model, which means they are called before layouts, paints, or other triggered events, so the developer need not worry about flashing content or other bad things happening before the callback has a chance to react to changes.
+`createdCallback` is invoked _synchronously_ with element instantiation, the other callbacks are called _asyncronously_. The asynchronous callbacks generally use the MutationObserver timing model, which means they are called before layouts, paints, or other triggered events, so the developer need not worry about flashing content or other bad things happening before the callback has a chance to react to changes.
 
 The `extends` option to `document.register()` (discussed above)  is exclusive to this polyfill.
 

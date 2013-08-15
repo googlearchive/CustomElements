@@ -42,6 +42,7 @@ if (useNative) {
   
   scope.watchShadow = nop;
   scope.watchAllShadows = nop;
+  scope.upgrade = nop;
   scope.upgradeAll = nop;
   scope.upgradeSubtree = nop;
   scope.observeDocument = nop;
@@ -211,10 +212,10 @@ if (useNative) {
     // flag as upgraded
     inElement.__upgraded__ = true;
     // there should never be a shadow root on inElement at this point
-    // we require child nodes be upgraded before ready
+    // we require child nodes be upgraded before `created`
     scope.upgradeSubtree(inElement);
     // lifecycle management
-    ready(inElement);
+    created(inElement);
     // OUTPUT
     return inElement;
   }
@@ -256,10 +257,10 @@ if (useNative) {
     }
   }
 
-  function ready(inElement) {
-    // invoke readyCallback
-    if (inElement.readyCallback) {
-      inElement.readyCallback();
+  function created(inElement) {
+    // invoke createdCallback
+    if (inElement.createdCallback) {
+      inElement.createdCallback();
     }
   }
 
@@ -302,12 +303,14 @@ if (useNative) {
     };
   }
 
-  function createElement(inTag) {
-    var definition = registry[inTag];
+  function createElement(tag, typeExtension) {
+    // TODO(sjmiles): ignore 'tag' when using 'typeExtension', we could
+    // error check it, or perhaps there should only ever be one argument
+    var definition = registry[typeExtension || tag];
     if (definition) {
       return new definition.ctor();
     }
-    return domCreateElement(inTag);
+    return domCreateElement(tag, typeExtension);
   }
 
   function upgradeElement(inElement) {
