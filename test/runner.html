@@ -22,11 +22,12 @@ license that can be found in the LICENSE file.
     <!-- -->
     <script src="js/customElements.js"></script>
     <script src="js/upgrade.js"></script>
-    <script src="js/htmlElementElement.js"></script>
     <script src="js/observe.js"></script>
     <!-- -->
     <script>
-      mocha.run();
+      document.addEventListener('WebComponentsReady', function() {
+        mocha.run();
+      });
     </script>
   </body>
 </html>

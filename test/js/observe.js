@@ -32,115 +32,48 @@ suite('observe', function() {
   }
 
   test('custom element automatically upgrades', function(done) {
-    registerTestComponent('x-auto', 'auto');
     work.innerHTML = '<x-auto></x-auto>';
     var x = work.firstChild;
     assert.isUndefined(x.value);
-    setTimeout(function() {
-      assert.equal(x.value, 'auto');
-      done();
-    }, 0);
+    registerTestComponent('x-auto', 'auto');
+    assert.equal(x.value, 'auto');
+    done();
   });
-  
+
   test('custom element automatically upgrades in subtree', function(done) {
-    registerTestComponent('x-auto-sub', 'auto-sub');
     work.innerHTML = '<div></div>';
     var target = work.firstChild;
-    setTimeout(function() {
-      target.innerHTML = '<x-auto-sub></x-auto-sub>';
-      var x = target.firstChild;
-      assert.isUndefined(x.value);
-      setTimeout(function() {
-        assert.equal(x.value, 'auto-sub');
-        done();
-      }, 0);
-    }, 0);
+    target.innerHTML = '<x-auto-sub></x-auto-sub>';
+    var x = target.firstChild;
+    assert.isUndefined(x.value);
+    registerTestComponent('x-auto-sub', 'auto-sub');
+    assert.equal(x.value, 'auto-sub');
+    done();
   });
-  
-  
+
   test('custom elements automatically upgrade', function(done) {
     registerTestComponent('x-auto1', 'auto1');
     registerTestComponent('x-auto2', 'auto2');
     work.innerHTML = '<div><div><x-auto1></x-auto1><x-auto1></x-auto1>' +
       '</div></div><div><x-auto2><x-auto1></x-auto1></x-auto2>' +
       '<x-auto2><x-auto1></x-auto1></x-auto2></div>';
-    setTimeout(function() {
-      testElements(work, 'x-auto1', 'auto1');
-      testElements(work, 'x-auto2', 'auto2');
-      done();
-    }, 0);
+    CustomElements.takeRecords();
+    testElements(work, 'x-auto1', 'auto1');
+    testElements(work, 'x-auto2', 'auto2');
+    done();
   });
-  
-  
+
   test('custom elements automatically upgrade in subtree', function(done) {
     registerTestComponent('x-auto-sub1', 'auto-sub1');
     registerTestComponent('x-auto-sub2', 'auto-sub2');
     work.innerHTML = '<div></div>';
     var target = work.firstChild;
-    setTimeout(function() {
-      target.innerHTML = '<div><div><x-auto-sub1></x-auto-sub1><x-auto-sub1></x-auto-sub1>' +
-        '</div></div><div><x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2>' +
-        '<x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2></div>';
-      setTimeout(function() {
-        testElements(target, 'x-auto-sub1', 'auto-sub1');
-        testElements(target, 'x-auto-sub2', 'auto-sub2');
-        done();
-      }, 0);
-    }, 0);
-    
+    target.innerHTML = '<div><div><x-auto-sub1></x-auto-sub1><x-auto-sub1></x-auto-sub1>' +
+      '</div></div><div><x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2>' +
+      '<x-auto-sub2><x-auto-sub1></x-auto-sub1></x-auto-sub2></div>';
+    CustomElements.takeRecords();
+    testElements(target, 'x-auto-sub1', 'auto-sub1');
+    testElements(target, 'x-auto-sub2', 'auto-sub2');
+    done();
   });
-  
-  // test ShadowDOM only in webkit for now...
-  if (HTMLElement.prototype.webkitCreateShadowRoot) {
-    test('custom element automatically upgrades in ShadowDOM', function(done) {
-      registerTestComponent('x-auto-shadow', 'auto-shadow');
-      work.innerHTML = '<div></div>';
-      var div = work.firstChild;
-      var root = div.webkitCreateShadowRoot();
-      CustomElements.watchShadow(root);
-      root.innerHTML = '<x-auto-shadow></x-auto-shadow>';
-      var x = root.firstChild;
-      assert.isUndefined(x.value);
-      setTimeout(function() {
-        assert.equal(x.value, 'auto-shadow');
-        done();
-      }, 0);
-    });
-  
-    test('custom element automatically upgrades in ShadowDOM subtree', function(done) {
-      registerTestComponent('x-sub', 'sub');
-      work.innerHTML = '<div></div>';
-      var div = work.firstChild;
-      var root = div.webkitCreateShadowRoot();
-      root.innerHTML = '<div></div>';
-      CustomElements.watchShadow(root);
-      var target = root.firstChild;
-      target.innerHTML = '<x-sub></x-sub>';
-      var x = target.firstChild;
-      assert.isUndefined(x.value);
-      setTimeout(function() {
-        assert.equal(x.value, 'sub');
-        done();
-      }, 0);
-    });
-    
-    test('custom element automatically upgrades in older shadow subtree', function(done) {
-      registerTestComponent('x-sub2', 'sub2');
-      work.innerHTML = '<div></div>';
-      var div = work.firstChild;
-      var root = div.webkitCreateShadowRoot();
-      var youngerRoot = div.webkitCreateShadowRoot();
-      youngerRoot.olderShadowRoot = root;
-      root.innerHTML = '<div></div>';
-      CustomElements.watchShadow(div);
-      var target = root.firstChild;
-      target.innerHTML = '<x-sub2></x-sub2>';
-      var x = target.firstChild;
-      assert.isUndefined(x.value);
-      setTimeout(function() {
-        assert.equal(x.value, 'sub2');
-        done();
-      }, 0);
-    });
-  }
 });
