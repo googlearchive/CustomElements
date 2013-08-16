@@ -310,7 +310,7 @@ if (useNative) {
     if (definition) {
       return new definition.ctor();
     }
-    return domCreateElement(tag, typeExtension);
+    return domCreateElement(tag);
   }
 
   function upgradeElement(inElement) {
