@@ -17,6 +17,24 @@
     document.body.removeChild(work);
   });
 
+  test('document.register requires name argument', function() {
+    try {
+      document.register();
+    } catch(x) {
+      return;
+    }
+    assert.ok(false, 'document.register failed to throw when given no arguments');
+  });
+
+  test('document.register requires name argument to contain a dash', function() {
+    try {
+      document.register('xfoo', {prototype: Object.create(HTMLElement.prototype)});
+    } catch(x) {
+      return;
+    }
+    assert.ok(false, 'document.register failed to throw when given no arguments');
+  });
+
   test('document.register create via new', function() {
     // register x-foo
     var XFoo = document.register('x-foo', {prototype: Object.create(HTMLElement.prototype)});
