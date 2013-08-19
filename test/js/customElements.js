@@ -169,11 +169,11 @@
     assert(!removed, 'removed must be false [XBoo]');
     work.appendChild(xboo);
     CustomElements.takeRecords();
-    //setTimeout(function() {
+    setTimeout(function() {
       assert(inserted, 'inserted must be true [XBoo]');
       work.removeChild(xboo);
       CustomElements.takeRecords();
-      //setTimeout(function() {
+      setTimeout(function() {
         assert(removed, 'removed must be true [XBoo]');
         //
         ready = inserted = removed = false;
@@ -206,8 +206,8 @@
             done();
           //}, 1);
         //}, 1);
-       //}, 1);
-     //}, 1);
+       }, 1);
+     }, 1);
   });
 
   test('document.register attributeChangedCallback in prototype', function(done) {
