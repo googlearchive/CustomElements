@@ -11,6 +11,7 @@ module.exports = function(karma) {
       'custom-elements.js',
       'test/js/*.js',
       {pattern: 'src/*', included: false},
+      {pattern: 'MutationObservers/*.js', included: false},
       {pattern: 'test/html/*.html', included: false},
       {pattern: 'tools/**/*.js', included: false}
     ],
