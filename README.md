@@ -20,6 +20,7 @@ As with any element, custom elements can be created in JavaScript or declared.
 Before you can use a custom element, it needs to be registered using one of the following
 methods. Otherwise, the browser considers it an <code>HTMLUnknownElement</code>.
 
+{%comment%}
 ##### &lt;element&gt;
 
 The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScript into reusable, encapsulated components.
@@ -60,6 +61,7 @@ based the value of this attribute.
 Example of extending `button`:
 
     <element name="x-foo" extends="button">
+{%endcomment%}
 
 ##### document.register()
 
@@ -136,8 +138,8 @@ Use the minified version (`custom-elements.min.js`) if you need to load the file
 
 ### Polyfill Notes
 
-The polyfill parses `<element>` tags and handles element upgrades _asynchronously_. To know when the polyfill has
-finished all start up tasks, listen to the `WebComponentsReady` event on `document` or `window`.
+The polyfill handles element upgrades _asynchronously_. To know when it has
+finished all of its start up tasks, listen to the `WebComponentsReady` event on `document` or `window`.
 
 Example:
 
