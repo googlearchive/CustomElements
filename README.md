@@ -17,8 +17,7 @@ As with any element, custom elements can be created in JavaScript or declared.
 
 #### Element registration
 
-Before you can use a custom element, it needs to be registered using one of the following
-methods. Otherwise, the browser considers it an <code>HTMLUnknownElement</code>.
+Before you can use a custom element, it needs to be registered. Otherwise, the browser considers it an <code>HTMLElement</code>.
 
 {%comment%}
 ##### &lt;element&gt;
