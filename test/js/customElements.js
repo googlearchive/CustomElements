@@ -17,6 +17,24 @@
     document.body.removeChild(work);
   });
 
+  test('document.register requires name argument', function() {
+    try {
+      document.register();
+    } catch(x) {
+      return;
+    }
+    assert.ok(false, 'document.register failed to throw when given no arguments');
+  });
+
+  test('document.register requires name argument to contain a dash', function() {
+    try {
+      document.register('xfoo', {prototype: Object.create(HTMLElement.prototype)});
+    } catch(x) {
+      return;
+    }
+    assert.ok(false, 'document.register failed to throw when given no arguments');
+  });
+
   test('document.register create via new', function() {
     // register x-foo
     var XFoo = document.register('x-foo', {prototype: Object.create(HTMLElement.prototype)});
@@ -151,11 +169,11 @@
     assert(!removed, 'removed must be false [XBoo]');
     work.appendChild(xboo);
     CustomElements.takeRecords();
-    //setTimeout(function() {
+    setTimeout(function() {
       assert(inserted, 'inserted must be true [XBoo]');
       work.removeChild(xboo);
       CustomElements.takeRecords();
-      //setTimeout(function() {
+      setTimeout(function() {
         assert(removed, 'removed must be true [XBoo]');
         //
         ready = inserted = removed = false;
@@ -188,8 +206,8 @@
             done();
           //}, 1);
         //}, 1);
-       //}, 1);
-     //}, 1);
+       }, 1);
+     }, 1);
   });
 
   test('document.register attributeChangedCallback in prototype', function(done) {

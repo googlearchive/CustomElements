@@ -1,5 +1,5 @@
 module.exports = function(karma) {
-  karma.configure({
+  karma.set({
     // base path, that will be used to resolve files and exclude
     basePath: '../',
 
@@ -11,6 +11,7 @@ module.exports = function(karma) {
       'custom-elements.js',
       'test/js/*.js',
       {pattern: 'src/*', included: false},
+      {pattern: 'MutationObservers/*.js', included: false},
       {pattern: 'test/html/*.html', included: false},
       {pattern: 'tools/**/*.js', included: false}
     ],
@@ -73,6 +74,7 @@ module.exports = function(karma) {
       'karma-mocha',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
+			'karma-ie-launcher',
       'karma-script-launcher',
       'karma-crbot-reporter'
     ]
