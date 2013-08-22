@@ -331,9 +331,7 @@ if (useNative) {
     var element = domCreateElement(tag);
     // Custom tags should be HTMLElements even if not upgraded.
     if (tag.indexOf('-') >= 0) {
-      implement(element, {
-        prototype: HTMLElement.prototype
-      });
+      implement(element, HTMLElement);
     }
     return element;
   }
