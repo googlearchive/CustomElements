@@ -151,7 +151,7 @@ Example:
       });
     </script>
 
-The Custom Elements specification is still under discussion. The polyfill implements certain features in advance of the specification. In particular, there are several notification callback methods that are used if implemented on the element prototype.
+The Custom Elements specification is still under discussion. The polyfill implements certain features in advance of the specification. In particular, the lifecycle callback methods that get called if implemented on the element prototype:
 
 * `createdCallback()` is called when a custom element is created.
 * `enteredDocumentCallback()` is called when a custom element is inserted into a DOM subtree.
