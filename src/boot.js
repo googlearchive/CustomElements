@@ -6,24 +6,29 @@
 (function(){
 
 // bootstrap parsing
-
 function bootstrap() {
   // parse document
   CustomElements.parser.parse(document);
   // one more pass before register is 'live'
   CustomElements.upgradeDocument(document);  
-  // set internal 'ready' flag, now document.register will trigger 
-  // synchronous upgrades
-  CustomElements.ready = true;
-  // capture blunt profiling data
-  CustomElements.readyTime = Date.now();
-  if (window.HTMLImports) {
-    CustomElements.elapsed = CustomElements.readyTime - HTMLImports.readyTime;
-  }
-  // notify the system that we are bootstrapped
-  document.body.dispatchEvent(
-    new CustomEvent('WebComponentsReady', {bubbles: true})
-  );
+  // choose async
+  var async = window.Platform && Platform.endOfMicrotask ? 
+    Platform.endOfMicrotask :
+    setTimeout;
+  async(function() {
+    // set internal 'ready' flag, now document.register will trigger 
+    // synchronous upgrades
+    CustomElements.ready = true;
+    // capture blunt profiling data
+    CustomElements.readyTime = Date.now();
+    if (window.HTMLImports) {
+      CustomElements.elapsed = CustomElements.readyTime - HTMLImports.readyTime;
+    }
+    // notify the system that we are bootstrapped
+    document.body.dispatchEvent(
+      new CustomEvent('WebComponentsReady', {bubbles: true})
+    );
+  });
 }
 
 // CustomEvent shim for IE
