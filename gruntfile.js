@@ -72,7 +72,7 @@ module.exports = function(grunt) {
           outdir: 'docs',
           linkNatives: 'true',
           tabtospace: 2,
-          themedir: '../docs/doc_themes/simple'
+          themedir: 'tools/doc/themes/polymerase'
         }
       }
     },
