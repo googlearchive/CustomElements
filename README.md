@@ -19,49 +19,6 @@ As with any element, custom elements can be created in JavaScript or declared.
 
 Before you can use a custom element, it needs to be registered. Otherwise, the browser considers it an <code>HTMLElement</code>.
 
-{%comment%}
-##### &lt;element&gt;
-
-The `<element>` tag provides a mechanism to encapsulate HTML, CSS, and JavaScript into reusable, encapsulated components.
-
-    <element name="x-foo" constructor="XFoo">
-      <section>
-        I'm an x-foo!
-      </section>
-      <script>
-        // When <element> is in document, we might run in wrong context.
-        // Only do work when this == <element>.
-        if (this !== window) {
-          var section = this.querySelector('section');
-
-          // Has built-in 'window' protection.
-          this.register({
-            prototype: {
-              createdCallback: function() {
-                this.innerHTML = section.innerHTML;
-              },
-              foo: function() {
-                console.log('foo() called');
-              }
-            }
-         });
-        }
-      </script>
-    </element>
-
-The `constructor` attribute name goes on global scope and can be used to construct the element in JavaScript.
-
-**Extending existing elements**
-
-Using `<element>`, the prototype must be a simple object, but the `extends` attribute
-can be used to extend existing DOM elements. The system chains the correct prototype
-based the value of this attribute.
-  
-Example of extending `button`:
-
-    <element name="x-foo" extends="button">
-{%endcomment%}
-
 ##### document.register()
 
 To register a new custom element in JavaScript, invoke `document.register()` somewhere in the page.
