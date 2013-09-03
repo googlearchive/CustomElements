@@ -6,15 +6,7 @@ license that can be found in the LICENSE file.
 
 (function(scope){
 
-/*
-if (HTMLElement.prototype.webkitShadowRoot) {
-  Object.defineProperty(HTMLElement.prototype, 'shadowRoot', {
-    get: function() {
-      return this.webkitShadowRoot;
-    }
-  };
-}
-*/
+var logFlags = window.logFlags || {};
 
 // walk the subtree rooted at node, applying 'find(element, data)' function 
 // to each element
@@ -197,13 +189,6 @@ function watchRoot(root) {
   }
 }
 
-function watchAllShadows(node) {
-  watchShadow(node);
-  forSubtree(node, function(e) {
-    watchShadow(node);
-  });
-}
-
 function filter(inNode) {
   switch (inNode.localName) {
     case 'style':
@@ -239,11 +224,6 @@ function handler(mutations) {
         if (filter(n)) {
           return;
         }
-        // watch shadow-roots on nodes that have had them attached manually
-        // TODO(sjmiles): remove if createShadowRoot is overridden
-        // TODO(sjmiles): removed as an optimization, manual shadow roots
-        // must be watched explicitly
-        //watchAllShadows(n);
         // nodes added may need lifecycle management
         addedNode(n);
       });
@@ -287,8 +267,6 @@ function upgradeDocument(document) {
 // exports
 
 scope.watchShadow = watchShadow;
-scope.watchAllShadows = watchAllShadows;
-
 scope.upgradeAll = addedNode;
 scope.upgradeSubtree = addedSubtree;
 

@@ -41,7 +41,6 @@ if (useNative) {
   scope.upgradeElement = nop;
   
   scope.watchShadow = nop;
-  scope.watchAllShadows = nop;
   scope.upgrade = nop;
   scope.upgradeAll = nop;
   scope.upgradeSubtree = nop;
