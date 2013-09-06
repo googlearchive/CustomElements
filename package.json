@@ -13,7 +13,6 @@
     "karma-ie-launcher": "*",
     "karma-safari-launcher": "*",
     "karma-script-launcher": "*",
-    "karma-crbot-reporter": "*",
-    "karma-ios-launcher": "0.0.3"
+    "karma-crbot-reporter": "*"
   }
 }
