@@ -110,7 +110,7 @@ function inserted(element) {
   // TODO(sjmiles): when logging, do work on all custom elements so we can
   // track behavior even when callbacks not defined
   //console.log('inserted: ', element.localName);
-  if (element.enteredDocumentCallback || (element.__upgraded__ && logFlags.dom)) {
+  if (element.enteredViewCallback || (element.__upgraded__ && logFlags.dom)) {
     logFlags.dom && console.group('inserted:', element.localName);
     if (inDocument(element)) {
       element.__inserted = (element.__inserted || 0) + 1;
@@ -122,9 +122,9 @@ function inserted(element) {
       if (element.__inserted > 1) {
         logFlags.dom && console.warn('inserted:', element.localName,
           'insert/remove count:', element.__inserted)
-      } else if (element.enteredDocumentCallback) {
+      } else if (element.enteredViewCallback) {
         logFlags.dom && console.log('inserted:', element.localName);
-        element.enteredDocumentCallback();
+        element.enteredViewCallback();
       }
     }
     logFlags.dom && console.groupEnd();
@@ -141,7 +141,7 @@ function removedNode(node) {
 function removed(element) {
   // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
-  if (element.leftDocumentCallback || (element.__upgraded__ && logFlags.dom)) {
+  if (element.leftViewCallback || (element.__upgraded__ && logFlags.dom)) {
     logFlags.dom && console.log('removed:', element.localName);
     if (!inDocument(element)) {
       element.__inserted = (element.__inserted || 0) - 1;
@@ -153,8 +153,8 @@ function removed(element) {
       if (element.__inserted < 0) {
         logFlags.dom && console.warn('removed:', element.localName,
             'insert/remove count:', element.__inserted)
-      } else if (element.leftDocumentCallback) {
-        element.leftDocumentCallback();
+      } else if (element.leftViewCallback) {
+        element.leftViewCallback();
       }
     }
   }
@@ -241,8 +241,6 @@ function handler(mutations) {
   logFlags.dom && console.groupEnd();
 };
 
-var observer = new MutationObserver(handler);
-
 function takeRecords() {
   // TODO(sjmiles): ask Raf why we have to call handler ourselves
   handler(observer.takeRecords());
@@ -250,7 +248,14 @@ function takeRecords() {
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
+var observer = new MutationObserver(handler);
+
 function observe(inRoot) {
+  // TODO(sorvell): delay creation of mutation observer to help with
+// IE flakiness
+  if (!observer) {
+    observer = new MutationObserver(handler);
+  }
   observer.observe(inRoot, {childList: true, subtree: true});
 }
 

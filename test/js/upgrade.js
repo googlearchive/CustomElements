@@ -84,7 +84,7 @@ suite('upgradeElements', function() {
     var XSpecialInputProto = Object.create(XInput.prototype);
     XSpecialInputProto.xSpecialInput = 'xSpecialInput';
     var XSpecialInput = document.register('x-special-input', {
-      extends: 'x-input',
+      extends: 'input',
       prototype: XSpecialInputProto
     });
     work.innerHTML = '<input is="x-special-input">';

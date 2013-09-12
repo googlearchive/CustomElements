@@ -102,7 +102,7 @@
     var XBarBarPrototype = Object.create(XBarPrototype);
     var XBarBar = document.register('x-barbar', {
       prototype: XBarBarPrototype,
-      extends: 'x-bar'
+      extends: 'button'
     });
     var xbarbar = new XBarBar();
     work.appendChild(xbarbar).textContent = 'x-barbar';
@@ -113,7 +113,7 @@
     var XBarBarBarPrototype = Object.create(XBarBarPrototype);
     var XBarBarBar = document.register('x-barbarbar', {
       prototype: XBarBarBarPrototype,
-      extends: 'x-barbar'
+      extends: 'button'
     });
     var xbarbarbar = new XBarBarBar();
     work.appendChild(xbarbarbar).textContent = 'x-barbarbar';
@@ -139,8 +139,7 @@
       this.style.fontSize = '32pt';
     };
     var XBooBoo = document.register('x-booboo', {
-      prototype: XBooBooPrototype,
-      extends: 'x-boo'
+      prototype: XBooBooPrototype
     });
     var xbooboo = new XBooBoo();
     assert.equal(xbooboo.style.fontStyle, 'italic');
@@ -148,16 +147,16 @@
   });
 
 
-  test('document.register [created|enteredDocument|leftDocument]Callbacks in prototype', function(done) {
+  test('document.register [created|enteredView|leftView]Callbacks in prototype', function(done) {
     var ready, inserted, removed;
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.createdCallback = function() {
       ready = true;
     }
-    XBooPrototype.enteredDocumentCallback = function() {
+    XBooPrototype.enteredViewCallback = function() {
       inserted = true;
     }
-    XBooPrototype.leftDocumentCallback = function() {
+    XBooPrototype.leftViewCallback = function() {
       removed = true;
     }
     var XBoo = document.register('x-boo-ir', {
@@ -169,45 +168,36 @@
     assert(!removed, 'removed must be false [XBoo]');
     work.appendChild(xboo);
     CustomElements.takeRecords();
-    setTimeout(function() {
-      assert(inserted, 'inserted must be true [XBoo]');
-      work.removeChild(xboo);
-      CustomElements.takeRecords();
-      setTimeout(function() {
-        assert(removed, 'removed must be true [XBoo]');
-        //
-        ready = inserted = removed = false;
-        var XBooBooPrototype = Object.create(XBooPrototype);
-        XBooBooPrototype.createdCallback = function() {
-          XBoo.prototype.createdCallback.call(this);
-        };
-        XBooBooPrototype.enteredDocumentCallback = function() {
-          XBoo.prototype.enteredDocumentCallback.call(this);
-        };
-        XBooBooPrototype.leftDocumentCallback = function() {
-          XBoo.prototype.leftDocumentCallback.call(this);
-        };
-        var XBooBoo = document.register('x-booboo-ir', {
-          prototype: XBooBooPrototype,
-          extends: 'x-boo-ir'
-        });
-        var xbooboo = new XBooBoo();
-        assert(ready, 'ready must be true [XBooBoo]');
-        assert(!inserted, 'inserted must be false [XBooBoo]');
-        assert(!removed, 'removed must be false [XBooBoo]');
-        work.appendChild(xbooboo);
-        CustomElements.takeRecords();
-        //setTimeout(function() {
-          assert(inserted, 'inserted must be true [XBooBoo]');
-          work.removeChild(xbooboo);
-          CustomElements.takeRecords();
-          //setTimeout(function() {
-            assert(removed, 'removed must be true [XBooBoo]');
-            done();
-          //}, 1);
-        //}, 1);
-       }, 1);
-     }, 1);
+    assert(inserted, 'inserted must be true [XBoo]');
+    work.removeChild(xboo);
+    CustomElements.takeRecords();
+    assert(removed, 'removed must be true [XBoo]');
+    //
+    ready = inserted = removed = false;
+    var XBooBooPrototype = Object.create(XBooPrototype);
+    XBooBooPrototype.createdCallback = function() {
+      XBoo.prototype.createdCallback.call(this);
+    };
+    XBooBooPrototype.enteredViewCallback = function() {
+      XBoo.prototype.enteredViewCallback.call(this);
+    };
+    XBooBooPrototype.leftViewCallback = function() {
+      XBoo.prototype.leftViewCallback.call(this);
+    };
+    var XBooBoo = document.register('x-booboo-ir', {
+      prototype: XBooBooPrototype
+    });
+    var xbooboo = new XBooBoo();
+    assert(ready, 'ready must be true [XBooBoo]');
+    assert(!inserted, 'inserted must be false [XBooBoo]');
+    assert(!removed, 'removed must be false [XBooBoo]');
+    work.appendChild(xbooboo);
+    CustomElements.takeRecords();
+    assert(inserted, 'inserted must be true [XBooBoo]');
+    work.removeChild(xbooboo);
+    CustomElements.takeRecords();
+    assert(removed, 'removed must be true [XBooBoo]');
+    done();
   });
 
   test('document.register attributeChangedCallback in prototype', function(done) {
@@ -236,11 +226,10 @@
     });
     var xboo = new XBoo();
     work.appendChild(xboo);
-    setTimeout(function() {
-      var xboo2 = xboo.cloneNode(true);
-      assert(xboo2.__ready__, 'clone createdCallback must be called');
-      done();
-    }, 0);
+    CustomElements.takeRecords();
+    var xboo2 = xboo.cloneNode(true);
+    assert(xboo2.__ready__, 'clone createdCallback must be called');
+    done();
   });
 });
 
