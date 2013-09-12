@@ -241,6 +241,8 @@ function handler(mutations) {
   logFlags.dom && console.groupEnd();
 };
 
+var observer = new MutationObserver(handler);
+
 function takeRecords() {
   // TODO(sjmiles): ask Raf why we have to call handler ourselves
   handler(observer.takeRecords());
@@ -248,14 +250,7 @@ function takeRecords() {
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
-var observer = new MutationObserver(handler);
-
 function observe(inRoot) {
-  // TODO(sorvell): delay creation of mutation observer to help with
-// IE flakiness
-  if (!observer) {
-    observer = new MutationObserver(handler);
-  }
   observer.observe(inRoot, {childList: true, subtree: true});
 }
 
