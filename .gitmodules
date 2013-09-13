@@ -1,6 +1,3 @@
 [submodule "MutationObservers"]
 	path = MutationObservers
 	url = https://github.com/Polymer/MutationObservers.git
-[submodule "tools"]
-	path = tools
-	url = https://github.com/Polymer/tools.git
