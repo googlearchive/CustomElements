@@ -249,12 +249,13 @@
 
     var docB = document.implementation.createHTMLDocument('');
     docB.body.innerHTML = '<' + tagName + '></' + tagName + '>';
-    CustomElements.upgradeAll(docB);
+    CustomElements.parser.parse(docB);
     CustomElements.takeRecords();
     assert.deepEqual(invocations, ['created'], 'created but not entered view');
 
     var element = docB.body.childNodes[0];
-    assert.instanceOf(element, CustomElement, 'element is correct type');
+    // note, cannot use instanceof due to IE
+    assert.equal(element.__proto__, CustomElement.prototype, 'element is correct type');
 
     work.appendChild(element)
     CustomElements.takeRecords();
