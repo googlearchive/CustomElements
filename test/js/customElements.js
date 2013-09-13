@@ -231,6 +231,41 @@
     assert(xboo2.__ready__, 'clone createdCallback must be called');
     done();
   });
+
+  test('entered left apply to view', function() {
+    var invocations = [];
+    var elementProto = Object.create(HTMLElement.prototype);
+    elementProto.createdCallback = function() {
+      invocations.push('created');
+    }
+    elementProto.enteredViewCallback = function() {
+      invocations.push('entered');
+    }
+    elementProto.leftViewCallback = function() {
+      invocations.push('left');
+    }
+    var tagName = 'x-entered-left-view';
+    var CustomElement = document.register(tagName, { prototype: elementProto });
+
+    var docB = document.implementation.createHTMLDocument('');
+    docB.body.innerHTML = '<' + tagName + '></' + tagName + '>';
+    CustomElements.upgradeAll(docB);
+    CustomElements.takeRecords();
+    assert.deepEqual(invocations, ['created'], 'created but not entered view');
+
+    var element = docB.body.childNodes[0];
+    assert.instanceOf(element, CustomElement, 'element is correct type');
+
+    work.appendChild(element)
+    CustomElements.takeRecords();
+    assert.deepEqual(invocations, ['created', 'entered'],
+        'created and entered view');
+
+    docB.body.appendChild(element);
+    CustomElements.takeRecords();
+    assert.deepEqual(invocations, ['created', 'entered', 'left'],
+        'created, entered then left view');
+  });
 });
 
 htmlSuite('customElements (html)', function() {
