@@ -25,13 +25,10 @@ var flags = scope.flags;
 
 // native document.register?
 
-var hasNative = Boolean(document.webkitRegister || document.register);
+var hasNative = Boolean(document.register);
 var useNative = !flags.register && hasNative;
 
 if (useNative) {
-
-  // normalize
-  document.register = document.register || document.webkitRegister;
 
   // stub
   var nop = function() {};
