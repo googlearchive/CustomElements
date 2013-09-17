@@ -1,4 +1,4 @@
 mocha.setup({
   ui:'tdd',
-  htmlbase: '/base/test/'
+  htmlbase: '/base/CustomElements/test/'
 });
