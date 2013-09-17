@@ -30,7 +30,7 @@ function findAll(node, find, data) {
 
 // walk all shadowRoots on a given node.
 function forRoots(node, cb) {
-  var root = node.webkitShadowRoot;
+  var root = node.shadowRoot;
   while(root) {
     forSubtree(root, cb);
     root = root.olderShadowRoot;
@@ -97,9 +97,50 @@ function insertedNode(node) {
   }
 }
 
-// TODO(sjmiles): if there are descents into trees that can never have inDocument(*) true, fix this
+
+// TODO(sorvell): on platforms without MutationObserver, mutations may not be 
+// reliable and therefore entered/leftView are not reliable.
+// To make these callbacks less likely to fail, we defer all inserts and removes
+// to give a chance for elements to be inserted into dom. 
+// This ensures enteredViewCallback fires for elements that are created and 
+// immediately added to dom.
+var hasPolyfillMutations = (!window.MutationObserver ||
+    (window.MutationObserver === window.JsMutationObserver));
+scope.hasPolyfillMutations = hasPolyfillMutations;
+
+var isPendingMutations = false;
+var pendingMutations = [];
+function deferMutation(fn) {
+  pendingMutations.push(fn);
+  if (!isPendingMutations) {
+    isPendingMutations = true;
+    var async = (window.Platform && window.Platform.endOfMicrotask) ||
+        setTimeout;
+    async(takeMutations);
+  }
+}
+
+function takeMutations() {
+  isPendingMutations = false;
+  var $p = pendingMutations;
+  for (var i=0, l=$p.length, p; (i<l) && (p=$p[i]); i++) {
+    p();
+  }
+  pendingMutations = [];
+}
 
 function inserted(element) {
+  if (hasPolyfillMutations) {
+    deferMutation(function() {
+      _inserted(element);
+    });
+  } else {
+    _inserted(element);
+  }
+}
+
+// TODO(sjmiles): if there are descents into trees that can never have inDocument(*) true, fix this
+function _inserted(element) {
   // TODO(sjmiles): it's possible we were inserted and removed in the space
   // of one microtask, in which case we won't be 'inDocument' here
   // But there are other cases where we are testing for inserted without
@@ -138,6 +179,17 @@ function removedNode(node) {
   });
 }
 
+
+function removed(element) {
+  if (hasPolyfillMutations) {
+    deferMutation(function() {
+      _removed(element);
+    });
+  } else {
+    _removed(element);
+  }
+}
+
 function removed(element) {
   // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
@@ -173,10 +225,10 @@ function inDocument(element) {
 }
 
 function watchShadow(node) {
-  if (node.webkitShadowRoot && !node.webkitShadowRoot.__watched) {
+  if (node.shadowRoot && !node.shadowRoot.__watched) {
     logFlags.dom && console.log('watching shadow-root for: ', node.localName);
     // watch all unwatched roots...
-    var root = node.webkitShadowRoot;
+    var root = node.shadowRoot;
     while (root) {
       watchRoot(root);
       root = root.olderShadowRoot;
@@ -248,6 +300,7 @@ var observer = new MutationObserver(handler);
 function takeRecords() {
   // TODO(sjmiles): ask Raf why we have to call handler ourselves
   handler(observer.takeRecords());
+  takeMutations();
 }
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
