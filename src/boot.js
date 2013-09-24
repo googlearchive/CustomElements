@@ -10,13 +10,13 @@ function bootstrap() {
   // parse document
   CustomElements.parser.parse(document);
   // one more pass before register is 'live'
-  CustomElements.upgradeDocument(document);  
+  CustomElements.upgradeDocument(document);
   // choose async
-  var async = window.Platform && Platform.endOfMicrotask ? 
+  var async = window.Platform && Platform.endOfMicrotask ?
     Platform.endOfMicrotask :
     setTimeout;
   async(function() {
-    // set internal 'ready' flag, now document.register will trigger 
+    // set internal 'ready' flag, now document.register will trigger
     // synchronous upgrades
     CustomElements.ready = true;
     // capture blunt profiling data
@@ -40,7 +40,8 @@ if (typeof window.CustomEvent !== 'function') {
   };
 }
 
-if (document.readyState === 'complete') {
+if (document.readyState === 'interactive'
+    || document.readyState === 'complete') {
   bootstrap();
 } else {
   var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
