@@ -40,11 +40,11 @@ if (typeof window.CustomEvent !== 'function') {
   };
 }
 
-if (document.readyState === 'interactive'
-    || document.readyState === 'complete') {
+if (document.readyState === 'complete') {
   bootstrap();
 } else {
-  var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
+  var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' :
+      document.readyState == 'loading' ? 'DOMContentLoaded' : 'load';
   window.addEventListener(loadEvent, bootstrap);
 }
 
