@@ -40,7 +40,12 @@ if (typeof window.CustomEvent !== 'function') {
   };
 }
 
-if (document.readyState === 'complete') {
+// When used together, HTMLImports must be loaded before CustomElements
+// Asynchronous loading is supported only when minified
+// readyState 'interactive' is expected when loaded with 'async' or 'defer' attributes
+// If HTMLImports polyfill loaded, wait for the *asynchronous* "imports loaded" event
+// Otherwise, wait for DOMContentLoaded
+if (document.readyState === 'complete' || (!window.HTMLImports && document.readyState === 'interactive')) {
   bootstrap();
 } else {
   var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
