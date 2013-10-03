@@ -40,8 +40,17 @@ if (typeof window.CustomEvent !== 'function') {
   };
 }
 
+// When loading at readyState complete time, boot custom elements immediately.
+// If relevant, HTMLImports must already be loaded.
 if (document.readyState === 'complete') {
   bootstrap();
+// When loading at readyState interactive time, bootstrap only if HTMLImports
+// are not pending. Also avoid IE as the semantics of this state are unreliable.
+} else if (document.readyState === 'interactive' && !window.attachEvent &&
+    (!window.HTMLImports || window.HTMLImports.ready)) {
+  bootstrap();
+// When loading at other readyStates, wait for the appropriate DOM event to 
+// bootstrap.
 } else {
   var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
   window.addEventListener(loadEvent, bootstrap);
