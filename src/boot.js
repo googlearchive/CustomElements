@@ -10,13 +10,13 @@ function bootstrap() {
   // parse document
   CustomElements.parser.parse(document);
   // one more pass before register is 'live'
-  CustomElements.upgradeDocument(document);  
+  CustomElements.upgradeDocument(document);
   // choose async
-  var async = window.Platform && Platform.endOfMicrotask ? 
+  var async = window.Platform && Platform.endOfMicrotask ?
     Platform.endOfMicrotask :
     setTimeout;
   async(function() {
-    // set internal 'ready' flag, now document.register will trigger 
+    // set internal 'ready' flag, now document.register will trigger
     // synchronous upgrades
     CustomElements.ready = true;
     // capture blunt profiling data
@@ -52,7 +52,8 @@ if (document.readyState === 'complete') {
 // When loading at other readyStates, wait for the appropriate DOM event to 
 // bootstrap.
 } else {
-  var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' : 'DOMContentLoaded';
+  var loadEvent = window.HTMLImports ? 'HTMLImportsLoaded' :
+      document.readyState == 'loading' ? 'DOMContentLoaded' : 'load';
   window.addEventListener(loadEvent, bootstrap);
 }
 
