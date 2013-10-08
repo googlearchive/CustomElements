@@ -48,6 +48,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json')
   });
 
+  grunt.loadTasks('../tools/tasks');
   // plugins
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-yuidoc');
@@ -57,7 +58,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['uglify']);
   grunt.registerTask('minify', ['uglify']);
   grunt.registerTask('docs', ['yuidoc']);
-  grunt.registerTask('test', ['karma:CustomElements']);
-  grunt.registerTask('test-buildbot', ['karma:buildbot']);
+  grunt.registerTask('test', ['override-chrome-launcher', 'karma:CustomElements']);
+  grunt.registerTask('test-buildbot', ['override-chrome-launcher', 'karma:buildbot']);
 };
 
