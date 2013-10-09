@@ -10,7 +10,7 @@ function bootstrap() {
   // parse document
   CustomElements.parser.parse(document);
   // one more pass before register is 'live'
-  CustomElements.upgradeDocument(document);  
+  CustomElements.upgradeDocument(document);
   // choose async
   var async = window.Platform && Platform.endOfMicrotask ? 
     Platform.endOfMicrotask :
@@ -34,9 +34,9 @@ function bootstrap() {
 // CustomEvent shim for IE
 if (typeof window.CustomEvent !== 'function') {
   window.CustomEvent = function(inType) {
-     var e = document.createEvent('HTMLEvents');
-     e.initEvent(inType, true, true);
-     return e;
+    var e = document.createEvent('HTMLEvents');
+    e.initEvent(inType, true, true);
+    return e;
   };
 }
 
