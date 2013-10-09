@@ -243,16 +243,6 @@ function watchRoot(root) {
   }
 }
 
-function filter(inNode) {
-  switch (inNode.localName) {
-    case 'style':
-    case 'script':
-    case 'template':
-    case undefined:
-      return true;
-  }
-}
-
 function handler(mutations) {
   //
   if (logFlags.dom) {
@@ -275,7 +265,7 @@ function handler(mutations) {
     if (mx.type === 'childList') {
       forEach(mx.addedNodes, function(n) {
         //logFlags.dom && console.log(n.localName);
-        if (filter(n)) {
+        if (!n.localName) {
           return;
         }
         // nodes added may need lifecycle management
@@ -284,7 +274,7 @@ function handler(mutations) {
       // removed nodes may need lifecycle management
       forEach(mx.removedNodes, function(n) {
         //logFlags.dom && console.log(n.localName);
-        if (filter(n)) {
+        if (!n.localName) {
           return;
         }
         removedNode(n);
