@@ -190,7 +190,7 @@ function removed(element) {
   }
 }
 
-function removed(element) {
+function _removed(element) {
   // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
   if (element.leftViewCallback || (element.__upgraded__ && logFlags.dom)) {
