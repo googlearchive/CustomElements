@@ -9,9 +9,7 @@
 var thisFile = 'custom-elements.js';
 var scopeName = 'CustomElements';
 var modules = [
-  'src/sidetable.js',
-  'MutationObservers/MutationObserver.js',
-  'src/MutationObserver.js',
+  '../MutationObservers/mutation-observers.js',
   'src/Observer.js',
   'src/CustomElements.js',
   'src/Parser.js',
