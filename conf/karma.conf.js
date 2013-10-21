@@ -13,8 +13,9 @@ module.exports = function(karma) {
       'CustomElements/custom-elements.js',
       'CustomElements/test/js/*.js',
       {pattern: 'CustomElements/src/*', included: false},
-      {pattern: 'CustomElements/MutationObservers/*.js', included: false},
       {pattern: 'CustomElements/test/html/*.html', included: false},
+      {pattern: 'MutationObservers/*.js', included: false},
+      {pattern: 'WeakMap/*.js', included: false},
       {pattern: 'tools/**/*.js', included: false}
     ]
   }));
