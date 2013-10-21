@@ -9,7 +9,7 @@ module.exports = function(karma) {
     files: [
       'tools/test/mocha-htmltest.js',
       'CustomElements/conf/mocha.conf.js',
-      'CustomElements/node_modules/chai/chai.js',
+      'CustomElements/../tools/test/chai/chai.js',
       'CustomElements/custom-elements.js',
       'CustomElements/test/js/*.js',
       {pattern: 'CustomElements/src/*', included: false},
