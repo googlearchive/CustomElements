@@ -4,24 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 module.exports = function(grunt) {
-
-  // recursive module builder
-  var path = require('path');
-  function readManifest(filename, modules) {
-    modules = modules || [];
-    var lines = grunt.file.readJSON(filename);
-    var dir = path.dirname(filename);
-    lines.forEach(function(line) {
-      var fullpath = path.join(dir, line);
-      if (line.slice(-5) == '.json') {
-        // recurse
-        readManifest(fullpath, modules);
-      } else {
-        modules.push(fullpath);
-      }
-    });
-    return modules;
-  }
+  var readManifest = require('../tools/loader/readManifest.js');
 
   CustomElements = readManifest('build.json');
   grunt.initConfig({
