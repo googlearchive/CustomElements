@@ -36,7 +36,7 @@ if (useNative) {
   // exports
   scope.registry = {};
   scope.upgradeElement = nop;
-  
+
   scope.watchShadow = nop;
   scope.upgrade = nop;
   scope.upgradeAll = nop;
@@ -276,17 +276,17 @@ if (useNative) {
       changeAttribute.call(this, name, value, setAttribute);
     }
     var removeAttribute = prototype.removeAttribute;
-    prototype.removeAttribute = function(name, value) {
-      changeAttribute.call(this, name, value, removeAttribute);
+    prototype.removeAttribute = function(name) {
+      changeAttribute.call(this, name, null, removeAttribute);
     }
   }
 
   function changeAttribute(name, value, operation) {
     var oldValue = this.getAttribute(name);
     operation.apply(this, arguments);
-    if (this.attributeChangedCallback 
+    if (this.attributeChangedCallback
         && (this.getAttribute(name) !== oldValue)) {
-      this.attributeChangedCallback(name, oldValue);
+      this.attributeChangedCallback(name, oldValue, value);
     }
   }
 
@@ -348,7 +348,7 @@ if (useNative) {
 
   /**
    * Upgrade an element to a custom element. Upgrading an element
-   * causes the custom prototype to be applied, an `is` attribute 
+   * causes the custom prototype to be applied, an `is` attribute
    * to be attached (as needed), and invocation of the `readyCallback`.
    * `upgrade` does nothing if the element is already upgraded, or
    * if it matches no registered custom tag name.
