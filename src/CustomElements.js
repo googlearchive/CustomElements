@@ -276,17 +276,20 @@ if (useNative) {
       changeAttribute.call(this, name, value, setAttribute);
     }
     var removeAttribute = prototype.removeAttribute;
-    prototype.removeAttribute = function(name, value) {
-      changeAttribute.call(this, name, value, removeAttribute);
+    prototype.removeAttribute = function(name) {
+      changeAttribute.call(this, name, null, removeAttribute);
     }
   }
 
+  // https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/custom/
+  // index.html#dfn-attribute-changed-callback
   function changeAttribute(name, value, operation) {
     var oldValue = this.getAttribute(name);
     operation.apply(this, arguments);
-    if (this.attributeChangedCallback 
-        && (this.getAttribute(name) !== oldValue)) {
-      this.attributeChangedCallback(name, oldValue);
+    var newValue = this.getAttribute(name);
+    if (this.attributeChangedCallback
+        && (newValue !== oldValue)) {
+      this.attributeChangedCallback(name, oldValue, newValue);
     }
   }
 

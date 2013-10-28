@@ -20,8 +20,9 @@
         this.setAttributeOk = true;
         HTMLElement.prototype.setAttribute.call(this, name, value);
       };
-      prototype.attributeChangedCallback = function(name) {
-        this.attributeChangedOk = (name == 'squid');
+      prototype.attributeChangedCallback = function(name, oldValue, newValue) {
+        this.attributeChangedOk = (name === 'squid') && (oldValue === null) 
+            && (newValue === 'tentacles');
       };
       document.register('x-foo', {prototype: prototype});
 
