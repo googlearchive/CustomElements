@@ -271,6 +271,9 @@ if (useNative) {
     // overrides to implement callbacks
     // TODO(sjmiles): should support access via .attributes NamedNodeMap
     // TODO(sjmiles): preserves user defined overrides, if any
+    if (prototype.setAttribute._polyfilled) {
+      return;
+    }
     var setAttribute = prototype.setAttribute;
     prototype.setAttribute = function(name, value) {
       changeAttribute.call(this, name, value, setAttribute);
@@ -279,6 +282,7 @@ if (useNative) {
     prototype.removeAttribute = function(name) {
       changeAttribute.call(this, name, null, removeAttribute);
     }
+    prototype.setAttribute._polyfilled = true;
   }
 
   // https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/custom/
