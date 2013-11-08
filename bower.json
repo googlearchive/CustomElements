@@ -1,0 +1,27 @@
+{
+  "name": "CustomElements",
+  "version": "0.0.20131107",
+  "homepage": "https://github.com/Polymer/CustomElements",
+  "authors": [
+    "The Polymer Authors"
+  ],
+  "description": "Custom Elements Polyfill",
+  "main": "custom-elements.js",
+  "keywords": [
+    "web",
+    "components"
+  ],
+  "dependencies": {
+    "MutationObservers": "Polymer/MutationObservers"
+  },
+  "license": "BSD",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "../",
+    "test",
+    "tests"
+  ]
+}
