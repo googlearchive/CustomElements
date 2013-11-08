@@ -12,7 +12,7 @@
     "components"
   ],
   "dependencies": {
-    "MutationObservers": "Polymer/MutationObservers"
+    "MutationObservers": "Polymer/MutationObservers#master"
   },
   "license": "BSD",
   "private": true,
