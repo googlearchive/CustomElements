@@ -3,7 +3,7 @@
  * Use of this source code is governed by a BSD-style
  * license that can be found in the LICENSE file.
  */
-(function(){
+(function(scope){
 
 // bootstrap parsing
 function bootstrap() {
@@ -40,9 +40,10 @@ if (typeof window.CustomEvent !== 'function') {
   };
 }
 
-// When loading at readyState complete time, boot custom elements immediately.
+// When loading at readyState complete time (or via flag), boot custom elements
+// immediately.
 // If relevant, HTMLImports must already be loaded.
-if (document.readyState === 'complete') {
+if (document.readyState === 'complete' || scope.flags.eager) {
   bootstrap();
 // When loading at readyState interactive time, bootstrap only if HTMLImports
 // are not pending. Also avoid IE as the semantics of this state are unreliable.
@@ -56,4 +57,4 @@ if (document.readyState === 'complete') {
   window.addEventListener(loadEvent, bootstrap);
 }
 
-})();
+})(window.CustomElements);
