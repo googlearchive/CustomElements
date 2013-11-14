@@ -10,6 +10,7 @@ var thisFile = 'custom-elements.js';
 var scopeName = 'CustomElements';
 var modules = [
   '../MutationObservers/mutation-observers.js',
+  'src/unresolved.js',
   'src/Observer.js',
   'src/CustomElements.js',
   'src/Parser.js',
