@@ -112,7 +112,16 @@ suite('upgradeElements', function() {
       assert.equal(b.test, 'ybutton');
       assert.equal(b.textContent, i);
     });
-    
-    
   });
+
+  // polyfill only tests
+  if (!CustomElements.useNative) {
+    test('unresolved attribute removed after upgrade', function() {
+      work.innerHTML = '<x-res unresolved>Resolved!</x-res>';
+      registerTestComponent('x-res', 'res');
+      var xres = work.firstChild;
+      assert.equal(xres.value, 'res');
+      assert.isFalse(xres.hasAttribute('unresolved'), 'unresolved is removed after upgrade');
+    });
+  }
 });

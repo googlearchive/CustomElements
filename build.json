@@ -1,7 +1,6 @@
 [
   "../MutationObservers/build.json",
   "src/scope.js",
-  "src/unresolved.js",
   "src/MutationObserver.js",
   "src/Observer.js",
   "src/CustomElements.js",

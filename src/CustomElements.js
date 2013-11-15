@@ -208,6 +208,8 @@ if (useNative) {
     if (definition.is) {
       element.setAttribute('is', definition.is);
     }
+    // remove 'unresolved' attr, which is a standin for :unresolved.
+    element.removeAttribute('unresolved');
     // make 'element' implement definition.prototype
     implement(element, definition);
     // flag as upgraded
