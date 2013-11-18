@@ -28,6 +28,10 @@ function bootstrap() {
     document.body.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true})
     );
+
+    document.addEventListener('LinkTagImported', function (e) {
+      CustomElements.parser.parseLink(e.detail);
+    });
   });
 }
 
