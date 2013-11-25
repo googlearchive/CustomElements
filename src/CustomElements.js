@@ -109,6 +109,10 @@ if (useNative) {
       // offer guidance)
       throw new Error('Options missing required prototype property');
     }
+    // elements may only be registered once
+    if (registry[name]) {
+      throw new Error('DuplicateDefinitionError: a type with name \'' + String(name) + '\' is already registered');
+    }
     // ensure a lifecycle object so we don't have to null test it
     definition.lifecycle = definition.lifecycle || {};
     // build a list of ancestral custom elements (for native base detection)
