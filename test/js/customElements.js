@@ -90,7 +90,6 @@
     assert.equal(work.firstChild.nextSibling.isXCase, true);
   });
 
-
   test('document.register create multiple instances', function() {
     var XFooPrototype = Object.create(HTMLElement.prototype);
     XFooPrototype.bluate = function() {
