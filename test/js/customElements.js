@@ -35,6 +35,17 @@
     assert.ok(false, 'document.register failed to throw when given no arguments');
   });
 
+  test('document.register requires name argument to be unique', function() {
+   var proto = {prototype: Object.create(HTMLElement.prototype)};
+   document.register('x-duplicate', proto);
+   try {
+    document.register('x-duplicate', proto);
+   } catch(x) {
+    return;
+   }
+   assert.ok(false, 'document.register failed to throw when called multiple times with the same element name');
+  });
+
   test('document.register create via new', function() {
     // register x-foo
     var XFoo = document.register('x-foo', {prototype: Object.create(HTMLElement.prototype)});
