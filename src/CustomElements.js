@@ -100,8 +100,10 @@ if (useNative) {
       // offer guidance)
       throw new Error('document.register: first argument (\'name\') must contain a dash (\'-\'). Argument provided was \'' + String(name) + '\'.');
     }
-    // record name
-    definition.name = name;
+    // elements may only be registered once
+    if (getRegisteredDefinition(name)) {
+      throw new Error('DuplicateDefinitionError: a type with name \'' + String(name) + '\' is already registered');
+    }
     // must have a prototype, default to an extension of HTMLElement
     // TODO(sjmiles): probably should throw if no prototype, check spec
     if (!definition.prototype) {
@@ -109,6 +111,8 @@ if (useNative) {
       // offer guidance)
       throw new Error('Options missing required prototype property');
     }
+    // record name
+    definition.name = name.toLowerCase();
     // ensure a lifecycle object so we don't have to null test it
     definition.lifecycle = definition.lifecycle || {};
     // build a list of ancestral custom elements (for native base detection)
@@ -124,7 +128,7 @@ if (useNative) {
     // overrides to implement attributeChanged callback
     overrideAttributeApi(definition.prototype);
     // 7.1.5: Register the DEFINITION with DOCUMENT
-    registerDefinition(name, definition);
+    registerDefinition(definition.name, definition);
     // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
     // 7.1.8. Return the output of the previous step.
     definition.ctor = generateConstructor(definition);
@@ -140,7 +144,7 @@ if (useNative) {
   }
 
   function ancestry(extnds) {
-    var extendee = registry[extnds];
+    var extendee = getRegisteredDefinition(extnds);
     if (extendee) {
       return ancestry(extendee.extends).concat([extendee]);
     }
@@ -303,6 +307,12 @@ if (useNative) {
 
   var registry = {};
 
+  function getRegisteredDefinition(name) {
+    if (name) {
+      return registry[name.toLowerCase()];
+    }
+  }
+
   function registerDefinition(name, definition) {
     registry[name] = definition;
   }
@@ -316,7 +326,7 @@ if (useNative) {
   function createElement(tag, typeExtension) {
     // TODO(sjmiles): ignore 'tag' when using 'typeExtension', we could
     // error check it, or perhaps there should only ever be one argument
-    var definition = registry[typeExtension || tag];
+    var definition = getRegisteredDefinition(typeExtension || tag);
     if (definition) {
       return new definition.ctor();
     }
@@ -326,7 +336,7 @@ if (useNative) {
   function upgradeElement(element) {
     if (!element.__upgraded__ && (element.nodeType === Node.ELEMENT_NODE)) {
       var type = element.getAttribute('is') || element.localName;
-      var definition = registry[type];
+      var definition = getRegisteredDefinition(type);
       return definition && upgrade(element, definition);
     }
   }
