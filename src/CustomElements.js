@@ -101,7 +101,7 @@ if (useNative) {
       throw new Error('document.register: first argument (\'name\') must contain a dash (\'-\'). Argument provided was \'' + String(name) + '\'.');
     }
     // record name
-    definition.name = name;
+    definition.name = name.toLowerCase();
     // must have a prototype, default to an extension of HTMLElement
     // TODO(sjmiles): probably should throw if no prototype, check spec
     if (!definition.prototype) {
@@ -110,7 +110,7 @@ if (useNative) {
       throw new Error('Options missing required prototype property');
     }
     // elements may only be registered once
-    if (registry[name]) {
+    if (getRegisteredDefinition(name)) {
       throw new Error('DuplicateDefinitionError: a type with name \'' + String(name) + '\' is already registered');
     }
     // ensure a lifecycle object so we don't have to null test it
@@ -144,7 +144,7 @@ if (useNative) {
   }
 
   function ancestry(extnds) {
-    var extendee = registry[extnds];
+    var extendee = getRegisteredDefinition(extnds);
     if (extendee) {
       return ancestry(extendee.extends).concat([extendee]);
     }
@@ -307,8 +307,14 @@ if (useNative) {
 
   var registry = {};
 
+  function getRegisteredDefinition(name) {
+    if (name) {
+      return registry[name.toLowerCase()];
+    }
+  }
+
   function registerDefinition(name, definition) {
-    registry[name] = definition;
+    registry[name.toLowerCase()] = definition;
   }
 
   function generateConstructor(definition) {
@@ -320,7 +326,7 @@ if (useNative) {
   function createElement(tag, typeExtension) {
     // TODO(sjmiles): ignore 'tag' when using 'typeExtension', we could
     // error check it, or perhaps there should only ever be one argument
-    var definition = registry[typeExtension || tag];
+    var definition = getRegisteredDefinition(typeExtension || tag);
     if (definition) {
       return new definition.ctor();
     }
@@ -330,7 +336,7 @@ if (useNative) {
   function upgradeElement(element) {
     if (!element.__upgraded__ && (element.nodeType === Node.ELEMENT_NODE)) {
       var type = element.getAttribute('is') || element.localName;
-      var definition = registry[type];
+      var definition = getRegisteredDefinition(type);
       return definition && upgrade(element, definition);
     }
   }

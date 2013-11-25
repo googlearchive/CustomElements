@@ -36,14 +36,14 @@
   });
 
   test('document.register requires name argument to be unique', function() {
-   var proto = {prototype: Object.create(HTMLElement.prototype)};
-   document.register('x-duplicate', proto);
-   try {
+    var proto = {prototype: Object.create(HTMLElement.prototype)};
     document.register('x-duplicate', proto);
-   } catch(x) {
-    return;
-   }
-   assert.ok(false, 'document.register failed to throw when called multiple times with the same element name');
+    try {
+      document.register('x-duplicate', proto);
+    } catch(x) {
+      return;
+    }
+    assert.ok(false, 'document.register failed to throw when called multiple times with the same element name');
   });
 
   test('document.register create via new', function() {
@@ -73,6 +73,23 @@
     // test textContent
     assert.equal(xfoo.textContent, '[x-foo2]');
   });
+
+  test('document.register treats names as case insensitive', function() {
+    var proto = {prototype: Object.create(HTMLElement.prototype)};
+    proto.prototype.isXCase = true;
+    var XCase = document.register('X-CASE', proto);
+    // createElement
+    var x = document.createElement('X-CASE');
+    assert.equal(x.isXCase, true);
+    x = document.createElement('x-case');
+    assert.equal(x.isXCase, true);
+    // upgrade
+    work.innerHTML = '<X-CASE></X-CASE><x-CaSe></x-CaSe>';
+    CustomElements.takeRecords();
+    assert.equal(work.firstChild.isXCase, true);
+    assert.equal(work.firstChild.nextSibling.isXCase, true);
+  });
+
 
   test('document.register create multiple instances', function() {
     var XFooPrototype = Object.create(HTMLElement.prototype);
