@@ -94,8 +94,9 @@ Use the minified version (`custom-elements.min.js`) if you need to load the file
 
 ### Polyfill Notes
 
-The polyfill handles element upgrades _asynchronously_. To know when it has
-finished all of its start up tasks, listen to the `WebComponentsReady` event on `document` or `window`.
+The custom elements polyfill handles element upgrades _asynchronously_. The polyfill defers upgrading elements until `DOMContentsLoaded` time. It does this as a performance optimization. Subsequent to the initial upgrade pass, Mutation Observers are used to discover new elements.
+
+To know when the polyfill has finished all of its start up tasks, listen to the `WebComponentsReady` event on `document` or `window`.
 
 Example:
 
