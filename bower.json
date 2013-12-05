@@ -12,7 +12,8 @@
     "components"
   ],
   "dependencies": {
-    "MutationObservers": "Polymer/MutationObservers#master"
+    "MutationObservers": "Polymer/MutationObservers#master",
+    "tools": "Polymer/tools#master"
   },
   "license": "BSD",
   "private": true,
