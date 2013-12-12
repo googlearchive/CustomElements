@@ -25,7 +25,7 @@ function bootstrap() {
       CustomElements.elapsed = CustomElements.readyTime - HTMLImports.readyTime;
     }
     // notify the system that we are bootstrapped
-    document.body.dispatchEvent(
+    document.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true})
     );
   });
