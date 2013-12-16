@@ -112,7 +112,7 @@ if (useNative) {
       throw new Error('Options missing required prototype property');
     }
     // record name
-    definition.name = name.toLowerCase();
+    definition.elementName = name.toLowerCase();
     // ensure a lifecycle object so we don't have to null test it
     definition.lifecycle = definition.lifecycle || {};
     // build a list of ancestral custom elements (for native base detection)
@@ -128,7 +128,7 @@ if (useNative) {
     // overrides to implement attributeChanged callback
     overrideAttributeApi(definition.prototype);
     // 7.1.5: Register the DEFINITION with DOCUMENT
-    registerDefinition(definition.name, definition);
+    registerDefinition(definition.elementName, definition);
     // 7.1.7. Run custom element constructor generation algorithm with PROTOTYPE
     // 7.1.8. Return the output of the previous step.
     definition.ctor = generateConstructor(definition);
@@ -161,10 +161,10 @@ if (useNative) {
       baseTag = a.is && a.tag;
     }
     // our tag is our baseTag, if it exists, and otherwise just our name
-    definition.tag = baseTag || definition.name;
+    definition.tag = baseTag || definition.elementName;
     if (baseTag) {
       // if there is a base tag, use secondary 'is' specifier
-      definition.is = definition.name;
+      definition.is = definition.elementName;
     }
   }
 

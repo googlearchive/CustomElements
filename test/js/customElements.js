@@ -243,6 +243,24 @@
     xboo.setAttribute('foo', 'zot');
   });
 
+  test('document.register can use Functions as definitions', function() {
+    // function used as Custom Element defintion
+    function A$A() {
+      this.alive = true;
+    }
+    A$A.prototype = Object.create(HTMLElement.prototype);
+    // bind createdCallback to function body
+    A$A.prototype.createdCallback = A$A;
+    A$A = document.register('a-a', A$A);
+    // test via new
+    var a = new A$A();
+    assert.equal(a.alive, true);
+    // test via parser upgrade
+    work.innerHTML = '<a-a></a-a>';
+    CustomElements.takeRecords();
+    assert.equal(work.firstElementChild.alive, true);
+  });
+
   test('node.cloneNode upgrades', function(done) {
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.createdCallback = function() {
