@@ -15,7 +15,7 @@
     "karma-script-launcher": "*",
     "karma-crbot-reporter": "*"
   },
-  "dependencies": {
+  "peerDependencies": {
     "MutationObservers": "git://github.com/briandipalma/MutationObservers"
   }
 }
