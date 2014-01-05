@@ -16,6 +16,6 @@
     "karma-crbot-reporter": "*"
   },
   "peerDependencies": {
-    "MutationObservers": "git://github.com/briandipalma/MutationObservers#34a7e828b24824754069bd3c0baf777d63fcc89d"
+    "mutationobservers": ">=0.0.0"
   }
 }
