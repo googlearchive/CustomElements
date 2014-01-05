@@ -1,5 +1,5 @@
 {
-  "name": "CustomElements",
+  "name": "customelements",
   "description": "Polyfill for W3C CustomElements Specification",
   "version": "0.0.1",
   "devDependencies": {
