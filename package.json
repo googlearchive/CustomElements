@@ -14,5 +14,8 @@
     "karma-safari-launcher": "*",
     "karma-script-launcher": "*",
     "karma-crbot-reporter": "*"
+  },
+  "dependencies": {
+    "MutationObservers": "git://github.com/briandipalma/MutationObservers"
   }
 }
