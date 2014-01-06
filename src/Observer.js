@@ -99,10 +99,10 @@ function insertedNode(node) {
 
 
 // TODO(sorvell): on platforms without MutationObserver, mutations may not be 
-// reliable and therefore entered/leftView are not reliable.
+// reliable and therefore attached/detached are not reliable.
 // To make these callbacks less likely to fail, we defer all inserts and removes
 // to give a chance for elements to be inserted into dom. 
-// This ensures enteredViewCallback fires for elements that are created and 
+// This ensures attachedCallback fires for elements that are created and 
 // immediately added to dom.
 var hasPolyfillMutations = (!window.MutationObserver ||
     (window.MutationObserver === window.JsMutationObserver));
@@ -151,7 +151,7 @@ function _inserted(element) {
   // TODO(sjmiles): when logging, do work on all custom elements so we can
   // track behavior even when callbacks not defined
   //console.log('inserted: ', element.localName);
-  if (element.enteredViewCallback || (element.__upgraded__ && logFlags.dom)) {
+  if (element.attachedCallback || (element.__upgraded__ && logFlags.dom)) {
     logFlags.dom && console.group('inserted:', element.localName);
     if (inDocument(element)) {
       element.__inserted = (element.__inserted || 0) + 1;
@@ -163,9 +163,9 @@ function _inserted(element) {
       if (element.__inserted > 1) {
         logFlags.dom && console.warn('inserted:', element.localName,
           'insert/remove count:', element.__inserted)
-      } else if (element.enteredViewCallback) {
+      } else if (element.attachedCallback) {
         logFlags.dom && console.log('inserted:', element.localName);
-        element.enteredViewCallback();
+        element.attachedCallback();
       }
     }
     logFlags.dom && console.groupEnd();
@@ -193,7 +193,7 @@ function removed(element) {
 function _removed(element) {
   // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
-  if (element.leftViewCallback || (element.__upgraded__ && logFlags.dom)) {
+  if (element.detachedCallback || (element.__upgraded__ && logFlags.dom)) {
     logFlags.dom && console.log('removed:', element.localName);
     if (!inDocument(element)) {
       element.__inserted = (element.__inserted || 0) - 1;
@@ -205,8 +205,8 @@ function _removed(element) {
       if (element.__inserted < 0) {
         logFlags.dom && console.warn('removed:', element.localName,
             'insert/remove count:', element.__inserted)
-      } else if (element.leftViewCallback) {
-        element.leftViewCallback();
+      } else if (element.detachedCallback) {
+        element.detachedCallback();
       }
     }
   }
