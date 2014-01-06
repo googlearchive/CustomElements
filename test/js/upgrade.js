@@ -20,7 +20,7 @@ suite('upgradeElements', function() {
   function registerTestComponent(inName, inValue) {
     var proto = Object.create(HTMLElement.prototype);
     proto.value = inValue || 'value';
-    document.register(inName, {
+    document.registerElement(inName, {
       prototype: proto
     });
   }
@@ -62,7 +62,7 @@ suite('upgradeElements', function() {
   test('CustomElements.upgrade upgrades native extendor', function() {
     var XButtonProto = Object.create(HTMLButtonElement.prototype);
     XButtonProto.test = 'xbutton';
-    document.register('x-button', {
+    document.registerElement('x-button', {
       extends: 'button',
       prototype: XButtonProto
     });
@@ -77,13 +77,13 @@ suite('upgradeElements', function() {
   test('CustomElements.upgrade upgrades extendor of native extendor', function() {
     var XInputProto = Object.create(HTMLInputElement.prototype);
     XInputProto.xInput = 'xInput';
-    var XInput = document.register('x-input', {
+    var XInput = document.registerElement('x-input', {
       extends: 'input',
       prototype: XInputProto
     });
     var XSpecialInputProto = Object.create(XInput.prototype);
     XSpecialInputProto.xSpecialInput = 'xSpecialInput';
-    var XSpecialInput = document.register('x-special-input', {
+    var XSpecialInput = document.registerElement('x-special-input', {
       extends: 'input',
       prototype: XSpecialInputProto
     });
@@ -98,7 +98,7 @@ suite('upgradeElements', function() {
   test('CustomElements.upgradeAll upgrades native extendor', function() {
     var YButtonProto = Object.create(HTMLButtonElement.prototype);
     YButtonProto.test = 'ybutton';
-    document.register('y-button', {
+    document.registerElement('y-button', {
       extends: 'button',
       prototype: YButtonProto
     });

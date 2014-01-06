@@ -20,7 +20,7 @@ suite('observe', function() {
   function registerTestComponent(inName, inValue) {
     var proto = Object.create(HTMLElement.prototype);
     proto.value = inValue || 'value';
-    document.register(inName, {
+    document.registerElement(inName, {
       prototype: proto
     });
   }

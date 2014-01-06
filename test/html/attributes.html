@@ -24,7 +24,7 @@
         this.attributeChangedOk = (name === 'squid') && (oldValue === null) 
             && (newValue === 'tentacles');
       };
-      document.register('x-foo', {prototype: prototype});
+      document.registerElement('x-foo', {prototype: prototype});
 
       addEventListener('WebComponentsReady', function() {
         var xfoo = document.createElement('x-foo');
