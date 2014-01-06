@@ -19,7 +19,7 @@
 
   test('document.register requires name argument', function() {
     try {
-      document.register();
+      document.registerElement();
     } catch(x) {
       return;
     }
@@ -28,7 +28,7 @@
 
   test('document.register requires name argument to contain a dash', function() {
     try {
-      document.register('xfoo', {prototype: Object.create(HTMLElement.prototype)});
+      document.registerElement('xfoo', {prototype: Object.create(HTMLElement.prototype)});
     } catch(x) {
       return;
     }
@@ -37,9 +37,9 @@
 
   test('document.register requires name argument to be unique', function() {
     var proto = {prototype: Object.create(HTMLElement.prototype)};
-    document.register('x-duplicate', proto);
+    document.registerElement('x-duplicate', proto);
     try {
-      document.register('x-duplicate', proto);
+      document.registerElement('x-duplicate', proto);
     } catch(x) {
       return;
     }
@@ -48,7 +48,7 @@
 
   test('document.register create via new', function() {
     // register x-foo
-    var XFoo = document.register('x-foo', {prototype: Object.create(HTMLElement.prototype)});
+    var XFoo = document.registerElement('x-foo', {prototype: Object.create(HTMLElement.prototype)});
     // create an instance via new
     var xfoo = new XFoo();
     // test localName
@@ -63,7 +63,7 @@
 
   test('document.register create via createElement', function() {
     // register x-foo
-    var XFoo = document.register('x-foo2', {prototype:  Object.create(HTMLElement.prototype)});
+    var XFoo = document.registerElement('x-foo2', {prototype:  Object.create(HTMLElement.prototype)});
     // create an instance via createElement
     var xfoo = document.createElement('x-foo2');
     // test localName
@@ -77,7 +77,7 @@
   test('document.register treats names as case insensitive', function() {
     var proto = {prototype: Object.create(HTMLElement.prototype)};
     proto.prototype.isXCase = true;
-    var XCase = document.register('X-CASE', proto);
+    var XCase = document.registerElement('X-CASE', proto);
     // createElement
     var x = document.createElement('X-CASE');
     assert.equal(x.isXCase, true);
@@ -95,7 +95,7 @@
     XFooPrototype.bluate = function() {
       this.color = 'lightblue';
     };
-    var XFoo = document.register('x-foo3', {
+    var XFoo = document.registerElement('x-foo3', {
       prototype: XFooPrototype
     });
     // create an instance
@@ -116,7 +116,7 @@
   test('document.register extend native element', function() {
     // test native element extension
     var XBarPrototype = Object.create(HTMLButtonElement.prototype);
-    var XBar = document.register('x-bar', {
+    var XBar = document.registerElement('x-bar', {
       prototype: XBarPrototype,
       extends: 'button'
     });
@@ -127,7 +127,7 @@
     assert.equal(xbar.textContent, 'x-bar');
     // test extension of native element extension
     var XBarBarPrototype = Object.create(XBarPrototype);
-    var XBarBar = document.register('x-barbar', {
+    var XBarBar = document.registerElement('x-barbar', {
       prototype: XBarBarPrototype,
       extends: 'button'
     });
@@ -138,7 +138,7 @@
     assert.equal(xbarbar.textContent, 'x-barbar');
     // test extension^3
     var XBarBarBarPrototype = Object.create(XBarBarPrototype);
-    var XBarBarBar = document.register('x-barbarbar', {
+    var XBarBarBar = document.registerElement('x-barbarbar', {
       prototype: XBarBarBarPrototype,
       extends: 'button'
     });
@@ -154,7 +154,7 @@
     XBooPrototype.createdCallback = function() {
       this.style.fontStyle = 'italic';
     }
-    var XBoo = document.register('x-boo', {
+    var XBoo = document.registerElement('x-boo', {
       prototype: XBooPrototype
     });
     var xboo = new XBoo();
@@ -165,7 +165,7 @@
       XBoo.prototype.createdCallback.call(this);
       this.style.fontSize = '32pt';
     };
-    var XBooBoo = document.register('x-booboo', {
+    var XBooBoo = document.registerElement('x-booboo', {
       prototype: XBooBooPrototype
     });
     var xbooboo = new XBooBoo();
@@ -174,19 +174,19 @@
   });
 
 
-  test('document.register [created|enteredView|leftView]Callbacks in prototype', function(done) {
+  test('document.register [created|attached|detached]Callbacks in prototype', function(done) {
     var ready, inserted, removed;
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.createdCallback = function() {
       ready = true;
     }
-    XBooPrototype.enteredViewCallback = function() {
+    XBooPrototype.attachedCallback = function() {
       inserted = true;
     }
-    XBooPrototype.leftViewCallback = function() {
+    XBooPrototype.detachedCallback = function() {
       removed = true;
     }
-    var XBoo = document.register('x-boo-ir', {
+    var XBoo = document.registerElement('x-boo-ir', {
       prototype: XBooPrototype
     });
     var xboo = new XBoo();
@@ -205,13 +205,13 @@
     XBooBooPrototype.createdCallback = function() {
       XBoo.prototype.createdCallback.call(this);
     };
-    XBooBooPrototype.enteredViewCallback = function() {
-      XBoo.prototype.enteredViewCallback.call(this);
+    XBooBooPrototype.attachedCallback = function() {
+      XBoo.prototype.attachedCallback.call(this);
     };
-    XBooBooPrototype.leftViewCallback = function() {
-      XBoo.prototype.leftViewCallback.call(this);
+    XBooBooPrototype.detachedCallback = function() {
+      XBoo.prototype.detachedCallback.call(this);
     };
-    var XBooBoo = document.register('x-booboo-ir', {
+    var XBooBoo = document.registerElement('x-booboo-ir', {
       prototype: XBooBooPrototype
     });
     var xbooboo = new XBooBoo();
@@ -235,7 +235,7 @@
         done();
       }
     }
-    var XBoo = document.register('x-boo-acp', {
+    var XBoo = document.registerElement('x-boo-acp', {
       prototype: XBooPrototype
     });
     var xboo = new XBoo();
@@ -251,7 +251,7 @@
     A$A.prototype = Object.create(HTMLElement.prototype);
     // bind createdCallback to function body
     A$A.prototype.createdCallback = A$A;
-    A$A = document.register('a-a', A$A);
+    A$A = document.registerElement('a-a', A$A);
     // test via new
     var a = new A$A();
     assert.equal(a.alive, true);
@@ -266,7 +266,7 @@
     XBooPrototype.createdCallback = function() {
       this.__ready__ = true;
     };
-    var XBoo = document.register('x-boo-clone', {
+    var XBoo = document.registerElement('x-boo-clone', {
       prototype: XBooPrototype
     });
     var xboo = new XBoo();
@@ -283,14 +283,14 @@
     elementProto.createdCallback = function() {
       invocations.push('created');
     }
-    elementProto.enteredViewCallback = function() {
+    elementProto.attachedCallback = function() {
       invocations.push('entered');
     }
-    elementProto.leftViewCallback = function() {
+    elementProto.detachedCallback = function() {
       invocations.push('left');
     }
     var tagName = 'x-entered-left-view';
-    var CustomElement = document.register(tagName, { prototype: elementProto });
+    var CustomElement = document.registerElement(tagName, { prototype: elementProto });
 
     var docB = document.implementation.createHTMLDocument('');
     docB.body.innerHTML = '<' + tagName + '></' + tagName + '>';
