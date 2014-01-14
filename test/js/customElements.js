@@ -173,7 +173,6 @@
     assert.equal(xbooboo.style.fontSize, '32pt');
   });
 
-
   test('document.register [created|attached|detached]Callbacks in prototype', function(done) {
     var ready, inserted, removed;
     var XBooPrototype = Object.create(HTMLElement.prototype);
@@ -243,7 +242,30 @@
     xboo.setAttribute('foo', 'zot');
   });
 
-test('document.register detachedCallbacks in prototype', function(done) {
+  test('document.register attachedCallbacks in prototype', function(done) {
+    var inserted = 0;
+    var XBooPrototype = Object.create(HTMLElement.prototype);
+    XBooPrototype.attachedCallback = function() {
+      inserted++;
+    };
+    var XBoo = document.registerElement('x-boo-at', {
+      prototype: XBooPrototype
+    });
+    var xboo = new XBoo();
+    assert.equal(inserted, 0, 'inserted must be 0');
+    work.appendChild(xboo);
+    CustomElements.takeRecords();
+    assert.equal(inserted, 1, 'inserted must be 1');
+    work.removeChild(xboo);
+    CustomElements.takeRecords();
+    assert(!xboo.parentNode);
+    work.appendChild(xboo);
+    CustomElements.takeRecords();
+    assert.equal(inserted, 2, 'inserted must be 2');
+    done();
+  });
+
+  test('document.register detachedCallbacks in prototype', function(done) {
     var ready, inserted, removed;
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.detachedCallback = function() {
