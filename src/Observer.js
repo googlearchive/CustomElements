@@ -194,7 +194,7 @@ function _removed(element) {
   // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
   if (element.detachedCallback || (element.__upgraded__ && logFlags.dom)) {
-    logFlags.dom && console.log('removed:', element.localName);
+    logFlags.dom && console.group('removed:', element.localName);
     if (!inDocument(element)) {
       element.__inserted = (element.__inserted || 0) - 1;
       // if we are in a 'inserted' state, bluntly adjust to an 'removed' state
@@ -209,6 +209,7 @@ function _removed(element) {
         element.detachedCallback();
       }
     }
+    logFlags.dom && console.groupEnd();
   }
 }
 
