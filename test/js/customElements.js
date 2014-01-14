@@ -243,6 +243,41 @@
     xboo.setAttribute('foo', 'zot');
   });
 
+test('document.register detachedCallbacks in prototype', function(done) {
+    var ready, inserted, removed;
+    var XBooPrototype = Object.create(HTMLElement.prototype);
+    XBooPrototype.detachedCallback = function() {
+      removed = true;
+    }
+    var XBoo = document.registerElement('x-boo-ir2', {
+      prototype: XBooPrototype
+    });
+    var xboo = new XBoo();
+    assert(!removed, 'removed must be false [XBoo]');
+    work.appendChild(xboo);
+    CustomElements.takeRecords();
+    work.removeChild(xboo);
+    CustomElements.takeRecords();
+    assert(removed, 'removed must be true [XBoo]');
+    //
+    ready = inserted = removed = false;
+    var XBooBooPrototype = Object.create(XBooPrototype);
+    XBooBooPrototype.detachedCallback = function() {
+      XBoo.prototype.detachedCallback.call(this);
+    };
+    var XBooBoo = document.registerElement('x-booboo-ir2', {
+      prototype: XBooBooPrototype
+    });
+    var xbooboo = new XBooBoo();
+    assert(!removed, 'removed must be false [XBooBoo]');
+    work.appendChild(xbooboo);
+    CustomElements.takeRecords();
+    work.removeChild(xbooboo);
+    CustomElements.takeRecords();
+    assert(removed, 'removed must be true [XBooBoo]');
+    done();
+  });
+
   test('document.register can use Functions as definitions', function() {
     // function used as Custom Element defintion
     function A$A() {
