@@ -4,11 +4,11 @@
  * license that can be found in the LICENSE file.
  */
 
-(function() {
+(function(scope) {
 
 // import
 
-var IMPORT_LINK_TYPE = window.HTMLImports ? HTMLImports.IMPORT_LINK_TYPE : 'none';
+var IMPORT_LINK_TYPE = scope.IMPORT_LINK_TYPE;
 
 // highlander object for parsing a document tree
 
@@ -43,8 +43,8 @@ var parser = {
     }
   },
   parseImport: function(linkElt) {
-    if (linkElt.content) {
-      parser.parse(linkElt.content);
+    if (linkElt.import) {
+      parser.parse(linkElt.import);
     }
   }
 };
@@ -58,6 +58,7 @@ var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
 // exports
 
-CustomElements.parser = parser;
+scope.parser = parser;
+scope.IMPORT_LINK_TYPE = IMPORT_LINK_TYPE;
 
-})();
+})(window.CustomElements);

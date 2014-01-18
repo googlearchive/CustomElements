@@ -138,7 +138,7 @@ if (useNative) {
     // if initial parsing is complete
     if (scope.ready) {
       // upgrade any pre-existing nodes of this type
-      scope.upgradeAll(document);
+      scope.upgradeDocumentTree(document);
     }
     return definition.ctor;
   }

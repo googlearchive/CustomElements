@@ -7,6 +7,7 @@ license that can be found in the LICENSE file.
 (function(scope){
 
 var logFlags = window.logFlags || {};
+var IMPORT_LINK_TYPE = window.HTMLImports ? HTMLImports.IMPORT_LINK_TYPE : 'none';
 
 // walk the subtree rooted at node, applying 'find(element, data)' function
 // to each element
@@ -213,10 +214,16 @@ function _removed(element) {
   }
 }
 
+// SD polyfill intrustion due mainly to the fact that 'document'
+// is not entirely wrapped
+function wrapIfNeeded(node) {
+  return window.ShadowDOMPolyfill ? ShadowDOMPolyfill.wrapIfNeeded(node)
+      : node;
+}
+
 function inDocument(element) {
   var p = element;
-  var doc = window.ShadowDOMPolyfill &&
-      window.ShadowDOMPolyfill.wrapIfNeeded(document) || document;
+  var doc = wrapIfNeeded(document);
   while (p) {
     if (p == doc) {
       return true;
@@ -300,19 +307,33 @@ function observe(inRoot) {
   observer.observe(inRoot, {childList: true, subtree: true});
 }
 
-function observeDocument(document) {
-  observe(document);
+function observeDocument(doc) {
+  observe(doc);
 }
 
-function upgradeDocument(document) {
-  logFlags.dom && console.group('upgradeDocument: ', (document.URL || document._URL || '').split('/').pop());
-  addedNode(document);
+function upgradeDocument(doc) {
+  logFlags.dom && console.group('upgradeDocument: ', (doc.baseURI).split('/').pop());
+  addedNode(doc);
   logFlags.dom && console.groupEnd();
 }
 
-// exports
+function upgradeDocumentTree(doc) {
+  doc = wrapIfNeeded(doc);
+  upgradeDocument(doc);
+  //console.log('upgradeDocumentTree: ', (doc.baseURI).split('/').pop());
+  // upgrade contained imported documents
+  var imports = doc.querySelectorAll('link[rel=' + IMPORT_LINK_TYPE + ']');
+  for (var i=0, l=imports.length, n; (i<l) && (n=imports[i]); i++) {
+    if (n.import && n.import.__parsed) {
+      upgradeDocumentTree(n.import);
+    }
+  }
+}
 
+// exports
+scope.IMPORT_LINK_TYPE = IMPORT_LINK_TYPE;
 scope.watchShadow = watchShadow;
+scope.upgradeDocumentTree = upgradeDocumentTree;
 scope.upgradeAll = addedNode;
 scope.upgradeSubtree = addedSubtree;
 
