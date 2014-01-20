@@ -7,6 +7,7 @@ license that can be found in the LICENSE file.
 (function(scope){
 
 var logFlags = window.logFlags || {};
+var IMPORT_LINK_TYPE = window.HTMLImports ? HTMLImports.IMPORT_LINK_TYPE : 'none';
 
 // walk the subtree rooted at node, applying 'find(element, data)' function
 // to each element
@@ -99,10 +100,10 @@ function insertedNode(node) {
 
 
 // TODO(sorvell): on platforms without MutationObserver, mutations may not be 
-// reliable and therefore entered/leftView are not reliable.
+// reliable and therefore attached/detached are not reliable.
 // To make these callbacks less likely to fail, we defer all inserts and removes
 // to give a chance for elements to be inserted into dom. 
-// This ensures enteredViewCallback fires for elements that are created and 
+// This ensures attachedCallback fires for elements that are created and 
 // immediately added to dom.
 var hasPolyfillMutations = (!window.MutationObserver ||
     (window.MutationObserver === window.JsMutationObserver));
@@ -151,7 +152,7 @@ function _inserted(element) {
   // TODO(sjmiles): when logging, do work on all custom elements so we can
   // track behavior even when callbacks not defined
   //console.log('inserted: ', element.localName);
-  if (element.enteredViewCallback || (element.__upgraded__ && logFlags.dom)) {
+  if (element.attachedCallback || element.detachedCallback || (element.__upgraded__ && logFlags.dom)) {
     logFlags.dom && console.group('inserted:', element.localName);
     if (inDocument(element)) {
       element.__inserted = (element.__inserted || 0) + 1;
@@ -163,9 +164,9 @@ function _inserted(element) {
       if (element.__inserted > 1) {
         logFlags.dom && console.warn('inserted:', element.localName,
           'insert/remove count:', element.__inserted)
-      } else if (element.enteredViewCallback) {
+      } else if (element.attachedCallback) {
         logFlags.dom && console.log('inserted:', element.localName);
-        element.enteredViewCallback();
+        element.attachedCallback();
       }
     }
     logFlags.dom && console.groupEnd();
@@ -193,8 +194,8 @@ function removed(element) {
 function _removed(element) {
   // TODO(sjmiles): temporary: do work on all custom elements so we can track
   // behavior even when callbacks not defined
-  if (element.leftViewCallback || (element.__upgraded__ && logFlags.dom)) {
-    logFlags.dom && console.log('removed:', element.localName);
+  if (element.attachedCallback || element.detachedCallback || (element.__upgraded__ && logFlags.dom)) {
+    logFlags.dom && console.group('removed:', element.localName);
     if (!inDocument(element)) {
       element.__inserted = (element.__inserted || 0) - 1;
       // if we are in a 'inserted' state, bluntly adjust to an 'removed' state
@@ -205,17 +206,24 @@ function _removed(element) {
       if (element.__inserted < 0) {
         logFlags.dom && console.warn('removed:', element.localName,
             'insert/remove count:', element.__inserted)
-      } else if (element.leftViewCallback) {
-        element.leftViewCallback();
+      } else if (element.detachedCallback) {
+        element.detachedCallback();
       }
     }
+    logFlags.dom && console.groupEnd();
   }
+}
+
+// SD polyfill intrustion due mainly to the fact that 'document'
+// is not entirely wrapped
+function wrapIfNeeded(node) {
+  return window.ShadowDOMPolyfill ? ShadowDOMPolyfill.wrapIfNeeded(node)
+      : node;
 }
 
 function inDocument(element) {
   var p = element;
-  var doc = window.ShadowDOMPolyfill &&
-      window.ShadowDOMPolyfill.wrapIfNeeded(document) || document;
+  var doc = wrapIfNeeded(document);
   while (p) {
     if (p == doc) {
       return true;
@@ -299,19 +307,33 @@ function observe(inRoot) {
   observer.observe(inRoot, {childList: true, subtree: true});
 }
 
-function observeDocument(document) {
-  observe(document);
+function observeDocument(doc) {
+  observe(doc);
 }
 
-function upgradeDocument(document) {
-  logFlags.dom && console.group('upgradeDocument: ', (document.URL || document._URL || '').split('/').pop());
-  addedNode(document);
+function upgradeDocument(doc) {
+  logFlags.dom && console.group('upgradeDocument: ', (doc.baseURI).split('/').pop());
+  addedNode(doc);
   logFlags.dom && console.groupEnd();
 }
 
-// exports
+function upgradeDocumentTree(doc) {
+  doc = wrapIfNeeded(doc);
+  upgradeDocument(doc);
+  //console.log('upgradeDocumentTree: ', (doc.baseURI).split('/').pop());
+  // upgrade contained imported documents
+  var imports = doc.querySelectorAll('link[rel=' + IMPORT_LINK_TYPE + ']');
+  for (var i=0, l=imports.length, n; (i<l) && (n=imports[i]); i++) {
+    if (n.import && n.import.__parsed) {
+      upgradeDocumentTree(n.import);
+    }
+  }
+}
 
+// exports
+scope.IMPORT_LINK_TYPE = IMPORT_LINK_TYPE;
 scope.watchShadow = watchShadow;
+scope.upgradeDocumentTree = upgradeDocumentTree;
 scope.upgradeAll = addedNode;
 scope.upgradeSubtree = addedSubtree;
 

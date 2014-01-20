@@ -12,16 +12,15 @@ Custom elements are still elements. We can create, use, manipulate, and compose 
 
 ### Basic usage
 
-As with any element, custom elements can be created in JavaScript or declared.
-**Custom element names must always contain a dash (-).**
+As with any element, custom elements can be created in JavaScript or declared. **Custom element names must always contain a dash (-).**
 
 #### Element registration
 
-Before you can use a custom element, it needs to be registered. Otherwise, the browser considers it an <code>HTMLElement</code>.
+Before you can use a custom element, it needs to be registered. Otherwise, the browser considers it an `HTMLElement`.
 
-##### document.register()
+##### document.registerElement()
 
-To register a new custom element in JavaScript, invoke `document.register()` somewhere in the page.
+To register a new custom element in JavaScript, invoke `document.registerElement()` somewhere in the page.
 As before, custom elements built this way work just like standard elements.
 
 Here's the imperative version of the previous example:
@@ -34,7 +33,7 @@ Here's the imperative version of the previous example:
       console.log('foo() called');
     };
 
-    var XFoo = document.register('x-foo', {
+    var XFoo = document.registerElement('x-foo', {
       prototype: XFooPrototype
     });
 
@@ -43,7 +42,7 @@ Here's the imperative version of the previous example:
 **Extending existing elements**
 
 If you want to inherit from a specialized form of `HTMLElement` (e.g. `HTMLButtonElement`),
-declare the type using the `extends` option when calling `document.register()`:
+declare the type using the `extends` option when calling `document.registerElement()`:
   
 Example extending `button`:
   
@@ -52,7 +51,7 @@ Example extending `button`:
       this.textContent = "I'm an x-foo button!";
     };
 
-    var XFooButton = document.register('x-foo-button', {
+    var XFooButton = document.registerElement('x-foo-button', {
       prototype: XFooButtonPrototype,
       extends: 'button'
     });
@@ -69,7 +68,7 @@ If you've used `extends` to create a custom element that derives from an existin
 
     <button is="x-foo-button"></button>
 
-In the declarative and `document.register()` example above, `XFoo` was defined as the new element's constructor.
+In the declarative and `document.registerElement()` example above, `XFoo` was defined as the new element's constructor.
 This can also be used to create an instance:
 
     var xFoo = new XFoo();
@@ -112,13 +111,13 @@ Example:
 The Custom Elements specification is still under discussion. The polyfill implements certain features in advance of the specification. In particular, the lifecycle callback methods that get called if implemented on the element prototype:
 
 * `createdCallback()` is called when a custom element is created.
-* `enteredViewCallback()` is called when a custom element is inserted into a DOM subtree.
-* `leftViewCallback()` is called when a custom element is removed from a DOM subtree.
+* `attachedCallback()` is called when a custom element is inserted into a DOM subtree.
+* `detachedCallback()` is called when a custom element is removed from a DOM subtree.
 * `attributeChangedCallback(attributeName)` is called when a custom element's attribute value has changed
 
 `createdCallback` is invoked _synchronously_ with element instantiation, the other callbacks are called _asyncronously_. The asynchronous callbacks generally use the MutationObserver timing model, which means they are called before layouts, paints, or other triggered events, so the developer need not worry about flashing content or other bad things happening before the callback has a chance to react to changes.
 
-The `extends` option to `document.register()` (discussed above)  is exclusive to this polyfill.
+The `extends` option to `document.registerElement()` (discussed above)  is exclusive to this polyfill.
 
 ## Tools & Testing
 

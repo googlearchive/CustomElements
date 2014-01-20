@@ -23,9 +23,9 @@ if (!scope) {
 }
 var flags = scope.flags;
 
-// native document.register?
+// native document.registerElement?
 
-var hasNative = Boolean(document.register);
+var hasNative = Boolean(document.registerElement);
 var useNative = !flags.register && hasNative;
 
 if (useNative) {
@@ -73,7 +73,7 @@ if (useNative) {
    *      element.
    *
    * @example
-   *      FancyButton = document.register("fancy-button", {
+   *      FancyButton = document.registerElement("fancy-button", {
    *        extends: 'button',
    *        prototype: Object.create(HTMLButtonElement.prototype, {
    *          readyCallback: {
@@ -86,19 +86,19 @@ if (useNative) {
    * @return {Function} Constructor for the newly registered type.
    */
   function register(name, options) {
-    //console.warn('document.register("' + name + '", ', options, ')');
+    //console.warn('document.registerElement("' + name + '", ', options, ')');
     // construct a defintion out of options
     // TODO(sjmiles): probably should clone options instead of mutating it
     var definition = options || {};
     if (!name) {
       // TODO(sjmiles): replace with more appropriate error (EricB can probably
       // offer guidance)
-      throw new Error('document.register: first argument `name` must not be empty');
+      throw new Error('document.registerElement: first argument `name` must not be empty');
     }
     if (name.indexOf('-') < 0) {
       // TODO(sjmiles): replace with more appropriate error (EricB can probably
       // offer guidance)
-      throw new Error('document.register: first argument (\'name\') must contain a dash (\'-\'). Argument provided was \'' + String(name) + '\'.');
+      throw new Error('document.registerElement: first argument (\'name\') must contain a dash (\'-\'). Argument provided was \'' + String(name) + '\'.');
     }
     // elements may only be registered once
     if (getRegisteredDefinition(name)) {
@@ -138,7 +138,7 @@ if (useNative) {
     // if initial parsing is complete
     if (scope.ready) {
       // upgrade any pre-existing nodes of this type
-      scope.upgradeAll(document);
+      scope.upgradeDocumentTree(document);
     }
     return definition.ctor;
   }
@@ -359,7 +359,7 @@ if (useNative) {
 
   // exports
 
-  document.register = register;
+  document.registerElement = register;
   document.createElement = createElement; // override
   Node.prototype.cloneNode = cloneNode; // override
 
@@ -378,6 +378,9 @@ if (useNative) {
    */
   scope.upgrade = upgradeElement;
 }
+
+// bc
+document.register = document.registerElement;
 
 scope.hasNative = hasNative;
 scope.useNative = useNative;
