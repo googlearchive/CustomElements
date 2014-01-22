@@ -17,25 +17,25 @@
     document.body.removeChild(work);
   });
 
-  test('document.register requires name argument', function() {
+  test('document.registerElement requires name argument', function() {
     try {
       document.registerElement();
     } catch(x) {
       return;
     }
-    assert.ok(false, 'document.register failed to throw when given no arguments');
+    assert.ok(false, 'document.registerElement failed to throw when given no arguments');
   });
 
-  test('document.register requires name argument to contain a dash', function() {
+  test('document.registerElement requires name argument to contain a dash', function() {
     try {
       document.registerElement('xfoo', {prototype: Object.create(HTMLElement.prototype)});
     } catch(x) {
       return;
     }
-    assert.ok(false, 'document.register failed to throw when given no arguments');
+    assert.ok(false, 'document.registerElement failed to throw when given no arguments');
   });
 
-  test('document.register requires name argument to be unique', function() {
+  test('document.registerElement requires name argument to be unique', function() {
     var proto = {prototype: Object.create(HTMLElement.prototype)};
     document.registerElement('x-duplicate', proto);
     try {
@@ -43,10 +43,10 @@
     } catch(x) {
       return;
     }
-    assert.ok(false, 'document.register failed to throw when called multiple times with the same element name');
+    assert.ok(false, 'document.registerElement failed to throw when called multiple times with the same element name');
   });
 
-  test('document.register create via new', function() {
+  test('document.registerElement create via new', function() {
     // register x-foo
     var XFoo = document.registerElement('x-foo', {prototype: Object.create(HTMLElement.prototype)});
     // create an instance via new
@@ -61,7 +61,7 @@
     assert.equal(xfoo.textContent, '[x-foo]');
   });
 
-  test('document.register create via createElement', function() {
+  test('document.registerElement create via createElement', function() {
     // register x-foo
     var XFoo = document.registerElement('x-foo2', {prototype:  Object.create(HTMLElement.prototype)});
     // create an instance via createElement
@@ -74,7 +74,7 @@
     assert.equal(xfoo.textContent, '[x-foo2]');
   });
 
-  test('document.register treats names as case insensitive', function() {
+  test('document.registerElement treats names as case insensitive', function() {
     var proto = {prototype: Object.create(HTMLElement.prototype)};
     proto.prototype.isXCase = true;
     var XCase = document.registerElement('X-CASE', proto);
@@ -90,7 +90,7 @@
     assert.equal(work.firstChild.nextSibling.isXCase, true);
   });
 
-  test('document.register create multiple instances', function() {
+  test('document.registerElement create multiple instances', function() {
     var XFooPrototype = Object.create(HTMLElement.prototype);
     XFooPrototype.bluate = function() {
       this.color = 'lightblue';
@@ -113,7 +113,7 @@
     assert.isUndefined(xfoo2.color);
   });
 
-  test('document.register extend native element', function() {
+  test('document.registerElement extend native element', function() {
     // test native element extension
     var XBarPrototype = Object.create(HTMLButtonElement.prototype);
     var XBar = document.registerElement('x-bar', {
@@ -149,7 +149,7 @@
     assert.equal(xbarbarbar.textContent, 'x-barbarbar');
   });
 
-  test('document.register createdCallback in prototype', function() {
+  test('document.registerElement createdCallback in prototype', function() {
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.createdCallback = function() {
       this.style.fontStyle = 'italic';
@@ -173,7 +173,7 @@
     assert.equal(xbooboo.style.fontSize, '32pt');
   });
 
-  test('document.register [created|attached|detached]Callbacks in prototype', function(done) {
+  test('document.registerElement [created|attached|detached]Callbacks in prototype', function(done) {
     var ready, inserted, removed;
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.createdCallback = function() {
@@ -226,7 +226,7 @@
     done();
   });
 
-  test('document.register attributeChangedCallback in prototype', function(done) {
+  test('document.registerElement attributeChangedCallback in prototype', function(done) {
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.attributeChangedCallback = function(inName, inOldValue) {
       if (inName == 'foo' && inOldValue=='bar'
@@ -242,7 +242,7 @@
     xboo.setAttribute('foo', 'zot');
   });
 
-  test('document.register attachedCallbacks in prototype', function(done) {
+  test('document.registerElement attachedCallbacks in prototype', function(done) {
     var inserted = 0;
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.attachedCallback = function() {
@@ -265,7 +265,7 @@
     done();
   });
 
-  test('document.register detachedCallbacks in prototype', function(done) {
+  test('document.registerElement detachedCallbacks in prototype', function(done) {
     var ready, inserted, removed;
     var XBooPrototype = Object.create(HTMLElement.prototype);
     XBooPrototype.detachedCallback = function() {
@@ -300,7 +300,7 @@
     done();
   });
 
-  test('document.register can use Functions as definitions', function() {
+  test('document.registerElement can use Functions as definitions', function() {
     // function used as Custom Element defintion
     function A$A() {
       this.alive = true;
