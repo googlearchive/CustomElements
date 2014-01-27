@@ -48,6 +48,7 @@ if (useNative) {
   scope.upgradeSubtree = nop;
   scope.observeDocument = nop;
   scope.upgradeDocument = nop;
+  scope.upgradeDocumentTree = nop;
   scope.takeRecords = nop;
 
 } else {
