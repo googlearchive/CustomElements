@@ -224,11 +224,11 @@ if (useNative) {
     implement(element, definition);
     // flag as upgraded
     element.__upgraded__ = true;
+    // lifecycle management
+    created(element);
     // there should never be a shadow root on element at this point
     // we require child nodes be upgraded before `created`
     scope.upgradeSubtree(element);
-    // lifecycle management
-    created(element);
     // OUTPUT
     return element;
   }
