@@ -28,6 +28,13 @@ function bootstrap() {
     document.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true})
     );
+
+    // install upgrade hook if HTMLImports are available
+    if (window.HTMLImports) {
+      HTMLImports.__importsParsingHook = function(elt) {
+        CustomElements.parser.parse(elt.import);
+      }
+    }
   });
 }
 
