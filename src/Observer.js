@@ -99,11 +99,11 @@ function insertedNode(node) {
 }
 
 
-// TODO(sorvell): on platforms without MutationObserver, mutations may not be 
+// TODO(sorvell): on platforms without MutationObserver, mutations may not be
 // reliable and therefore attached/detached are not reliable.
 // To make these callbacks less likely to fail, we defer all inserts and removes
-// to give a chance for elements to be inserted into dom. 
-// This ensures attachedCallback fires for elements that are created and 
+// to give a chance for elements to be inserted into dom.
+// This ensures attachedCallback fires for elements that are created and
 // immediately added to dom.
 var hasPolyfillMutations = (!window.MutationObserver ||
     (window.MutationObserver === window.JsMutationObserver));
@@ -179,7 +179,6 @@ function removedNode(node) {
     removed(e);
   });
 }
-
 
 function removed(element) {
   if (hasPolyfillMutations) {
