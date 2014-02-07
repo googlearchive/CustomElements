@@ -29,7 +29,7 @@ var hasNative = Boolean(document.registerElement);
 // TODO(sorvell): See https://github.com/Polymer/polymer/issues/399
 // we'll address this by defaulting to CE polyfill in the presence of the SD
 // polyfill. This will avoid spamming excess attached/detached callbacks.
-// If there is a compelling need to run CE native with SD polyfill, 
+// If there is a compelling need to run CE native with SD polyfill,
 // we'll need to fix this issue.
 var useNative = !flags.register && hasNative && !window.ShadowDOMPolyfill;
 
@@ -41,7 +41,7 @@ if (useNative) {
   // exports
   scope.registry = {};
   scope.upgradeElement = nop;
-  
+
   scope.watchShadow = nop;
   scope.upgrade = nop;
   scope.upgradeAll = nop;
@@ -320,6 +320,9 @@ if (useNative) {
   }
 
   function registerDefinition(name, definition) {
+    if (registry[name]) {
+      throw new Error('a type with that name is already registered.');
+    }
     registry[name] = definition;
   }
 
@@ -334,16 +337,39 @@ if (useNative) {
     // error check it, or perhaps there should only ever be one argument
     var definition = getRegisteredDefinition(typeExtension || tag);
     if (definition) {
-      return new definition.ctor();
+      if (tag == definition.tag && typeExtension == definition.is) {
+        return new definition.ctor();
+      }
+      // Handle empty string for type extension.
+      if (!typeExtension && !definition.is) {
+        return new definition.ctor();
+      }
     }
-    return domCreateElement(tag);
+
+    if (typeExtension) {
+      var element = createElement(tag);
+      element.setAttribute('is', typeExtension);
+      return element;
+    }
+    var element = domCreateElement(tag);
+    // Custom tags should be HTMLElements even if not upgraded.
+    if (tag.indexOf('-') >= 0) {
+      implement(element, HTMLElement);
+    }
+    return element;
   }
 
   function upgradeElement(element) {
     if (!element.__upgraded__ && (element.nodeType === Node.ELEMENT_NODE)) {
-      var type = element.getAttribute('is') || element.localName;
-      var definition = getRegisteredDefinition(type);
-      return definition && upgrade(element, definition);
+      var is = element.getAttribute('is');
+      var definition = getRegisteredDefinition(is || element.localName);
+      if (definition) {
+        if (is && definition.tag == element.localName) {
+          return upgrade(element, definition);
+        } else if (!is && !definition.extends) {
+          return upgrade(element, definition);
+        }
+      }
     }
   }
 
@@ -373,7 +399,7 @@ if (useNative) {
 
   /**
    * Upgrade an element to a custom element. Upgrading an element
-   * causes the custom prototype to be applied, an `is` attribute 
+   * causes the custom prototype to be applied, an `is` attribute
    * to be attached (as needed), and invocation of the `readyCallback`.
    * `upgrade` does nothing if the element is already upgraded, or
    * if it matches no registered custom tag name.
