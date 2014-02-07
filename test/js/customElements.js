@@ -369,6 +369,50 @@
     assert.deepEqual(invocations, ['created', 'entered', 'left'],
         'created, entered then left view');
   });
+
+  test('attachedCallback ordering', function() {
+    var log = [];
+    var p = Object.create(HTMLElement.prototype);
+    p.attachedCallback = function() {
+      log.push(this.id);
+    };
+    document.registerElement('x-boo-ordering', {prototype: p});
+
+    work.innerHTML =
+        '<x-boo-ordering id=a>' +
+          '<x-boo-ordering id=b></x-boo-ordering>' +
+          '<x-boo-ordering id=c>' +
+            '<x-boo-ordering id=d></x-boo-ordering>' +
+            '<x-boo-ordering id=e></x-boo-ordering>' +
+          '</x-boo-ordering>' +
+        '</x-boo-ordering>';
+
+    CustomElements.takeRecords();
+    assert.deepEqual(['a', 'b', 'c', 'd', 'e'], log);
+  });
+
+  test('detachedCallback ordering', function() {
+    var log = [];
+    var p = Object.create(HTMLElement.prototype);
+    p.detachedCallback = function() {
+     log.push(this.id);
+    };
+    document.registerElement('x-boo2-ordering', {prototype: p});
+
+    work.innerHTML =
+        '<x-boo2-ordering id=a>' +
+          '<x-boo2-ordering id=b></x-boo2-ordering>' +
+          '<x-boo2-ordering id=c>' +
+            '<x-boo2-ordering id=d></x-boo2-ordering>' +
+            '<x-boo2-ordering id=e></x-boo2-ordering>' +
+          '</x-boo2-ordering>' +
+        '</x-boo2-ordering>';
+
+      CustomElements.takeRecords();
+      work.innerHTML = '';
+      CustomElements.takeRecords();
+      assert.deepEqual(['a', 'b', 'c', 'd', 'e'], log);
+  });
 });
 
 htmlSuite('customElements (html)', function() {

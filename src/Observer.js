@@ -98,7 +98,6 @@ function insertedNode(node) {
   }
 }
 
-
 // TODO(sorvell): on platforms without MutationObserver, mutations may not be
 // reliable and therefore attached/detached are not reliable.
 // To make these callbacks less likely to fail, we defer all inserts and removes
@@ -335,6 +334,7 @@ scope.watchShadow = watchShadow;
 scope.upgradeDocumentTree = upgradeDocumentTree;
 scope.upgradeAll = addedNode;
 scope.upgradeSubtree = addedSubtree;
+scope.insertedNode = insertedNode;
 
 scope.observeDocument = observeDocument;
 scope.upgradeDocument = upgradeDocument;

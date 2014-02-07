@@ -226,8 +226,9 @@ if (useNative) {
     element.__upgraded__ = true;
     // lifecycle management
     created(element);
+    // attachedCallback fires in tree order, call before recursing
+    scope.insertedNode(element);
     // there should never be a shadow root on element at this point
-    // we require child nodes be upgraded before `created`
     scope.upgradeSubtree(element);
     // OUTPUT
     return element;
