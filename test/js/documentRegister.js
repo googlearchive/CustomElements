@@ -18,22 +18,22 @@ function isFormControl(element)
 suite('register-type-extensions', function() {
   var assert = chai.assert;
 
-  var fooConstructor = document.register('x-foo-x', {
+  var fooConstructor = document.registerElement('x-foo-x', {
       prototype: Object.create(HTMLElement.prototype) });
   var fooOuterHTML = '<x-foo-x></x-foo-x>';
-  var barConstructor = document.register('x-bar-x', {
+  var barConstructor = document.registerElement('x-bar-x', {
       prototype: Object.create(HTMLInputElement.prototype),
       extends:'input'});
   var barOuterHTML = '<input is="x-bar-x">';
-  var bazConstructor = document.register('x-baz', {
+  var bazConstructor = document.registerElement('x-baz', {
       prototype: Object.create(fooConstructor.prototype) });
-  var quxConstructor = document.register('x-qux', {
+  var quxConstructor = document.registerElement('x-qux', {
       prototype: Object.create(barConstructor.prototype),
-      extends:'x-bar-x'});
+      extends:'input'});
 
   test('cannot register twice', function() {
     assert.throws(function() {
-      document.register('x-foo-x', {
+      document.registerElement('x-foo-x', {
           prototype: Object.create(HTMLDivElement.prototype) });
     });
   });
