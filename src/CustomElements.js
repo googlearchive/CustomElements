@@ -320,9 +320,6 @@ if (useNative) {
   }
 
   function registerDefinition(name, definition) {
-    if (registry[name]) {
-      throw new Error('a type with that name is already registered.');
-    }
     registry[name] = definition;
   }
 
