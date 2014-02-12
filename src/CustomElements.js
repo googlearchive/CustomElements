@@ -254,11 +254,9 @@ if (useNative) {
     var used = {};
     // start with inSrc
     var p = inSrc;
-    // sometimes the default is HTMLUnknownElement.prototype instead of
-    // HTMLElement.prototype, so we add a test
-    // the idea is to avoid mixing in native prototypes, so adding
-    // the second test is WLOG
-    while (p !== inNative && p !== HTMLUnknownElement.prototype) {
+    // The default is HTMLElement.prototype, so we add a test to avoid mixing in
+    // native prototypes
+    while (p !== inNative && p !== HTMLElement.prototype) {
       var keys = Object.getOwnPropertyNames(p);
       for (var i=0, k; k=keys[i]; i++) {
         if (!used[k]) {

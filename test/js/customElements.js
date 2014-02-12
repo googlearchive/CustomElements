@@ -409,7 +409,7 @@
         '</x-boo2-ordering>';
 
       CustomElements.takeRecords();
-      work.innerHTML = '';
+      work.removeChild(work.firstElementChild);
       CustomElements.takeRecords();
       assert.deepEqual(['a', 'b', 'c', 'd', 'e'], log);
   });
