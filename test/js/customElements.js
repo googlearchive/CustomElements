@@ -413,6 +413,36 @@
       CustomElements.takeRecords();
       assert.deepEqual(['a', 'b', 'c', 'd', 'e'], log);
   });
+
+  test('instanceof', function() {
+    var p = Object.create(HTMLElement.prototype);
+    var PCtor = document.registerElement('x-instance', {prototype: p});
+    var x = document.createElement('x-instance');
+    assert.isTrue(CustomElements.instanceof(x, PCtor), 'instanceof failed for x-instance');
+
+    var p2 = Object.create(PCtor.prototype);
+    var P2Ctor = document.registerElement('x-instance2', {prototype: p2});
+    var x2 = document.createElement('x-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, P2Ctor), 'instanceof failed for x-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-instance2');
+  });
+
+  
+  test('instanceof typeExtension', function() {
+    var p = Object.create(HTMLButtonElement.prototype);
+    var PCtor = document.registerElement('x-button-instance', {prototype: p, extends: 'button'});
+    var x = document.createElement('button', 'x-button-instance');
+    assert.isTrue(CustomElements.instanceof(x, PCtor), 'instanceof failed for x-button-instance');
+    assert.isTrue(CustomElements.instanceof(x, HTMLButtonElement), 'instanceof failed for x-button-instance');
+
+    var p2 = Object.create(PCtor.prototype);
+    var P2Ctor = document.registerElement('x-button-instance2', {prototype: p2, extends: 'button'});
+    var x2 = document.createElement('button','x-button-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, P2Ctor), 'instanceof failed for x-button-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-button-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, HTMLButtonElement), 'instanceof failed for x-button-instance2');
+  });
+  
 });
 
 htmlSuite('customElements (html)', function() {

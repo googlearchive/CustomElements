@@ -407,6 +407,32 @@ if (useNative) {
   scope.upgrade = upgradeElement;
 }
 
+// Create a custom 'instanceof'. This is necessary when CustomElements
+// are implemented via a mixin strategy, as for example on IE10.
+var isInstance;
+if (!Object.__proto__ && !useNative) {
+  isInstance = function(obj, ctor) {
+    var p = obj;
+    while (p) {
+      // NOTE: this is not technically correct since we're not checking if
+      // an object is an instance of a constructor; however, this should
+      // be good enough for the mixin strategy.
+      if (p === ctor.prototype) {
+        return true;
+      }
+      p = p.__proto__;
+    }
+    return false;
+  }
+} else {
+  isInstance = function(obj, base) {
+    return obj instanceof base;
+  }
+}
+
+// exports
+scope.instanceof = isInstance;
+
 // bc
 document.register = document.registerElement;
 
