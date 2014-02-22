@@ -121,4 +121,4 @@ The `extends` option to `document.registerElement()` (discussed above)  is exclu
 
 ## Tools & Testing
 
-For running tests or building minified files, consult the [tooling information](http://polymer-project.org/tooling-strategy.html).
+For running tests or building minified files, consult the [tooling information](http://polymer-project.org/resources/tooling-strategy.html).
