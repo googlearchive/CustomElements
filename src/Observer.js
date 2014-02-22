@@ -317,7 +317,6 @@ function upgradeDocument(doc) {
 
 function upgradeDocumentTree(doc) {
   doc = wrapIfNeeded(doc);
-  upgradeDocument(doc);
   //console.log('upgradeDocumentTree: ', (doc.baseURI).split('/').pop());
   // upgrade contained imported documents
   var imports = doc.querySelectorAll('link[rel=' + IMPORT_LINK_TYPE + ']');
@@ -326,6 +325,7 @@ function upgradeDocumentTree(doc) {
       upgradeDocumentTree(n.import);
     }
   }
+  upgradeDocument(doc);
 }
 
 // exports
