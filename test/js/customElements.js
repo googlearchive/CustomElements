@@ -7,6 +7,7 @@
  suite('customElements', function() {
   var work;
   var assert = chai.assert;
+  var HTMLNS = 'http://www.w3.org/1999/xhtml';
 
   setup(function() {
     work = document.createElement('div');
@@ -74,6 +75,17 @@
     assert.equal(xfoo.textContent, '[x-foo2]');
   });
 
+  test('document.registerElement create via createElementNS', function() {
+    // create an instance via createElementNS
+    var xfoo = document.createElementNS(HTMLNS, 'x-foo2');
+    // test localName
+    assert.equal(xfoo.localName, 'x-foo2');
+    // attach content
+    xfoo.textContent = '[x-foo2]';
+    // test textContent
+    assert.equal(xfoo.textContent, '[x-foo2]');
+  });
+
   test('document.registerElement treats names as case insensitive', function() {
     var proto = {prototype: Object.create(HTMLElement.prototype)};
     proto.prototype.isXCase = true;
@@ -82,6 +94,11 @@
     var x = document.createElement('X-CASE');
     assert.equal(x.isXCase, true);
     x = document.createElement('x-case');
+    assert.equal(x.isXCase, true);
+    // createElementNS
+    x = document.createElementNS(HTMLNS, 'X-CASE');
+    assert.equal(x.isXCase, true);
+    x = document.createElementNS(HTMLNS, 'x-case');
     assert.equal(x.isXCase, true);
     // upgrade
     work.innerHTML = '<X-CASE></X-CASE><x-CaSe></x-CaSe>';
@@ -419,10 +436,15 @@
     var PCtor = document.registerElement('x-instance', {prototype: p});
     var x = document.createElement('x-instance');
     assert.isTrue(CustomElements.instanceof(x, PCtor), 'instanceof failed for x-instance');
+    x = document.createElementNS(HTMLNS, 'x-instance');
+    assert.isTrue(CustomElements.instanceof(x, PCtor), 'instanceof failed for x-instance');
 
     var p2 = Object.create(PCtor.prototype);
     var P2Ctor = document.registerElement('x-instance2', {prototype: p2});
     var x2 = document.createElement('x-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, P2Ctor), 'instanceof failed for x-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-instance2');
+    x2 = document.createElementNS(HTMLNS, 'x-instance2');
     assert.isTrue(CustomElements.instanceof(x2, P2Ctor), 'instanceof failed for x-instance2');
     assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-instance2');
   });
@@ -434,10 +456,17 @@
     var x = document.createElement('button', 'x-button-instance');
     assert.isTrue(CustomElements.instanceof(x, PCtor), 'instanceof failed for x-button-instance');
     assert.isTrue(CustomElements.instanceof(x, HTMLButtonElement), 'instanceof failed for x-button-instance');
+    x = document.createElementNS(HTMLNS, 'button', 'x-button-instance');
+    assert.isTrue(CustomElements.instanceof(x, PCtor), 'instanceof failed for x-button-instance');
+    assert.isTrue(CustomElements.instanceof(x, HTMLButtonElement), 'instanceof failed for x-button-instance');
 
     var p2 = Object.create(PCtor.prototype);
     var P2Ctor = document.registerElement('x-button-instance2', {prototype: p2, extends: 'button'});
     var x2 = document.createElement('button','x-button-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, P2Ctor), 'instanceof failed for x-button-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-button-instance2');
+    assert.isTrue(CustomElements.instanceof(x2, HTMLButtonElement), 'instanceof failed for x-button-instance2');
+    x2 = document.createElementNS(HTMLNS, 'button','x-button-instance2');
     assert.isTrue(CustomElements.instanceof(x2, P2Ctor), 'instanceof failed for x-button-instance2');
     assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-button-instance2');
     assert.isTrue(CustomElements.instanceof(x2, HTMLButtonElement), 'instanceof failed for x-button-instance2');

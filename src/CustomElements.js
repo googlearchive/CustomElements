@@ -328,6 +328,17 @@ if (useNative) {
     };
   }
 
+  var HTML_NAMESPACE = 'http://www.w3.org/1999/xhtml';
+  function createElementNS(namespace, tag, typeExtension) {
+    // NOTE: we do not support non-HTML elements,
+    // just call createElementNS for non HTML Elements
+    if (namespace === HTML_NAMESPACE) {
+      return createElement(tag, typeExtension);
+    } else {
+      return domCreateElementNS(namespace, tag);
+    }
+  }
+
   function createElement(tag, typeExtension) {
     // TODO(sjmiles): ignore 'tag' when using 'typeExtension', we could
     // error check it, or perhaps there should only ever be one argument
@@ -380,6 +391,7 @@ if (useNative) {
   // capture native createElement before we override it
 
   var domCreateElement = document.createElement.bind(document);
+  var domCreateElementNS = document.createElementNS.bind(document);
 
   // capture native cloneNode before we override it
 
@@ -389,6 +401,7 @@ if (useNative) {
 
   document.registerElement = register;
   document.createElement = createElement; // override
+  document.createElementNS = createElementNS; // override
   Node.prototype.cloneNode = cloneNode; // override
 
   scope.registry = registry;
