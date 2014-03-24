@@ -36,6 +36,15 @@
     assert.ok(false, 'document.registerElement failed to throw when given no arguments');
   });
 
+  test('document.registerElement requires name argument to not conflict with a reserved name', function() {
+    try {
+      document.registerElement('font-face', {prototype: Object.create(HTMLElement.prototype)});
+    } catch(x) {
+      return;
+    }
+    assert.ok(false, 'Failed to execute \'registerElement\' on \'Document\': Registration failed for type \'font-face\'. The type name is invalid.');
+  });
+
   test('document.registerElement requires name argument to be unique', function() {
     var proto = {prototype: Object.create(HTMLElement.prototype)};
     document.registerElement('x-duplicate', proto);
