@@ -50,6 +50,7 @@ if (useNative) {
   scope.upgradeDocument = nop;
   scope.upgradeDocumentTree = nop;
   scope.takeRecords = nop;
+  scope.reservedTagList = [];
 
 } else {
 
@@ -106,6 +107,10 @@ if (useNative) {
       // offer guidance)
       throw new Error('document.registerElement: first argument (\'name\') must contain a dash (\'-\'). Argument provided was \'' + String(name) + '\'.');
     }
+    // prevent registering reserved names
+    if (isReservedTag(name)) {
+      throw new Error('Failed to execute \'registerElement\' on \'Document\': Registration failed for type \'' + String(name) + '\'. The type name is invalid.');
+    }
     // elements may only be registered once
     if (getRegisteredDefinition(name)) {
       throw new Error('DuplicateDefinitionError: a type with name \'' + String(name) + '\' is already registered');
@@ -148,6 +153,19 @@ if (useNative) {
     }
     return definition.ctor;
   }
+
+  function isReservedTag(name) {
+    for (var i = 0; i < reservedTagList.length; i++) {
+      if (name === reservedTagList[i]) {
+        return true;
+      }
+    }
+  }
+
+  var reservedTagList = [
+    'annotation-xml', 'color-profile', 'font-face', 'font-face-src',
+    'font-face-uri', 'font-face-format', 'font-face-name', 'missing-glyph'
+  ];
 
   function ancestry(extnds) {
     var extendee = getRegisteredDefinition(extnds);
@@ -445,6 +463,7 @@ if (!Object.__proto__ && !useNative) {
 
 // exports
 scope.instanceof = isInstance;
+scope.reservedTagList = reservedTagList;
 
 // bc
 document.register = document.registerElement;
