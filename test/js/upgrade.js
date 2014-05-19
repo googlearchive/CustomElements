@@ -114,6 +114,20 @@ suite('upgradeElements', function() {
     });
   });
 
+  test('__proto__ property isnt leaked as enumerable', function() {
+    document.registerElement('x-button2', {
+      prototype: Object.create(HTMLElement.prototype),
+      'extends': 'button'
+    });
+
+    var name, obj = {};
+    for (name in obj) {
+      if (name === '__proto__') {
+        assert.ok(false, 'obj.__proto__ is enumerable');
+      }
+    }
+  });
+
   // polyfill only tests
   if (!CustomElements.useNative) {
     test('unresolved attribute removed after upgrade', function() {
