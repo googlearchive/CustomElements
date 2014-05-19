@@ -481,7 +481,19 @@
     assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-button-instance2');
     assert.isTrue(CustomElements.instanceof(x2, HTMLButtonElement), 'instanceof failed for x-button-instance2');
   });
-  
+
+  test('extends and prototype mismatch', function() {
+    var p = Object.create(HTMLElement.prototype);
+    var PCtor = document.registerElement('not-button', {
+      extends: 'button',
+      prototype: p
+    });
+
+    var e = document.createElement('button', 'not-button');
+    assert.isFalse(CustomElements.instanceof(e, HTMLButtonElement));
+    assert.isTrue(CustomElements.instanceof(e, HTMLElement));
+  });
+
 });
 
 htmlSuite('customElements (html)', function() {
