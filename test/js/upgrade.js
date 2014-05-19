@@ -115,9 +115,9 @@ suite('upgradeElements', function() {
   });
 
   test('__proto__ property isnt leaked as enumerable', function() {
-    document.registerElement('x-button2', {
+    document.registerElement('x-time', {
       prototype: Object.create(HTMLElement.prototype),
-      'extends': 'button'
+      'extends': 'time'
     });
 
     var name, obj = {};
