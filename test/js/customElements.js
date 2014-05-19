@@ -4,7 +4,7 @@
  * license that can be found in the LICENSE file.
  */
 
- suite('customElements', function() {
+suite('customElements', function() {
   var work;
   var assert = chai.assert;
   var HTMLNS = 'http://www.w3.org/1999/xhtml';
@@ -459,7 +459,7 @@
     assert.isTrue(CustomElements.instanceof(x2, PCtor), 'instanceof failed for x-instance2');
   });
 
-  
+
   test('instanceof typeExtension', function() {
     var p = Object.create(HTMLButtonElement.prototype);
     var PCtor = document.registerElement('x-button-instance', {prototype: p, extends: 'button'});
@@ -490,8 +490,20 @@
     });
 
     var e = document.createElement('button', 'not-button');
-    assert.isFalse(CustomElements.instanceof(e, HTMLButtonElement));
-    assert.isTrue(CustomElements.instanceof(e, HTMLElement));
+
+    // NOTE: firefox has a hack for instanceof that uses element tagname mapping
+    // Work around by checking prototype manually
+    //
+    var ff = document.createElement('button'); ff.__proto__ = null;
+    if (ff instanceof HTMLButtonElement) {
+      // Base proto will be one below custom proto
+      var proto = e.__proto__.__proto__;
+      assert.isFalse(proto === HTMLButtonElement.prototype);
+      assert.isTrue(proto === HTMLElement.prototype);
+    } else {
+      assert.isFalse(CustomElements.instanceof(e, HTMLButtonElement));
+      assert.isTrue(CustomElements.instanceof(e, HTMLElement));
+    }
   });
 
 });
