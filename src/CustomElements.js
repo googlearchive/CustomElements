@@ -211,7 +211,12 @@ if (useNative) {
       var proto = definition.prototype, ancestor;
       while (proto && (proto !== nativePrototype)) {
         var ancestor = Object.getPrototypeOf(proto);
-        proto.__proto__ = ancestor;
+        Object.defineProperty(proto, '__proto__', {
+          enumerable: false,
+          configurable: true,
+          writable: true,
+          value: ancestor
+        });
         proto = ancestor;
       }
     }
