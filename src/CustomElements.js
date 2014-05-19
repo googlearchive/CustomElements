@@ -201,7 +201,11 @@ if (useNative) {
       // work out prototype when using type-extension
       if (definition.is) {
         var inst = document.createElement(definition.tag);
-        nativePrototype = Object.getPrototypeOf(inst);
+        var expectedPrototype = Object.getPrototypeOf(inst);
+        // only set nativePrototype if it will actually appear in the definition's chain
+        if (expectedPrototype === definition.prototype) {
+          nativePrototype = expectedPrototype;
+        }
       }
       // ensure __proto__ reference is installed at each point on the prototype
       // chain.
@@ -210,13 +214,13 @@ if (useNative) {
       // limited support for prototype traversal.
       var proto = definition.prototype, ancestor;
       while (proto && (proto !== nativePrototype)) {
-        var ancestor = Object.getPrototypeOf(proto);
+        ancestor = Object.getPrototypeOf(proto);
         proto.__proto__ = ancestor;
         proto = ancestor;
       }
+      // cache this in case of mixin
+      definition.native = nativePrototype;
     }
-    // cache this in case of mixin
-    definition.native = nativePrototype;
   }
 
   // SECTION 4
