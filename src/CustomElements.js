@@ -321,6 +321,7 @@ if (useNative) {
   // https://dvcs.w3.org/hg/webcomponents/raw-file/tip/spec/custom/
   // index.html#dfn-attribute-changed-callback
   function changeAttribute(name, value, operation) {
+    name = name.toLowerCase();
     var oldValue = this.getAttribute(name);
     operation.apply(this, arguments);
     var newValue = this.getAttribute(name);
