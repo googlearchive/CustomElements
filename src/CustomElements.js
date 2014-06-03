@@ -26,12 +26,9 @@ var flags = scope.flags;
 // native document.registerElement?
 
 var hasNative = Boolean(document.registerElement);
-// TODO(sorvell): See https://github.com/Polymer/polymer/issues/399
-// we'll address this by defaulting to CE polyfill in the presence of the SD
-// polyfill. This will avoid spamming excess attached/detached callbacks.
-// If there is a compelling need to run CE native with SD polyfill,
-// we'll need to fix this issue.
-var useNative = !flags.register && hasNative && !window.ShadowDOMPolyfill;
+// For consistent timing, use native custom elements only when not polyfilling
+// other key related web components features.
+var useNative = !flags.register && hasNative && !window.ShadowDOMPolyfill && (!window.HTMLImports || HTMLImports.useNative);
 
 if (useNative) {
 
