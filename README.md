@@ -29,6 +29,7 @@ Here's the imperative version of the previous example:
     XFooPrototype.createdCallback = function() {
       this.textContent = "I'm an x-foo!";
     };
+    
     XFooPrototype.foo = function() {
       console.log('foo() called');
     };
