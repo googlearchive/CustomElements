@@ -5,7 +5,7 @@
  */
 
 /**
- * Implements `document.register`
+ * Implements `document.registerElement`
  * @module CustomElements
 */
 
