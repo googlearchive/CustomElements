@@ -31,19 +31,6 @@ var hasNative = Boolean(document.registerElement);
 var useNative = !flags.register && hasNative && !window.ShadowDOMPolyfill && (!window.HTMLImports || HTMLImports.useNative);
 
 if (useNative) {
-  // FF doesn't store methods and properties after cloning
-  document.registerElement('check-cloning-element', {
-    prototype: Object.create(HTMLElement.prototype, {
-      test: { get: function() { return 1; } }
-    })
-  });
-
-  if (!document.createElement('check-cloning-element').cloneNode(true).test) {
-    useNative = false;
-  }
-}
-
-if (useNative) {
 
   // stub
   var nop = function() {};
