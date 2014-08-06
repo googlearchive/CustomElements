@@ -510,4 +510,5 @@ suite('customElements', function() {
 
 htmlSuite('customElements (html)', function() {
   htmlTest('html/attributes.html');
+  htmlTest('html/upgrade-order.html');
 });
