@@ -14,14 +14,13 @@ function bootstrap() {
   CustomElements.parser.parse(document);
   // one more pass before register is 'live'
   CustomElements.upgradeDocument(document);
-  // choose async
-  var async = window.Platform && Platform.endOfMicrotask ? 
-    Platform.endOfMicrotask :
-    setTimeout;
-  async(function() {
-    // set internal 'ready' flag, now document.registerElement will trigger 
-    // synchronous upgrades
-    CustomElements.ready = true;
+  // set internal 'ready' flag, now document.registerElement will trigger 
+  // synchronous upgrades
+  CustomElements.ready = true;
+  // async to ensure *native* custom elements upgrade prior to this
+  // DOMContentLoaded can fire before elements upgrade (e.g. when there's
+  // an external script)
+  setTimeout(function() {
     // capture blunt profiling data
     CustomElements.readyTime = Date.now();
     if (window.HTMLImports) {

@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Custom Elements: upgrade order</title>
+    <script src="../../../tools/test/htmltest.js"></script>
+    <script src="../../../tools/test/chai/chai.js"></script>
+    <script src="../../custom-elements.js"></script>
+  </head>
+  <body>
+    <script>
+      var created = [];
+      function registerTestElement(name) {
+        var p = Object.create(HTMLElement.prototype);
+        p.createdCallback = function() {
+          created.push(this.localName);
+        };
+        document.registerElement(name, {prototype: p});
+      }
+
+      registerTestElement('x-foo');
+      
+      addEventListener('DOMContentLoaded', function() {
+        registerTestElement('x-bar');
+      });
+
+      addEventListener('WebComponentsReady', function() {
+        chai.assert.equal(created.length, 2, 'elements registered a DOMContentLoaded time are upgraded');
+        done();
+      });
+    </script>
+
+    <x-foo></x-foo>
+    <x-bar></x-bar>
+  </body>
+</html>
