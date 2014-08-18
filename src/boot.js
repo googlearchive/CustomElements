@@ -14,6 +14,12 @@ function bootstrap() {
   CustomElements.parser.parse(document);
   // one more pass before register is 'live'
   CustomElements.upgradeDocument(document);
+  // install upgrade hook if HTMLImports are available
+  if (window.HTMLImports) {
+    HTMLImports.__importsParsingHook = function(elt) {
+      CustomElements.parser.parse(elt.import);
+    }
+  }
   // set internal 'ready' flag, now document.registerElement will trigger 
   // synchronous upgrades
   CustomElements.ready = true;
@@ -30,13 +36,6 @@ function bootstrap() {
     document.dispatchEvent(
       new CustomEvent('WebComponentsReady', {bubbles: true})
     );
-
-    // install upgrade hook if HTMLImports are available
-    if (window.HTMLImports) {
-      HTMLImports.__importsParsingHook = function(elt) {
-        CustomElements.parser.parse(elt.import);
-      }
-    }
   });
 }
 

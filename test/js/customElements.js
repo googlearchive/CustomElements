@@ -522,4 +522,5 @@ htmlSuite('customElements (html)', function() {
   htmlTest('html/attributes.html');
   htmlTest('html/upgrade-order.html');
   htmlTest('html/upgrade-dcl.html');
+  htmlTest('html/imports.html');
 });
