@@ -13,9 +13,11 @@
     "karma-crbot-reporter": "*",
     "karma-firefox-launcher": "*",
     "karma-ie-launcher": "*",
-    "karma-mocha": "*",
     "karma-safari-launcher": "*",
     "karma-script-launcher": "*",
     "mocha": "*"
+  },
+  "dependencies": {
+    "gulp": "^3.8.7"
   }
 }

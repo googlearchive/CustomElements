@@ -36,16 +36,6 @@ suite('customElements', function() {
     assert.ok(false, 'document.registerElement failed to throw when given no arguments');
   });
 
-  // http://w3c.github.io/webcomponents/spec/custom/#extensions-to-document-interface-to-register
-  test('document.registerElement second argument is optional', function() {
-    try {
-      document.registerElement('x-no-proto');
-    } catch(x) {
-      return;
-    }
-    assert.ok(true, 'document.registerElement failed to function without ElementRegistionOptions argument');
-  });
-
   test('document.registerElement requires name argument to not conflict with a reserved name', function() {
     try {
       document.registerElement('font-face', {prototype: Object.create(HTMLElement.prototype)});
@@ -522,5 +512,4 @@ htmlSuite('customElements (html)', function() {
   htmlTest('html/attributes.html');
   htmlTest('html/upgrade-order.html');
   htmlTest('html/upgrade-dcl.html');
-  htmlTest('html/imports.html');
 });

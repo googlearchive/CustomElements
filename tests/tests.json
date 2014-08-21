@@ -1,0 +1,9 @@
+{
+	"tools": ["chai", "mocha-tdd"],
+	"tests": [
+		"js/customElements.js",
+		"js/upgrade.js",
+		"js/observe.js",
+		"js/documentRegister.js"
+	]
+}
