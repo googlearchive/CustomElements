@@ -1,4 +1,5 @@
 {
+	"runner": "gulp-web-component-tester",
 	"tools": ["chai", "mocha-tdd"],
 	"tests": [
 		"js/customElements.js",
