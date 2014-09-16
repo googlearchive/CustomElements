@@ -318,14 +318,34 @@ function upgradeDocument(doc) {
   logFlags.dom && console.groupEnd();
 }
 
+/*
+This method is intended to be called when the document tree (including imports)
+has pending custom elements to upgrade. It can be called multiple times and 
+should do nothing if no elements are in need of upgrade.
+
+Note that the import tree can consume itself and therefore special care
+must be taken to avoid recursion.
+*/
+var upgradedDocuments;
 function upgradeDocumentTree(doc) {
+  upgradedDocuments = [];
+  _upgradeDocumentTree(doc);
+  upgradedDocuments = null;
+}
+
+
+function _upgradeDocumentTree(doc) {
   doc = wrapIfNeeded(doc);
+  if (upgradedDocuments.indexOf(doc) >= 0) {
+    return;
+  }
+  upgradedDocuments.push(doc);
   //console.log('upgradeDocumentTree: ', (doc.baseURI).split('/').pop());
   // upgrade contained imported documents
   var imports = doc.querySelectorAll('link[rel=' + IMPORT_LINK_TYPE + ']');
   for (var i=0, l=imports.length, n; (i<l) && (n=imports[i]); i++) {
     if (n.import && n.import.__parsed) {
-      upgradeDocumentTree(n.import);
+      _upgradeDocumentTree(n.import);
     }
   }
   upgradeDocument(doc);
