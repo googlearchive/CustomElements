@@ -293,7 +293,7 @@ function handler(mutations) {
 
 function takeRecords(node) {
   // If the optional node is not supplied, assume we mean the whole document.
-  if (node === undefined) node = document;
+  if (!node) node = wrapIfNeeded(document);
 
   // Find the root of the tree, which will be an Document or ShadowRoot.
   while (node.parentNode) {
