@@ -29,7 +29,7 @@ suite('upgradeElements', function() {
     registerTestComponent('x-foo31', 'foo');
     work.innerHTML = '<x-foo31>Foo</x-foo31>';
     var xfoo = work.firstChild;
-    CustomElements.upgrade(xfoo);
+    CustomElements.upgradeAll(xfoo);
     assert.equal(xfoo.value, 'foo');
   });
 
@@ -49,7 +49,7 @@ suite('upgradeElements', function() {
     assert.equal(xfoo.value, 'foo');
   });
   
-  test('CustomElements.upgradeAll upgrades custom element syntax', function() {
+  test('CustomElements.upgrade upgrades custom element syntax', function() {
     registerTestComponent('x-zot', 'zot');
     registerTestComponent('x-zim', 'zim');
     work.innerHTML = '<x-zot><x-zim></x-zim></x-zot>';
@@ -69,7 +69,7 @@ suite('upgradeElements', function() {
     
     work.innerHTML = '<button is="x-button"></button>';
     var xbutton = work.firstChild;
-    CustomElements.upgrade(xbutton);
+    CustomElements.upgradeAll(xbutton);
     assert.equal(xbutton.test, 'xbutton');
   });
   
@@ -89,13 +89,13 @@ suite('upgradeElements', function() {
     });
     work.innerHTML = '<input is="x-special-input">';
     var x = work.firstChild;
-    CustomElements.upgrade(x);
+    CustomElements.upgradeAll(x);
     assert.equal(x.xInput, 'xInput');
     assert.equal(x.xSpecialInput, 'xSpecialInput');
   });
   
   
-  test('CustomElements.upgradeAll upgrades native extendor', function() {
+  test('CustomElements.upgrade upgrades native extendor', function() {
     var YButtonProto = Object.create(HTMLButtonElement.prototype);
     YButtonProto.test = 'ybutton';
     document.registerElement('y-button', {

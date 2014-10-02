@@ -388,7 +388,7 @@ suite('customElements', function() {
 
     var docB = document.implementation.createHTMLDocument('');
     docB.body.innerHTML = '<' + tagName + '></' + tagName + '>';
-    CustomElements.parser.parse(docB);
+    CustomElements.upgradeDocumentTree(docB);
     CustomElements.takeRecords();
     assert.deepEqual(invocations, ['created'], 'created but not entered view');
 

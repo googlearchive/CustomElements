@@ -8,17 +8,53 @@
  */
 (function(scope){
 
+// imports
+var useNative = scope.useNative;
+
+// If native, setup stub api and bail.
+if (useNative) {
+  // stub
+  var nop = function() {};
+
+  // exports
+  scope.watchShadow = nop;
+  scope.upgradeAll = nop;
+  scope.upgradeDocumentTree = nop;
+  scope.takeRecords = nop;
+  scope.instanceof = function(obj, base) {
+    return obj instanceof base;
+  };
+}
+
+// imports
+var upgradeDocumentTree = scope.upgradeDocumentTree;
+
+// NOTE: ShadowDOM polyfill wraps elements but some elements like `document`
+// cannot be wrapped so we help the polyfill by wrapping some elements.
+if (!window.wrap) {
+  if (window.ShadowDOMPolyfill) {
+    window.wrap = ShadowDOMPolyfill.wrapIfNeeded;
+    window.unwrap = ShadowDOMPolyfill.unwrapIfNeeded;
+  } else {
+    window.wrap = window.unwrap = function(node) {
+      return node;
+    };
+  }
+}
+
 // bootstrap parsing
 function bootstrap() {
   // parse document
-  CustomElements.parser.parse(document);
+  upgradeDocumentTree(wrap(document));
+  //CustomElements.parser.parse(document);
   // one more pass before register is 'live'
-  CustomElements.upgradeDocument(document);
+  //CustomElements.upgradeDocument(document);
   // install upgrade hook if HTMLImports are available
   if (window.HTMLImports) {
     HTMLImports.__importsParsingHook = function(elt) {
-      CustomElements.parser.parse(elt.import);
-    }
+      upgradeDocumentTree(wrap(elt.import));
+      //CustomElements.parser.parse(elt.import);
+    };
   }
   // set internal 'ready' flag, now document.registerElement will trigger 
   // synchronous upgrades

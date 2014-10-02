@@ -1,9 +1,9 @@
 [
   "../MutationObservers/build.json",
-  "src/scope.js",
-  "src/MutationObserver.js",
-  "src/Observer.js",
-  "src/CustomElements.js",
-  "src/Parser.js",
+  "src/base.js",
+  "src/traverse.js",
+  "src/observe.js",
+  "src/upgrade.js",
+  "src/register.js",
   "src/boot.js"
 ]

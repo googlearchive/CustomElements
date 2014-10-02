@@ -7,34 +7,31 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 (function() {
+  
+var thisFile = 'CustomElements.js';
 
-var thisFile = 'custom-elements.js';
-var scopeName = 'CustomElements';
 var modules = [
   '../MutationObservers/mutation-observers.js',
-  'src/Observer.js',
-  'src/CustomElements.js',
-  'src/Parser.js',
+  'src/base.js',
+  'src/traverse.js',
+  'src/observe.js',
+  'src/upgrade.js',
+  'src/register.js',
   'src/boot.js'
 ];
 
-// export
-
-window[scopeName] = {
-  entryPointName: thisFile,
-  modules: modules
-};
-
-// bootstrap
-
-var script = document.querySelector('script[src*="' + thisFile + '"]');
-var src = script.attributes.src.value;
+var src = document.querySelector('script[src*="' + thisFile +
+    '"]').attributes.src.value;
 var basePath = src.slice(0, src.indexOf(thisFile));
 
-if (!window.PolymerLoader) {
-  var path = basePath + '../tools/loader/loader.js';
-  document.write('<script src="' + path + '"></script>');
+function loadFiles(files) {
+  files.forEach(function(f) {
+    document.write('<script src="' + basePath + f + '"></script>');
+  });
 }
-document.write('<script>PolymerLoader.load("' + scopeName + '")</script>');
+
+// for simplicity, we directly check here if native imports is supported.
+loadFiles(modules);
 
 })();
+
