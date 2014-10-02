@@ -251,6 +251,15 @@ function upgradeDocumentTree(doc) {
   forDocumentTree(doc, upgradeDocument);
 }
 
+
+// ensure that all ShadowRoots watch for CustomElements.
+var originalCreateShadowRoot = Element.prototype.createShadowRoot;
+Element.prototype.createShadowRoot = function() {
+  var root = originalCreateShadowRoot.call(this);
+  CustomElements.watchShadow(this);
+  return root;
+};
+
 // exports
 scope.watchShadow = watchShadow;
 scope.upgradeDocumentTree = upgradeDocumentTree;

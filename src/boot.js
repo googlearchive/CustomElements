@@ -12,6 +12,7 @@
 var useNative = scope.useNative;
 
 // If native, setup stub api and bail.
+// NOTE: we fire `WebComponentsReady` under native for api compatibility
 if (useNative) {
   // stub
   var nop = function() {};
