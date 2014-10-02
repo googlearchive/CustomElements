@@ -82,7 +82,7 @@ function _forDocumentTree(doc, cb) {
   var imports = doc.querySelectorAll('link[rel=' + IMPORT_LINK_TYPE + ']');
   for (var i=0, l=imports.length, n; (i<l) && (n=imports[i]); i++) {
     if (n.import) {
-      _forDocumentTree(n.import);
+      _forDocumentTree(n.import, cb);
     }
   }
   cb(doc);
