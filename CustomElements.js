@@ -8,7 +8,7 @@
  */
 (function() {
   
-var thisFile = 'CustomElements.js';
+var file = 'CustomElements.js';
 
 var modules = [
   '../MutationObservers/mutation-observers.js',
@@ -20,18 +20,12 @@ var modules = [
   'src/boot.js'
 ];
 
-var src = document.querySelector('script[src*="' + thisFile +
-    '"]').attributes.src.value;
-var basePath = src.slice(0, src.indexOf(thisFile));
+var src = 
+  document.querySelector('script[src*="' + file + '"]').getAttribute('src');
+var basePath = src.slice(0, src.indexOf(file));
 
-function loadFiles(files) {
-  files.forEach(function(f) {
-    document.write('<script src="' + basePath + f + '"></script>');
-  });
-}
-
-// for simplicity, we directly check here if native imports is supported.
-loadFiles(modules);
+modules.forEach(function(f) {
+  document.write('<script src="' + basePath + f + '"></script>');
+});
 
 })();
-
