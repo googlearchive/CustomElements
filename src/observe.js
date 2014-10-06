@@ -48,11 +48,6 @@ function addedSubtree(node) {
   });
 }
 
-function upgradeSubtree(node) {
-  node = wrap(node);
-  return addedSubtree(node);
-}
-
 function attachedNode(node) {
   attached(node);
   // only check subtree if node is actually in document
@@ -306,7 +301,7 @@ Element.prototype.createShadowRoot = function() {
 // exports
 scope.watchShadow = watchShadow;
 scope.upgradeDocumentTree = upgradeDocumentTree;
-scope.upgradeSubtree = upgradeSubtree;
+scope.upgradeSubtree = addedSubtree;
 scope.upgradeAll = addedNode;
 scope.attachedNode = attachedNode;
 scope.takeRecords = takeRecords;
