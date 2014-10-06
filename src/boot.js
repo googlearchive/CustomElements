@@ -10,6 +10,7 @@
 
 // imports
 var useNative = scope.useNative;
+var initializeModules = scope.initializeModules;
 
 // If native, setup stub api and bail.
 // NOTE: we fire `WebComponentsReady` under native for api compatibility
@@ -25,6 +26,13 @@ if (useNative) {
   scope.instanceof = function(obj, base) {
     return obj instanceof base;
   };
+
+} else {
+  // Initialize polyfill modules. Note, polyfill modules are loaded but not 
+  // executed; this is a convenient way to control which modules run when 
+  // the polyfill is required and allows the polyfill to load even when it's
+  // not needed.
+  initializeModules();
 }
 
 // imports

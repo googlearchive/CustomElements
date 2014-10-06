@@ -7,15 +7,10 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
-(function(scope){
+CustomElements.addModule(function(scope){
 
 // imports
 var IMPORT_LINK_TYPE = window.HTMLImports ? HTMLImports.IMPORT_LINK_TYPE : 'none';
-var useNative = scope.useNative;
-
-if (useNative) {
-  return;
-}
 
 // walk the subtree rooted at node, including descent into shadow-roots,
 // applying 'cb' to each element
@@ -93,4 +88,4 @@ scope.forDocumentTree = forDocumentTree;
 scope.forSubtree = forSubtree;
 
 
-})(window.CustomElements);
+});

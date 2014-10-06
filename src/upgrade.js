@@ -11,15 +11,11 @@
  * Implements custom element upgrading
  * @module upgrade
 */
-(function(scope) {
+
+CustomElements.addModule(function(scope) {
 
 // imports
 var flags = scope.flags;
-var useNative = scope.useNative;
-
-if (useNative) {
-  return;
-}
 
 /**
  * Upgrade an element to a custom element. Upgrading an element
@@ -116,4 +112,4 @@ scope.upgrade = upgrade;
 scope.upgradeWithDefinition = upgradeWithDefinition;
 scope.implementPrototype = implementPrototype;
 
-})(window.CustomElements);
+});

@@ -11,17 +11,13 @@
  * Implements custom element observation and attached/detached callbacks
  * @module observe
 */
-(function(scope){
+
+CustomElements.addModule(function(scope){
 
 // imports
 var flags = scope.flags;
-var useNative = scope.useNative;
 var forSubtree = scope.forSubtree;
 var forDocumentTree = scope.forDocumentTree;
-
-if (useNative) {
-  return;
-}
 
 // manage lifecycle on added node
 function added(node) {
@@ -268,4 +264,4 @@ scope.upgradeAll = addedNode;
 scope.insertedNode = insertedNode;
 scope.takeRecords = takeRecords;
 
-})(window.CustomElements);
+});

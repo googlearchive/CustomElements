@@ -10,7 +10,21 @@ window.CustomElements = window.CustomElements || {flags:{}};
 
 (function(scope) {
 
+// world's simplest module initializer
+var modules = [];
+var addModule = function(module) {
+	modules.push(module);
+};
+
+var initializeModules = function() {
+	modules.forEach(function(module) {
+		module(scope);
+	});
+};
+
 // exports
+scope.addModule = addModule;
+scope.initializeModules = initializeModules;
 scope.hasNative = Boolean(document.registerElement);
 // For consistent timing, use native custom elements only when not polyfilling
 // other key related web components features.

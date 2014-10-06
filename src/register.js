@@ -17,17 +17,14 @@
  * @class Document
 */
 
-(function(scope) {
+CustomElements.addModule(function(scope) {
+
 // imports
 var upgradeDocumentTree = scope.upgradeDocumentTree;
 var upgrade = scope.upgrade;
 var upgradeWithDefinition = scope.upgradeWithDefinition;
 var implementPrototype = scope.implementPrototype;
 var useNative = scope.useNative;
-
-if (useNative) {
-  return;
-}
 
 /**
  * Registers a custom tag name with the document.
@@ -351,4 +348,4 @@ scope.getRegisteredDefinition = getRegisteredDefinition;
 // bc
 document.register = document.registerElement;
 
-})(window.CustomElements);
+});
