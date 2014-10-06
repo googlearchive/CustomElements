@@ -7,6 +7,7 @@
  * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
  */
 
+// helper methods for traversing through element trees
 CustomElements.addModule(function(scope){
 
 // imports

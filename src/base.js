@@ -10,6 +10,9 @@ window.CustomElements = window.CustomElements || {flags:{}};
 
 (function(scope) {
 
+// imports
+var flags = scope.flags;
+
 // world's simplest module initializer
 var modules = [];
 var addModule = function(module) {
@@ -26,8 +29,9 @@ var initializeModules = function() {
 scope.addModule = addModule;
 scope.initializeModules = initializeModules;
 scope.hasNative = Boolean(document.registerElement);
-// For consistent timing, use native custom elements only when not polyfilling
-// other key related web components features.
+
+// NOTE: For consistent timing, use native custom elements only when not
+// polyfilling other key related web components features.
 scope.useNative = !flags.register && scope.hasNative && 
 		!window.ShadowDOMPolyfill && (!window.HTMLImports || HTMLImports.useNative);
 

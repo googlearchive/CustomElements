@@ -70,13 +70,9 @@ function register(name, options) {
   // TODO(sjmiles): probably should clone options instead of mutating it
   var definition = options || {};
   if (!name) {
-    // TODO(sjmiles): replace with more appropriate error (EricB can probably
-    // offer guidance)
     throw new Error('document.registerElement: first argument `name` must not be empty');
   }
   if (name.indexOf('-') < 0) {
-    // TODO(sjmiles): replace with more appropriate error (EricB can probably
-    // offer guidance)
     throw new Error('document.registerElement: first argument (\'name\') must contain a dash (\'-\'). Argument provided was \'' + String(name) + '\'.');
   }
   // prevent registering reserved names
@@ -283,13 +279,13 @@ function createElement(tag, typeExtension) {
       return new definition.ctor();
     }
   }
-
+  var element;
   if (typeExtension) {
-    var element = createElement(tag);
+    element = createElement(tag);
     element.setAttribute('is', typeExtension);
     return element;
   }
-  var element = domCreateElement(tag);
+  element = domCreateElement(tag);
   // Custom tags should be HTMLElements even if not upgraded.
   if (tag.indexOf('-') >= 0) {
     implementPrototype(element, HTMLElement);
@@ -328,11 +324,11 @@ if (!Object.__proto__ && !useNative) {
       p = p.__proto__;
     }
     return false;
-  }
+  };
 } else {
   isInstance = function(obj, base) {
     return obj instanceof base;
-  }
+  };
 }
 
 // exports

@@ -38,7 +38,7 @@ if (useNative) {
 // imports
 var upgradeDocumentTree = scope.upgradeDocumentTree;
 
-// NOTE: ShadowDOM polyfill wraps elements but some elements like `document`
+// ShadowDOM polyfill wraps elements but some elements like `document`
 // cannot be wrapped so we help the polyfill by wrapping some elements.
 if (!window.wrap) {
   if (window.ShadowDOMPolyfill) {
@@ -55,9 +55,6 @@ if (!window.wrap) {
 function bootstrap() {
   // parse document
   upgradeDocumentTree(wrap(document));
-  //CustomElements.parser.parse(document);
-  // one more pass before register is 'live'
-  //CustomElements.upgradeDocument(document);
   // install upgrade hook if HTMLImports are available
   if (window.HTMLImports) {
     HTMLImports.__importsParsingHook = function(elt) {

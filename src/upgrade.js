@@ -58,7 +58,7 @@ function upgradeWithDefinition(element, definition) {
   // lifecycle management
   created(element);
   // attachedCallback fires in tree order, call before recursing
-  scope.insertedNode(element);
+  scope.attachedNode(element);
   // there should never be a shadow root on element at this point
   scope.upgradeSubtree(element);
   flags.upgrade && console.groupEnd();
@@ -66,6 +66,8 @@ function upgradeWithDefinition(element, definition) {
   return element;
 }
 
+//  Set __proto__ on supported platforms and use a mixin strategy when 
+//  this is not supported; e.g. on IE10.
 function implementPrototype(element, definition) {
   // prototype swizzling is best
   if (Object.__proto__) {

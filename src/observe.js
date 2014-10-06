@@ -19,15 +19,27 @@ var flags = scope.flags;
 var forSubtree = scope.forSubtree;
 var forDocumentTree = scope.forDocumentTree;
 
-// manage lifecycle on added node
+/*
+  Manage nodes attached to document trees
+*/
+
+// manage lifecycle on added node and it's subtree; upgrade the node and
+// entire subtree if necessary and process attached for the node and entire
+// subtree
+function addedNode(node) {
+  return added(node) || addedSubtree(node);
+}
+
+// manage lifecycle on added node; upgrade if necessary and process attached
 function added(node) {
   if (scope.upgrade(node)) {
     return true;
   }
-  inserted(node);
+  attached(node);
 }
 
-// manage lifecycle on added node's subtree only
+// manage lifecycle on added node's subtree only; allows the entire subtree
+// to upgrade if necessary and process attached
 function addedSubtree(node) {
   forSubtree(node, function(e) {
     if (added(e)) {
@@ -36,29 +48,25 @@ function addedSubtree(node) {
   });
 }
 
-// manage lifecycle on added node and it's subtree
-function addedNode(node) {
-  return added(node) || addedSubtree(node);
-}
-
 function upgradeSubtree(node) {
   node = wrap(node);
   return addedSubtree(node);
 }
 
-function insertedNode(node) {
-  inserted(node);
+function attachedNode(node) {
+  attached(node);
+  // only check subtree if node is actually in document
   if (inDocument(node)) {
     forSubtree(node, function(e) {
-      inserted(e);
+      attached(e);
     });
   }
 }
 
-// TODO(sorvell): on platforms without MutationObserver, mutations may not be
+// On platforms without MutationObserver, mutations may not be
 // reliable and therefore attached/detached are not reliable.
 // To make these callbacks less likely to fail, we defer all inserts and removes
-// to give a chance for elements to be inserted into dom.
+// to give a chance for elements to be attached into dom.
 // This ensures attachedCallback fires for elements that are created and
 // immediately added to dom.
 var hasPolyfillMutations = (!window.MutationObserver ||
@@ -86,54 +94,74 @@ function takeMutations() {
   pendingMutations = [];
 }
 
-function inserted(element) {
+function attached(element) {
   if (hasPolyfillMutations) {
     deferMutation(function() {
-      _inserted(element);
+      _attached(element);
     });
   } else {
-    _inserted(element);
+    _attached(element);
   }
 }
 
-// TODO(sjmiles): if there are descents into trees that can never have inDocument(*) true, fix this
-function _inserted(element) {
-  if ((element.attachedCallback || element.detachedCallback) &&
-      element.__upgraded__ && !element.__inserted && inDocument(element)) {
-    element.__inserted = true;
-    if (element.attachedCallback) {
-      element.attachedCallback();
+// NOTE: due to how MO works (see comments below), an element may be attached
+// multiple times so we protect against extra processing here.
+function _attached(element) {
+  // track element for insertion if it's upgraded and cares about insertion
+  if (element.__upgraded__ && 
+    (element.attachedCallback || element.detachedCallback)) {
+    // bail if the element is already marked as attached and proceed only 
+    // if it's actually in the document at this moment.
+    if (!element.__attached && inDocument(element)) {
+      element.__attached = true;
+      if (element.attachedCallback) {
+        element.attachedCallback();
+      }
     }
   }
 }
 
-function removedNode(node) {
-  removed(node);
+/*
+  Manage nodes detached from document trees
+*/
+
+// manage lifecycle on detached node and it's subtree; process detached 
+// for the node and entire subtree
+function detachedNode(node) {
+  detached(node);
   forSubtree(node, function(e) {
-    removed(e);
+    detached(e);
   });
 }
 
-function removed(element) {
+function detached(element) {
   if (hasPolyfillMutations) {
     deferMutation(function() {
-      _removed(element);
+      _detached(element);
     });
   } else {
-    _removed(element);
+    _detached(element);
   }
 }
 
-function _removed(element) {
-  if ((element.attachedCallback || element.detachedCallback) && 
-    element.__upgraded__ && element.__inserted && !inDocument(element)) {
-    element.__inserted = false;
-    if (element.detachedCallback) {
-      element.detachedCallback();
+// NOTE: due to how MO works (see comments below), an element may be detached
+// multiple times so we protect against extra processing here.
+function _detached(element) {
+  // track element for removal if it's upgraded and cares about removal
+  if (element.__upgraded__ && 
+    (element.attachedCallback || element.detachedCallback)) {
+    // bail if the element is already marked as not attached and proceed only 
+    // if it's actually *not* in the document at this moment.
+    if (element.__attached && !inDocument(element)) {
+      element.__attached = false;
+      if (element.detachedCallback) {
+        element.detachedCallback();
+      }
     }
   }
 }
 
+// recurse up the tree to check if an element is actually in the main document.
 function inDocument(element) {
   var p = element;
   var doc = wrap(document);
@@ -145,22 +173,35 @@ function inDocument(element) {
   }
 }
 
+//  Install an element observer on all shadowRoots owned by node.
 function watchShadow(node) {
   if (node.shadowRoot && !node.shadowRoot.__watched) {
     flags.dom && console.log('watching shadow-root for: ', node.localName);
     // watch all unwatched roots...
     var root = node.shadowRoot;
     while (root) {
-      watchRoot(root);
+      observe(root);
       root = root.olderShadowRoot;
     }
   }
 }
 
-function watchRoot(root) {
-  observe(root);
-}
+/*
+  NOTE: In order to process all mutations, it's necessary to recurse into
+  any added nodes. However, it's not possible to determine a priori if a node
+  will get its own mutation record. This means
+  *nodes can be seen multiple times*.
 
+  Here's an example:
+
+  (1) In this case, recursion is required to see `child`: 
+
+      node.innerHTML = '<div><child></child></div>'
+
+  (2) In this case, child will get its own mutation record:
+
+      node.appendChild(div).appendChild(child);
+*/
 function handler(mutations) {
   // for logging only
   if (flags.dom) {
@@ -190,13 +231,19 @@ function handler(mutations) {
         if (!n.localName) {
           return;
         }
-        removedNode(n);
+        detachedNode(n);
       });
     }
   });
   flags.dom && console.groupEnd();
 };
 
+
+/*
+  When elements are added to the dom, upgrade and attached/detached may be 
+  asynchronous. `CustomElements.takeRecords` can be called to process any
+  pending upgrades and attached/detached callbacks synchronously.
+*/
 function takeRecords(node) {
   node = wrap(node);
   // If the optional node is not supplied, assume we mean the whole document.
@@ -216,6 +263,8 @@ function takeRecords(node) {
 
 var forEach = Array.prototype.forEach.call.bind(Array.prototype.forEach);
 
+
+// observe a node tree; bail if it's already being observed.
 function observe(inRoot) {
   if (inRoot.__observer) {
     return;
@@ -227,6 +276,7 @@ function observe(inRoot) {
   inRoot.__observer = observer;
 }
 
+// upgrade an entire document and observe it for elements changes.
 function upgradeDocument(doc) {
   doc = wrap(doc);
   flags.dom && console.group('upgradeDocument: ', (doc.baseURI).split('/').pop());
@@ -239,9 +289,6 @@ function upgradeDocument(doc) {
 This method is intended to be called when the document tree (including imports)
 has pending custom elements to upgrade. It can be called multiple times and 
 should do nothing if no elements are in need of upgrade.
-
-Note that the import tree can consume itself and therefore special care
-must be taken to avoid recursion.
 */
 function upgradeDocumentTree(doc) {
   forDocumentTree(doc, upgradeDocument);
@@ -261,7 +308,7 @@ scope.watchShadow = watchShadow;
 scope.upgradeDocumentTree = upgradeDocumentTree;
 scope.upgradeSubtree = upgradeSubtree;
 scope.upgradeAll = addedNode;
-scope.insertedNode = insertedNode;
+scope.attachedNode = attachedNode;
 scope.takeRecords = takeRecords;
 
 });
